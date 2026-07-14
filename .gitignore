@@ -20,7 +20,12 @@ venv/
 apps/ai-training/artifacts/*
 !apps/ai-training/artifacts/.gitkeep
 apps/ai-training/outputs/
+V1/apps/ai-training/artifacts/*
+!V1/apps/ai-training/artifacts/.gitkeep
+V1/apps/ai-training/outputs/
 
 # Organizer-provided source package stays local unless redistribution is approved.
 data/*.pdf
 data/Delivery_Hackathon_DataPackage_20260624/*.csv
+V1/data/*.pdf
+V1/data/Delivery_Hackathon_DataPackage_20260624/*.csv

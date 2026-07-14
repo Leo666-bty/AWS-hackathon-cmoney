@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#06101d" />
+    <meta name="description" content="從 300 檔股票重建你的 2025 投資軌跡與人格。" />
+    <title>Mindfolio Time Machine — Portfolio Reconstruction Engine</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <button class="brand" id="homeBtn" aria-label="回首頁"><i>M</i><span><b>Mindfolio</b><small>TIME MACHINE V2</small></span></button>
+      <div class="db-status"><span></span><b id="dbCount">300</b> 檔 2025 行情已載入</div>
+    </header>
+
+    <main>
+      <section class="screen hero active" id="heroScreen">
+        <div class="hero-copy">
+          <p class="eyebrow">CMONEY 2025 PORTFOLIO LAB</p>
+          <h1>重建五檔持股，<br /><em>看見你的投資人格。</em></h1>
+          <p class="lead">從熱門股票或 300 檔資料庫選出你熟悉的個股，提供大概月份與價格區間。引擎會驗證價格、重建投報率，產生可分享的投資指紋。</p>
+          <div class="hero-actions"><button class="primary big" id="startBtn">匿名建立五檔持股 <span>→</span></button><small>不用登入・不連券商・約 2 分鐘</small></div>
+          <div class="hero-metrics"><article><b>300</b><span>檔股票搜尋</span></article><article><b>12</b><span>個月份重建</span></article><article><b>3</b><span>層價格驗證</span></article></div>
+        </div>
+        <aside class="engine-preview">
+          <header><span>PORTFOLIO RECONSTRUCTION ENGINE</span><i>LIVE</i></header>
+          <div class="engine-flow"><b>股票實體</b><span>→</span><b>時間定位</b><span>→</span><b>價格驗證</b><span>→</span><b>投資指紋</b></div>
+          <div class="terminal-lines"><p><i></i> loaded market_database: 300 stocks</p><p><i></i> built monthly price envelopes: <b id="envelopeCount">—</b></p><p><i></i> corporate-action adjustment: enabled</p><p><i></i> anonymous portfolio events: ready</p></div>
+          <div class="fingerprint-mini"><small>INVESTMENT FINGERPRINT</small><strong>LHDX</strong><span>低接・長抱・分散・精準</span></div>
+        </aside>
+      </section>
+
+      <section class="screen builder" id="builderScreen">
+        <header class="stage-head"><div><p class="eyebrow">STEP 1 / 3</p><h1>選出五檔你熟悉的股票</h1><p>熱門推薦來自 CMoney 同學會瀏覽人數；也可以搜尋 300 檔資料庫。</p></div><button class="text-btn" data-reset>重新開始</button></header>
+        <div class="builder-grid">
+          <section class="stock-browser">
+            <div class="search-box"><span>⌕</span><input id="stockSearch" type="search" placeholder="輸入股票代號、名稱或產業" autocomplete="off" /><b>300 檔</b></div>
+            <div class="popular-head"><h2>2025 熱門推薦</h2><button id="quickPickBtn">使用熱門五檔體驗</button></div>
+            <div class="stock-results" id="stockResults"></div>
+          </section>
+          <aside class="selected-panel">
+            <header><div><small>YOUR FIVE</small><h2>我的五檔股票</h2></div><strong id="selectedCount">0 / 5</strong></header>
+            <div class="selected-list" id="selectedList"></div>
+            <button class="primary full" id="configureBtn" disabled>開始重建買賣時間 →</button>
+            <p>只有最後標記「仍持有」的股票，才會成為陌生用戶主動確認的持股資料。</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="screen configure" id="configureScreen">
+        <header class="stage-head compact"><div><p class="eyebrow" id="configStep">STEP 2 / 3 · STOCK 1 / 5</p><h1 id="configTitle">設定買賣時間與價格</h1><p id="configSubtitle"></p></div><button class="text-btn" data-reset>重新開始</button></header>
+        <div class="config-progress"><span id="configProgress"></span></div>
+        <div id="configContent"></div>
+      </section>
+
+      <section class="screen computing" id="computingScreen">
+        <div class="compute-core"><span></span><i></i><b></b></div>
+        <p class="eyebrow">RECONSTRUCTING PORTFOLIO</p>
+        <h1>正在重建你的 2025 投資軌跡</h1>
+        <p id="computeMessage">驗證每筆價格是否落在當月行情…</p>
+      </section>
+
+      <section class="screen result" id="resultScreen">
+        <header class="result-hero">
+          <div><p class="eyebrow">YOUR INVESTMENT FINGERPRINT</p><div class="type-row"><strong id="personaCode">LHDX</strong><span id="personaName">低接收藏家</span></div><h1 id="personaHeadline"></h1><p id="personaCopy"></p><div class="action-row"><button class="primary" id="shareBtn">複製匿名分享文案</button><button class="secondary" data-reset>重新建立</button></div></div>
+          <aside class="confidence-card"><small>資料重建可信度</small><strong id="confidenceScore">88</strong><span>/ 100</span><p>依價格驗證、月份完整度與輸入精度計算</p></aside>
+        </header>
+
+        <section class="result-grid">
+          <article class="return-card"><p class="eyebrow">2025 RECONSTRUCTED RETURN</p><h2>五檔等權重推估報酬</h2><strong id="portfolioReturn">+18.5%</strong><p>以使用者輸入價格轉換為公司行動調整後的可比較價格；未計稅費與滑價。</p></article>
+          <article class="holding-card"><p class="eyebrow">CONFIRMED HOLDINGS</p><h2>主動確認持股</h2><strong><b id="holdingCount">3</b> / 5</strong><p id="holdingNames">—</p></article>
+        </section>
+
+        <section class="panel"><header class="panel-head"><div><p class="eyebrow">PORTFOLIO TIMELINE</p><h2>五檔買賣重建結果</h2></div><span>月份級估算</span></header><div class="trade-table" id="tradeTable"></div></section>
+
+        <section class="panel tech-panel"><header class="panel-head"><div><p class="eyebrow">TECHNICAL PROOF</p><h2>不是表單，是資料重建引擎</h2></div><span id="engineStatus">5 / 5 validated</span></header>
+          <div class="pipeline"><article><b>01</b><h3>Entity Resolution</h3><p>代號、名稱與產業搜尋，對應 300 檔股票主檔。</p></article><article><b>02</b><h3>Temporal Validation</h3><p>用每月最高、最低價檢查手動輸入與異常值。</p></article><article><b>03</b><h3>Corporate Action</h3><p>以還原價因子處理拆股、除權息後的可比報酬。</p></article><article><b>04</b><h3>Fingerprint Vector</h3><p>把進場位置、持有期、產業集中與輸入精度轉為人格。</p></article></div>
+          <div class="vector-box"><span>Portfolio Fingerprint</span><code id="fingerprintVector">[0.22, 0.80, 0.34, 0.92, 0.18]</code></div>
+        </section>
+
+        <section class="panel"><header class="panel-head"><div><p class="eyebrow">DECISION BREAKDOWN</p><h2>2025 情境決策力</h2></div><span>不等於真實投資能力</span></header><div class="ability-grid" id="abilityGrid"></div></section>
+
+        <section class="share-funnel">
+          <article class="share-card"><small>MINDFOLIO 2025</small><p>我的投資人格是</p><strong id="sharePersona">低接收藏家</strong><b id="shareCode">LHDX</b><span id="shareHeadline"></span><footer>不曬持股，也能分享。 #投資時光機</footer></article>
+          <div><p class="eyebrow">FROM STRANGER TO PORTFOLIO USER</p><h2>先匿名看見自己，再換取長期價值</h2><ol><li class="done"><b>匿名測驗完成</b><span>人格＋投報率＋分享卡</span></li><li><b>註冊解鎖完整回放</b><span>查看每月軌跡與同人格比較</span></li><li><b>同步真實持股雷達</b><span>只針對已確認持股提供後續提醒</span></li></ol><button class="primary" id="unlockBtn">儲存報告並開啟持股雷達</button></div>
+        </section>
+
+        <p class="disclaimer">此結果依使用者回憶的月份與價格重建，屬估算情境；人格不是心理診斷，分數不代表未來績效，內容不構成投資建議。手動價格只做行情合理性檢查，不代表交易真實性已被券商驗證。</p>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./market-data.js"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>
