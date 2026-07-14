@@ -119,6 +119,48 @@ def test_report_claim_to_dashboard_happy_path() -> None:
     assert body["weekly_review"]["data_as_of"] == "2025-12-31"
 
 
+def _sold(stock_id: str):
+    return {
+        "stock_id": stock_id,
+        "relation": "sold",
+        "buy_month": "01",
+        "buy_mode": "band",
+        "buy_band": "mid",
+        "sell_month": "06",
+    }
+
+
+def test_confirm_rejects_non_holding_candidate() -> None:
+    """Consent gate: a sold (non-holding) stock can never be confirmed, even
+    through a validly claimed report — the server re-derives candidates."""
+    client = _client()
+    trades = [_holding(s) for s in ("2382", "S2", "S3")] + [_sold("S4"), _sold("S5")]
+    report = client.post(
+        "/api/v2/reconstructions/complete", json={"trades": trades}
+    ).json()["report"]
+    headers = _auth(client)
+    client.post(
+        f"/api/v2/reports/{report['report_id']}/claim",
+        json={"claim_token": report["claim_token"]},
+        headers=headers,
+    )
+
+    rejected = client.post(
+        f"/api/v2/reports/{report['report_id']}/confirmed-holdings",
+        json={"stock_ids": ["S4"]},  # sold → not a holding candidate
+        headers=headers,
+    )
+    assert rejected.status_code == 422
+
+    accepted = client.post(
+        f"/api/v2/reports/{report['report_id']}/confirmed-holdings",
+        json={"stock_ids": ["2382"]},
+        headers=headers,
+    )
+    assert accepted.status_code == 200
+    assert {item["stock_id"] for item in accepted.json()} == {"2382"}
+
+
 def test_identity_and_claim_are_isolated() -> None:
     client = _client()
     report = _complete(client)

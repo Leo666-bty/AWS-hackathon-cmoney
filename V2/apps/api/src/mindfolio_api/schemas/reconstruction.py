@@ -31,11 +31,3 @@ class CompleteResponse(BaseModel):
     result: ReconstructionResult
     narrative: NarrativeDraft
     report: ReportHandle | None = None
-
-
-class ConfirmHoldingsRequest(BaseModel):
-    """Consent to save holdings. The trades are re-sent so the backend can
-    re-verify which stocks are `holding` candidates before writing any."""
-
-    user_id: str
-    trades: list[TradeConfig] = Field(min_length=5, max_length=5)

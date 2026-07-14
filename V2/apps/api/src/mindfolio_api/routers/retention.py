@@ -34,7 +34,12 @@ from mindfolio_api.schemas.retention import (
     SessionRequest,
     SessionResponse,
 )
-from mindfolio_api.services.reconstruction import complete_reconstruction
+from mindfolio_api.services.reconstruction import (
+    MonthNotFound,
+    StockNotFound,
+    TradeValidationError,
+    complete_reconstruction,
+)
 from mindfolio_api.services.retention import build_action_card, build_dashboard
 from mindfolio_core.domain.models import ConfirmedHolding
 
@@ -104,6 +109,15 @@ def confirm_report_holdings(
         if not set(selected).issubset(allowed):
             raise HTTPException(status_code=422, detail="One or more stocks are not verified holding candidates.")
         return holdings.add_holdings(identity.member_id, selected, source_report_id=report_id)
+    except StockNotFound as exc:
+        raise HTTPException(status_code=404, detail=f"Unknown stock {exc.stock_id}.")
+    except MonthNotFound as exc:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No data for stock {exc.stock_id} in month {exc.month}.",
+        )
+    except TradeValidationError as exc:
+        raise HTTPException(status_code=422, detail=f"Trade {exc.index}: {exc.message}")
     except RetentionUnavailable:
         raise HTTPException(status_code=503, detail="Report store is unavailable.")
     except HoldingsUnavailable:

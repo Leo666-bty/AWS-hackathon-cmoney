@@ -14,7 +14,7 @@ from mindfolio_api.repositories.retention import (
     RetentionRepository,
     build_retention_repository,
 )
-from mindfolio_api.routers import health, holdings, reconstructions, retention, stocks
+from mindfolio_api.routers import health, reconstructions, retention, stocks
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +86,6 @@ def create_app(
     app.include_router(health.router, prefix="/api/v2")
     app.include_router(stocks.router, prefix="/api/v2")
     app.include_router(reconstructions.router, prefix="/api/v2")
-    app.include_router(holdings.router, prefix="/api/v2")
     app.include_router(retention.router, prefix="/api/v2")
     return app
 
