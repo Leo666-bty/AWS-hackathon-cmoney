@@ -70,6 +70,10 @@ class MarketCatalog:
         ]
         return [_to_summary(s) for s in matches[: _clamp_limit(limit)]]
 
+    def get_stock(self, stock_id: str) -> dict[str, Any] | None:
+        """Raw catalog record for a stock (id, name, industry, views, months)."""
+        return self._by_id.get(stock_id)
+
     def envelope(self, stock_id: str, month: str) -> MonthEnvelope | None:
         stock = self._by_id.get(stock_id)
         if stock is None:

@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from mindfolio_api.config import get_settings
 from mindfolio_api.repositories.market_data import MarketCatalog
-from mindfolio_api.routers import health, stocks
+from mindfolio_api.routers import health, reconstructions, stocks
 
 
 def create_app(catalog: MarketCatalog | None = None) -> FastAPI:
@@ -28,6 +28,7 @@ def create_app(catalog: MarketCatalog | None = None) -> FastAPI:
     )
     app.include_router(health.router, prefix="/api/v2")
     app.include_router(stocks.router, prefix="/api/v2")
+    app.include_router(reconstructions.router, prefix="/api/v2")
     return app
 
 

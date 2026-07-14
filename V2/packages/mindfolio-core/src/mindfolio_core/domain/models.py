@@ -53,6 +53,14 @@ class MonthEnvelope(BaseModel):
     allowed_price_modes: list[str]
 
 
+class PriceValidation(BaseModel):
+    """Displayable result of validating one user-entered price against a month."""
+
+    valid: bool
+    level: str  # "good" | "warn" | "bad"
+    message: str
+
+
 class TradeResult(BaseModel):
     """One reconstructed trade in a portfolio result."""
 
