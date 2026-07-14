@@ -51,3 +51,45 @@ class MonthEnvelope(BaseModel):
     corporate_action: bool
     regimes: list[PriceRegime]
     allowed_price_modes: list[str]
+
+
+class TradeResult(BaseModel):
+    """One reconstructed trade in a portfolio result."""
+
+    stock_id: str
+    name: str
+    industry: str
+    buy_month: str
+    exit_month: str
+    relation: str  # "holding" | "sold"
+    buy_raw: float
+    exit_raw: float
+    return_pct: float
+    confidence: int
+
+
+class DecisionScores(BaseModel):
+    """2025 情境決策力 breakdown (max 40/25/20/15)."""
+
+    outcome: int
+    entry: int
+    capture: int
+    data: int
+
+
+class ReconstructionResult(BaseModel):
+    """The verified portfolio reconstruction result.
+
+    This is the contract the AI narrative service consumes — it never sees raw
+    prices beyond what is here, and never recomputes any of these numbers.
+    """
+
+    trades: list[TradeResult]
+    average_return: float
+    confidence: int
+    persona_code: str
+    persona_name: str
+    persona_headline: str
+    fingerprint: list[float]
+    scores: DecisionScores
+    holding_candidates: list[str]
