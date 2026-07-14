@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mindfolio AI — CMoney Hackathon Pitch</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="deck" aria-live="polite">
+      <section class="slide cover active" data-slide="1">
+        <div class="brandline">CMoney × AWS AI Hackathon</div>
+        <div class="cover-copy">
+          <p class="eyebrow">Mindfolio AI</p>
+          <h1>不用問 AI，<br />AI 在對的畫面先告訴你</h1>
+          <p class="lead">先給洞察，再用一次點擊建立真實庫存情境。</p>
+        </div>
+        <div class="cover-mark">Reverse<br />Portfolio<br />Onboarding</div>
+      </section>
+
+      <section class="slide" data-slide="2">
+        <p class="eyebrow">The signal</p>
+        <h2>ChatGPT 使用率低，不一定是模型不夠好</h2>
+        <div class="split big-gap">
+          <div class="statement">
+            <p>使用者必須先離開看盤流程、想一個問題，再組織成 Prompt。</p>
+            <strong>每多一步，AI 就離投資現場更遠一步。</strong>
+          </div>
+          <div class="funnel">
+            <span>打開 Chat</span><i>↓</i><span>想問題</span><i>↓</i><span>輸入</span><i>↓</i><span>等待答案</span>
+          </div>
+        </div>
+        <p class="takeaway">真正的突破不是讓對話更長，而是讓使用者根本不需要開口。</p>
+      </section>
+
+      <section class="slide" data-slide="3">
+        <p class="eyebrow">The friction</p>
+        <h2>傳統建庫在價值出現前，就要求使用者先交出資料</h2>
+        <div class="before-after">
+          <div class="old"><span>現在</span><p>輸入持股</p><p>輸入成本</p><p>輸入股數</p><strong>才看到價值</strong></div>
+          <div class="arrow">→</div>
+          <div class="new"><span>Mindfolio</span><strong>先看到洞察</strong><p>點一次確認關係</p><p>不交出完整財務資料</p></div>
+        </div>
+        <p class="takeaway">阻力不是沒有持股，而是信任與價值交換的順序錯了。</p>
+      </section>
+
+      <section class="slide dark" data-slide="4">
+        <p class="eyebrow">The idea</p>
+        <h2>Reverse Portfolio Onboarding</h2>
+        <p class="hero-line">用洞察換確認，<br />不用問題換資料。</p>
+        <div class="three-zero"><span><b>Zero</b> Prompt</span><span><b>Zero</b> Upload</span><span><b>One</b> Tap</span></div>
+      </section>
+
+      <section class="slide" data-slide="5">
+        <p class="eyebrow">LEO's experience</p>
+        <h2>LEO 只是照常看廣達，AI 已經把重點放在眼前</h2>
+        <div class="journey">
+          <div><b>01</b><strong>查看 2382</strong><p>不進聊天頁</p></div>
+          <div><b>02</b><strong>先看到背離</strong><p>法人 × 社群</p></div>
+          <div><b>03</b><strong>點一次</strong><p>持股／觀察／不相關</p></div>
+          <div><b>04</b><strong>Portfolio 更新</strong><p>下一次更相關</p></div>
+        </div>
+        <p class="takeaway">沒有上傳、沒有輸入框，也沒有被迫完成一份 Portfolio 表單。</p>
+      </section>
+
+      <section class="slide data-slide" data-slide="6">
+        <p class="eyebrow">Evidence first</p>
+        <h2>廣達出現值得確認關係的市場時刻</h2>
+        <div class="data-contrast">
+          <div><small>近 20 日法人</small><strong class="negative">−60,265 張</strong><p>中期籌碼仍在調節</p></div>
+          <div class="vs">VS</div>
+          <div><small>明確多空貼文・近 7 日</small><strong class="positive">93.9% 偏多</strong><p>社群方向高度樂觀</p></div>
+        </div>
+        <div class="action-strip"><span>廣達與你目前的關係是？</span><b>是我的持股</b><b>只是觀察</b><b>不相關</b></div>
+        <p class="source">資料基準日 2025-12-31；93.9% 僅計算可判定看多或看空的貼文。</p>
+      </section>
+
+      <section class="slide" data-slide="7">
+        <p class="eyebrow">The loop</p>
+        <h2>Portfolio 不是猜出來，而是在每次有價值的互動中被確認</h2>
+        <div class="loop">
+          <div><b>1</b><strong>Context</strong><p>現在看哪一檔</p></div><i>→</i>
+          <div><b>2</b><strong>Moment</strong><p>是否值得打擾</p></div><i>→</i>
+          <div><b>3</b><strong>Action Card</strong><p>先給證據</p></div><i>→</i>
+          <div><b>4</b><strong>Confirm</strong><p>一鍵建立關係</p></div>
+        </div>
+        <p class="takeaway">使用者確認才是真實持股；AI 候選永遠不會直接寫入 Portfolio。</p>
+      </section>
+
+      <section class="slide" data-slide="8">
+        <p class="eyebrow">AI done differently</p>
+        <h2>AI 生成的是下一個可操作介面，不是一段聊天長文</h2>
+        <div class="split code-layout">
+          <pre>{
+  "type": "signal_divergence",
+  "stock": "2382",
+  "evidence": [
+    "法人 20 日 -60,265 張",
+    "社群明確多空 93.9% 偏多"
+  ],
+  "actions": [
+    "是我的持股",
+    "只是觀察",
+    "不相關"
+  ]
+}</pre>
+          <div class="statement"><strong>Generative Action Card</strong><p>Bedrock 負責解釋與卡片結構；Python 負責算數、證據與排序。</p><p>模型失敗時，固定模板仍可完成整個流程。</p></div>
+        </div>
+      </section>
+
+      <section class="slide" data-slide="9">
+        <p class="eyebrow">Data integrity</p>
+        <h2>市場資料與個人資料分開，才不會把推測說成事實</h2>
+        <div class="data-layers">
+          <div><small>官方 CSV</small><strong>市場、法人、基本面、社群彙總</strong><p>支撐洞察，不包含個人持股。</p></div>
+          <div><small>LEO 一鍵回饋</small><strong>持有／觀察／不相關</strong><p>唯一能寫入 Portfolio 的來源。</p></div>
+          <div><small>刻意不知道</small><strong>股數、成本、券商、總資產</strong><p>三天版本不索取、不推測。</p></div>
+        </div>
+      </section>
+
+      <section class="slide" data-slide="10">
+        <p class="eyebrow">Business outcome</p>
+        <h2>我們優化的是首檔持股確認，不是聊天次數</h2>
+        <div class="metric-chain"><span>洞察曝光</span><i>→</i><span>一鍵回饋</span><i>→</i><span class="north">首檔持股確認人數</span><i>→</i><span>D7 回訪</span><i>→</i><span>30 日更新</span></div>
+        <p class="takeaway">每一筆確認都讓籌碼 K 線能提供更相關的內容，也建立可持續的第一方 Portfolio Context。</p>
+      </section>
+
+      <section class="slide" data-slide="11">
+        <p class="eyebrow">Three-day build</p>
+        <h2>兩人三天，只做一條可信的完整閉環</h2>
+        <div class="days">
+          <div><b>Day 1</b><strong>流程先跑通</strong><p>Web、API contract、2382 evidence、Portfolio update</p></div>
+          <div><b>Day 2</b><strong>接資料與 Bedrock</strong><p>Context Builder、Moment ranking、Action Card schema</p></div>
+          <div><b>Day 3</b><strong>凍結與交付</strong><p>部署、Demo、簡報、影片與 fallback</p></div>
+        </div>
+        <p class="takeaway">不做模型訓練、RAG、聊天 Agent 或完整推播服務。</p>
+      </section>
+
+      <section class="slide closing dark" data-slide="12">
+        <p class="eyebrow">Mindfolio AI</p>
+        <h2>別人的 AI 等使用者開口</h2>
+        <p class="hero-line">我們的 AI 先證明價值，<br />再用一次點擊理解你。</p>
+        <div class="close-note">讓籌碼 K 線從「查資料」進化成「理解我的投資情境」。</div>
+      </section>
+    </main>
+
+    <footer class="controls">
+      <button id="prev" aria-label="上一頁">←</button>
+      <span><b id="current">1</b> / <span id="total">12</span></span>
+      <button id="next" aria-label="下一頁">→</button>
+    </footer>
+    <script src="./script.js"></script>
+  </body>
+</html>

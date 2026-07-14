@@ -1,0 +1,19 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+build/
+.next/
+coverage/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.log
+
+# Organizer-provided source package stays local unless redistribution is approved.
+data/*.pdf
+data/Delivery_Hackathon_DataPackage_20260624/*.csv

@@ -1,0 +1,133 @@
+openapi: 3.1.0
+info:
+  title: Mindfolio AI API
+  version: 0.1.0
+  description: Reverse Portfolio Onboarding prototype contract.
+servers:
+  - url: /api
+paths:
+  /v1/stocks/{stock_id}/context:
+    get:
+      summary: Get evidence-grounded stock context
+      parameters:
+        - in: path
+          name: stock_id
+          required: true
+          schema: { type: string, example: "2382" }
+        - in: query
+          name: as_of
+          required: true
+          schema: { type: string, format: date, example: "2025-12-31" }
+      responses:
+        "200":
+          description: Stock context
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StockContext" }
+  /v1/users/{user_id}/cards/next:
+    get:
+      summary: Get the highest-value contextual action card
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema: { type: string, example: "LEO" }
+      responses:
+        "200":
+          description: Next card or no-content state
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ActionCard" }
+  /v1/users/{user_id}/cards/{card_id}/feedback:
+    post:
+      summary: Submit one-tap relationship feedback
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema: { type: string }
+        - in: path
+          name: card_id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  enum: [confirmed_holding, watch_only, irrelevant]
+      responses:
+        "200":
+          description: Updated relationship and follow-up card
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  relationship: { $ref: "#/components/schemas/PortfolioRelationship" }
+                  follow_up_card: { $ref: "#/components/schemas/ActionCard" }
+  /v1/users/{user_id}/portfolio:
+    get:
+      summary: Get user-confirmed portfolio relationships
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Confirmed portfolio
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PortfolioRelationship" }
+components:
+  schemas:
+    StockContext:
+      type: object
+      required: [stock_id, as_of, close, institutional_net_20d, community_bullish_ratio_7d]
+      properties:
+        stock_id: { type: string, example: "2382" }
+        stock_name: { type: string, example: "廣達" }
+        as_of: { type: string, format: date, example: "2025-12-31" }
+        close: { type: number, example: 272 }
+        institutional_net_20d: { type: integer, example: -60265 }
+        community_bullish_ratio_7d:
+          type: number
+          example: 0.939
+          description: Ratio among posts with an explicit bullish or bearish stance.
+    ActionCard:
+      type: object
+      required: [card_id, card_type, stock_id, title, evidence, actions]
+      properties:
+        card_id: { type: string }
+        card_type: { type: string, enum: [signal_divergence, holding_update, daily_priority] }
+        stock_id: { type: string }
+        title: { type: string }
+        summary: { type: string }
+        evidence:
+          type: array
+          items: { type: string }
+        actions:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string, enum: [confirmed_holding, watch_only, irrelevant] }
+              label: { type: string }
+    PortfolioRelationship:
+      type: object
+      required: [user_id, stock_id, relationship, source, confirmed_at]
+      properties:
+        user_id: { type: string, example: "LEO" }
+        stock_id: { type: string, example: "2382" }
+        relationship: { type: string, enum: [holding, watch_only, irrelevant] }
+        importance: { type: string, enum: [core, normal, small, unknown] }
+        source: { type: string, enum: [user_confirmed] }
+        confirmed_at: { type: string, format: date-time }

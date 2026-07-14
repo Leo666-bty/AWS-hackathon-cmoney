@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mindfolio AI — Reverse Portfolio Onboarding</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#" data-page="stock"><span>籌</span><strong>籌碼 K 線</strong><small>＋ Mindfolio AI</small></a>
+      <nav aria-label="主要導覽">
+        <button class="nav active" data-page="stock">個股</button>
+        <button class="nav" data-page="portfolio">我的庫存 <b id="portfolioCount">0</b></button>
+      </nav>
+      <button class="profile" data-page="portfolio"><i>L</i><span>LEO</span></button>
+    </header>
+
+    <main>
+      <section class="page active" id="stockPage">
+        <div class="stock-header">
+          <div><p class="kicker">電腦及週邊設備</p><h1>2382 廣達</h1><p>資料基準日：2025-12-31</p></div>
+          <div class="quote"><small>收盤價</small><strong>272</strong><span>全年報酬 −0.7%</span></div>
+        </div>
+
+        <div class="grid">
+          <section class="market-panel">
+            <div class="tabs"><button class="selected">籌碼</button><button>法人</button><button>社群</button><button>基本面</button></div>
+            <article class="chart-card">
+              <header><div><p class="kicker">近 20 日</p><h2>法人籌碼趨勢</h2></div><strong class="down">−60,265 張</strong></header>
+              <div class="chart" aria-label="法人籌碼示意圖"><span></span></div>
+              <div class="facts"><p><small>單日法人</small><b class="up">＋3,957 張</b></p><p><small>全年報酬</small><b>−0.7%</b></p><p><small>殖利率</small><b>4.78%</b></p></div>
+            </article>
+            <article class="community-card">
+              <div><p class="kicker">爆料同學會・近 7 日</p><h2>明確多空貼文中 93.9% 偏多</h2><p>此數值是個股社群彙總，不代表 LEO 的情緒。</p></div>
+              <div class="sentiment"><span style="--ratio:93.9%"></span><small>多 93.9%</small><small>空 6.1%</small></div>
+            </article>
+          </section>
+
+          <aside>
+            <article class="ai-card" id="aiCard">
+              <div class="ai-head"><span>AI</span><div><b>今天值得注意</b><small>證據先行，不用聊天</small></div></div>
+              <div id="discoveryState">
+                <p class="badge">法人 × 社群背離</p>
+                <h2>市場很樂觀，法人卻仍在調節</h2>
+                <p>廣達近 20 日法人賣超 60,265 張，但明確多空貼文中 93.9% 偏多。兩種訊號方向不一致。</p>
+                <div class="evidence"><span>官方資料</span><span>截至 2025-12-31</span></div>
+                <hr />
+                <h3>廣達與你目前的關係是？</h3>
+                <p class="privacy">不用提供成本、股數或券商資料。</p>
+                <div class="actions">
+                  <button class="primary" id="holdingBtn">是我的持股</button>
+                  <button id="watchBtn">只是觀察</button>
+                  <button class="quiet" id="irrelevantBtn">不相關</button>
+                </div>
+              </div>
+              <div class="hidden" id="resultState">
+                <p class="badge success" id="resultBadge">已確認持股</p>
+                <h2 id="resultTitle">廣達已加入你的庫存情境</h2>
+                <p id="resultCopy">之後廣達的重大籌碼變化會優先出現在你的今日洞察。</p>
+                <button class="primary full" data-page="portfolio">查看我的庫存</button>
+              </div>
+            </article>
+            <article class="principle"><b>Reverse Portfolio Onboarding</b><p>先讓使用者看到與當下股票相關的價值，再用一次點擊確認關係。</p></article>
+          </aside>
+        </div>
+      </section>
+
+      <section class="page" id="portfolioPage">
+        <div class="portfolio-header"><div><p class="kicker">LEO</p><h1>我的庫存情境</h1><p>只保存你親自確認的關係，不推測股數、成本或總資產。</p></div><button class="reset" id="resetBtn">重設 Demo</button></div>
+        <div class="portfolio-grid">
+          <article class="empty-state" id="emptyPortfolio">
+            <span>0</span><h2>目前還沒有已確認持股</h2><p>回到個股頁查看洞察，再用一次點擊確認。</p><button class="primary" data-page="stock">回到廣達</button>
+          </article>
+          <article class="holding hidden" id="holdingCard">
+            <header><div><small>已確認持股</small><h2>2382 廣達</h2></div><span>使用者確認</span></header>
+            <div class="priority"><small>今日優先事件</small><strong>法人與社群方向不一致</strong><p>近 20 日法人 −60,265 張／明確多空貼文 93.9% 偏多</p></div>
+            <footer><span>未收集：成本、股數、券商</span><button id="removeBtn">我已賣出</button></footer>
+          </article>
+          <aside class="trust-card">
+            <p class="kicker">AI 現在知道什麼</p>
+            <ul><li class="known">廣達是否為持股</li><li>股數</li><li>成本</li><li>券商帳戶</li><li>總資產</li></ul>
+            <p>三天版本只驗證最低敏感度的「是否持有」。</p>
+          </aside>
+        </div>
+      </section>
+    </main>
+    <script src="./script.js"></script>
+  </body>
+</html>
