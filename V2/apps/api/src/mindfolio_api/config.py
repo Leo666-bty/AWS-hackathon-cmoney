@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     env: str = "development"
     cors_origins: str = "http://localhost:5173"
     model_status: str = "not_loaded"
+    market_data_path: str = "./data/market-catalog.json"
 
     @property
     def cors_origin_list(self) -> list[str]:

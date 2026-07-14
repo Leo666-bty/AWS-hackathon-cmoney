@@ -18,3 +18,36 @@ class MarketInference(BaseModel):
     anomaly_level: str
     evidence_keys: list[str]
     model_version: str
+
+
+class StockSummary(BaseModel):
+    """UI-facing stock summary for popular/search lists."""
+
+    id: str
+    name: str
+    industry: str
+    views: int = Field(ge=0)
+    popular: bool = False
+
+
+class PriceRegime(BaseModel):
+    """A pre/post corporate-action raw-price band with its adjustment factor."""
+
+    low: float
+    high: float
+    factor: float
+
+
+class MonthEnvelope(BaseModel):
+    """A stock's price envelope for one month, plus the input modes it allows."""
+
+    stock_id: str
+    month: str
+    raw_low: float
+    raw_high: float
+    close: float
+    adjusted_close: float
+    factor: float
+    corporate_action: bool
+    regimes: list[PriceRegime]
+    allowed_price_modes: list[str]
