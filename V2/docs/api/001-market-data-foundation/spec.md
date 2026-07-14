@@ -128,7 +128,7 @@ message.
   and shaping pre-built catalog values. The `allowed_price_modes` rule and any
   envelope shaping live in `packages/mindfolio-core`; routers in `apps/api`.
 - **FR-005**: The catalog MUST be built by `V2/tools/build_market_catalog.py`
-  from the organizer CSVs in `V1/data/`, output in a backend-readable JSON form
+  from the organizer CSVs in `V2/data/`, output in a backend-readable JSON form
   (Open Decision 1), and loaded once at startup via
   `MINDFOLIO_MARKET_DATA_PATH`; a missing catalog fails fast.
 - **FR-006**: Unknown `stock_id`/month → 404 with `detail`; malformed

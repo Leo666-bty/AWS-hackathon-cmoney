@@ -6,9 +6,9 @@
 ## Phase 1: Catalog build (data foundation)
 
 - [x] T001 Add an additive `--json PATH` option to `tools/build_market_catalog.py` that writes the same `build()` payload as pure JSON (default `data/market-catalog.json`); keep the existing `market-data.js` output unchanged
-- [x] T002 Run the tool against `V1/data/…` and verify the JSON: 300 stocks (3584 month-envelopes), 2330 2025-04 reproduces docs/09 (raw_low 780 / raw_high 952), 2382 廣達 present; built `data/market-catalog.json` (fixture, gitignored via data/*.json? — see note)
+- [x] T002 Run the tool against `V2/data/Delivery_…` and verify the JSON: 300 stocks (3584 month-envelopes), 2330 2025-04 reproduces docs/09 (raw_low 780 / raw_high 952), 2382 廣達 present; built `V2/data/market-catalog.json` (committed fixture; raw CSV/PDF gitignored)
 - [x] T003 Point `MINDFOLIO_MARKET_DATA_PATH` at `data/market-catalog.json` in `.env.example`
-- [x] T000 (pre-req, done) Move organizer CSV package + PDFs from root `data/` → `V1/data/` to match the tool/docs/constitution; removed empty root `data/`
+- [x] T000 (pre-req) Organizer CSV package + PDFs live under `V2/data/` (active version owns its data, gitignored); the build tool reads from there
 
 ## Phase 2: Core domain (packages/mindfolio-core)
 

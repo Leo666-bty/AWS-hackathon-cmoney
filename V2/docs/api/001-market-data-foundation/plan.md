@@ -19,7 +19,7 @@ Makefile (`make dev-api`, `make test`) — the team's setup, not uv.
 mindfolio-core; test: httpx, pytest. No DB driver needed this slice.
 
 **Data**: catalog JSON built by `V2/tools/build_market_catalog.py` from
-`V1/data/…CSV`; read via `MINDFOLIO_MARKET_DATA_PATH`.
+`V2/data/…CSV` (gitignored raw package); read via `MINDFOLIO_MARKET_DATA_PATH`.
 
 **Base path**: `/api/v2`. **Settings prefix**: `MINDFOLIO_`.
 

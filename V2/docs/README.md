@@ -13,6 +13,9 @@
 | [`08_TECHNICAL_INNOVATION.md`](08_TECHNICAL_INNOVATION.md) | Portfolio Reconstruction Engine 與正式 API 邊界 |
 | [`09_FRONTEND_BACKEND_ARCHITECTURE.md`](09_FRONTEND_BACKEND_ARCHITECTURE.md) | 前後端分離、FastAPI 模組、API contract 與部署邊界 |
 | [`10_AI_TRAINING_PLAN.md`](10_AI_TRAINING_PLAN.md) | 可實作模型、features、labels、artifact、inference 與評估 |
+| [`11_DEPLOYMENT.md`](11_DEPLOYMENT.md) | 部署決策：Docker Compose（api + postgres）on EC2 與雷點 |
+
+> 後端 SDD 功能規格（spec/plan/tasks）在 [`api/`](api/)：001 資料地基、002 重建引擎、003 確認持股。
 
 ## Source of truth
 

@@ -36,7 +36,7 @@ V2/
 └── demo/                       # 現有靜態 UX reference，非正式架構
 ```
 
-以上骨架已建立。React 可完成 production build，FastAPI health endpoint、共用 core contract 與 training artifact contract 已有測試。現階段只代表工程底座可執行，不代表下列正式 MVP API、金融規則或模型已完成。
+以上骨架已建立。**正式 MVP API 與金融規則已完成**：8 支端點、deterministic 重建引擎（區間驗證、公司行動還原、人格／分數）、AI 敘事 fallback、確認持股（Postgres），58 tests 綠並對真實 300 檔 catalog 端到端驗證。**尚未完成**：前端 React 與 API 的串接、離線模型訓練（`apps/ai-training` 仍是 scaffold）、AWS/Docker 部署（藍圖見 `11_DEPLOYMENT.md`）。
 
 ## Initialization checkpoint
 

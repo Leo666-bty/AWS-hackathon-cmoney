@@ -23,7 +23,7 @@
 
 > React 負責讓陌生用戶低門檻完成重建；FastAPI 先驗證、計算與執行 Market Regime／Anomaly inference，最後才讓同一個 Python 環境中的 AI service 生成文案。
 
-目前若尚未完成後端，簡報必須使用「目標架構」與「下一步實作」，不可把靜態 Demo 描述為已上線的 FastAPI 系統。
+FastAPI 後端已實作完成（8 支端點、58 tests、對真實 300 檔 catalog 驗證），簡報可展示真實後端重算（`/api/v2/docs`）。前端 React 與此 API 的串接進行中，故完整 UI 流程目前以 `V2/demo/` 靜態 reference 呈現——簡報說明時區分「後端已完成、前端串接進行中」，不把 `V2/demo/` 說成已串接的正式系統。
 
 ## Closing
 
