@@ -51,5 +51,7 @@ stays file-based, only confirmed holdings are persisted.
 
 - `user_id` carries whichever identifier the caller supplies; anonymous vs
   member separation (Constitution V) is a later hardening step.
-- Apply the schema on the EC2 Postgres once: `psql "$DATABASE_URL" -f
-  V2/infra/schema/001_init.sql`.
+- Docker Compose mounts `V2/infra/schema/001_init.sql` into
+  `/docker-entrypoint-initdb.d/001_init.sql`, so it runs automatically only when
+  `pgdata` is first initialized. Existing volumes require an explicit migration;
+  manual `psql` is not needed for a fresh Compose deployment.

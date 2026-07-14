@@ -35,16 +35,20 @@
 
 熱門標籤只能描述「同學會瀏覽熱度」，介面與簡報不得把它寫成投資推薦。
 
-## 正式資料庫邊界
+## 目前資料與資料庫邊界
 
-Demo 使用 `market-data.js` 快照；它只能作為 UX reference。正式版由 FastAPI 從 repository 讀取資料，前端不下載完整月行情資料庫，也不自行計算驗證結果。資料表建議：
+正式 React runtime 由 FastAPI repository 在啟動時載入
+`data/market-catalog.json`；前端只取熱門、搜尋與單月 envelope，不下載整份月行情，
+也不自行計算驗證結果。靜態 `demo/market-data.js` 只作為 presentation-only 的
+視覺 reference，不是正式 runtime fallback。
 
-- `stock_master`：代號、名稱、產業。
-- `monthly_price_envelope`：年月、原始高低、月末原始／還原價、公司行動旗標。
-- `anonymous_portfolio_event`：session、股票、買進月、價格模式、狀態、可信度。
-- `confirmed_holding`：只有明確同意後才從匿名事件建立。
+目前 PostgreSQL 只有 `confirmed_holdings`：`user_id`、`stock_id`、固定
+`source=user_confirmed` 與 `confirmed_at`。市場主檔與月行情不進 PostgreSQL，
+reconstruction input／result、匿名 session 與 event 也尚未持久化。
 
-匿名事件與會員持股必須分表，避免測驗輸入自動污染正式 Portfolio。
+未來導入登入與報告認領時，anonymous reconstruction、member profile 和
+confirmed holding 必須使用清楚分離的 identifier／table；不能把搜尋、測驗選股或
+未同意的重建事件自動轉成正式 Portfolio。
 
 ## 前後端信任邊界
 

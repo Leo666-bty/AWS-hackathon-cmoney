@@ -10,7 +10,9 @@ V2 不再是固定五檔歷史選擇題。使用者可以從 CMoney 熱門推薦
 
 - **AI 只是傳播層**：Bedrock 只把已算好的結果寫成人格文案，不做計算、不給投資建議。
 - **護城河是 Reconstruction Engine**：把「大概三月買的吧」變成經行情驗證、公司行動還原、附可信度分數的結構化重建事件——單純 LLM 包裝做不到的技術資產。
-- **North Star：Verified Holding Activation**——完成重建**且主動標記至少一檔「仍持有」**的人數。CMoney 不用叫使用者連券商，就取得使用者明確確認的持股關係。
+- **North Star：Verified Holding Activation**——完成重建、明確同意，且成功保存
+  至少一檔「仍持有」關係的人數。CMoney 不用叫使用者連券商，就取得使用者
+  明確確認的持股關係。
 
 10x 陌生用戶靠兩件事：**匿名分享卡**（病毒獲客，不露持股金額）＋ **Progressive Profiling**（免登入快測 → 註冊完整回放 → 確認持股解鎖雷達）。完整論述見 [產品命題](docs/00_PROJECT_CHARTER.md) 與 [成長漏斗](docs/04_GROWTH_AND_SALES_FUNNEL.md)。
 
@@ -34,11 +36,11 @@ V2 不再是固定五檔歷史選擇題。使用者可以從 CMoney 熱門推薦
 ```text
 React + TypeScript Frontend
   → FastAPI REST API
-      → Stock / Price Repository
+      → File Market Catalog
       → Reconstruction & Scoring Services
       → AI Narrative Service
-      → Trained Model Inference
-      → PostgreSQL / CMoney Data
+      → PostgreSQL Confirmed Holdings
+      → [future] Approved Model Inference / Live CMoney Data
 ```
 
 目前 `demo/` 是靜態 UX reference，內嵌資料與前端計算只用來示範流程，不代表正式安全邊界。正式版的價格驗證、報酬、可信度、人格向量與 AI context 必須全部由 FastAPI 重算。
@@ -51,7 +53,10 @@ React + TypeScript Frontend
 - `apps/ai-training`：離線模型 scaffold（feature 契約 + CLI 狀態）；目前未訓練模型，也不產生假 metrics。
 - 根目錄 workspace、Python 共用 virtual environment 設定與前後端測試／建置指令。
 
-尚未完成：真實 Bedrock 線上驗證、離線模型訓練、正式身份驗證、即時行情 feed 與 AWS/Docker 部署（藍圖見 [部署決策](docs/11_DEPLOYMENT.md)）。
+部署程式已完成：`api + web + postgres` 可由 Docker Compose 在單一 EC2
+執行，且本機容器驗收已通過。尚未完成的是實際 EC2 上線、HTTPS／網域、
+真實 Bedrock 線上驗證、離線模型訓練、正式身份驗證與即時行情 feed
+（操作見 [部署決策](docs/11_DEPLOYMENT.md)）。
 
 ## 核心閉環
 
@@ -63,9 +68,12 @@ React + TypeScript Frontend
 → 價格異常驗證＋公司行動校正
 → 投報率＋投資人格＋資料可信度
 → 匿名分享
-→ 註冊保存
-→ 只將「仍持有」寫入已確認 Portfolio
+→ 明確同意
+→ 只將「仍持有」寫入 LEO Demo Portfolio
 ```
+
+註冊認領與 Portfolio Radar 是下一階段需求，目前尚未實作；現行前端使用
+固定 Demo identity `LEO` 驗證 consent 與 PostgreSQL 持久化閉環。
 
 ## 快速入口
 

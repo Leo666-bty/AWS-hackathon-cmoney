@@ -19,7 +19,11 @@
 - 月內 adjustment factor 變動超過 5% 的公司行動旗標。
 - 公司行動前後的原始價格 regime，供實際價格選擇正確還原因子。
 
-這是靜態 Demo database snapshot；正式產品改由搜尋 API 與資料庫提供相同 schema。
+這是版本化的 2025 靜態 market snapshot。正式 React runtime 不直接下載整份
+catalog，而是由 FastAPI 啟動時載入 `market-catalog.json`，再透過熱門、搜尋與
+月份 envelope API 回傳必要資料。PostgreSQL 不保存市場行情，只保存使用者
+明確同意的 confirmed holdings；`demo/market-data.js` 只供 presentation-only 的
+靜態視覺 reference，不是正式 runtime fallback。
 
 ## 價格與報酬
 

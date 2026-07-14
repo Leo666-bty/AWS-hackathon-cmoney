@@ -1,5 +1,18 @@
 # React frontend
 
-React + TypeScript 前端骨架已初始化，包含 Router、Query provider、typed health client、狀態頁與基本測試。正式功能依 feature folders 逐步加入。
+**V2 acquisition vertical slice 已完成。** React + TypeScript 前端包含：
 
-**後端 API 已就緒可串接**：8 支端點在 `/api/v2`，OpenAPI 於 `/api/v2/openapi.json`（`make dev-api` 後 Swagger 在 `/api/v2/docs`）。前端可直接由 OpenAPI 產 typed client；合約與資料流見 [`../../docs/09`](../../docs/09_FRONTEND_BACKEND_ARCHITECTURE.md)。
+- `/`：Landing 與 API health 狀態。
+- `/builder`：熱門清單、300 檔搜尋與五檔選擇。
+- `/reconstruct/:index`：月份 envelope、band／exact 價格、逐筆 validation，
+  最後一檔送出五檔 complete。
+- `/result`：只顯示後端回傳的人格、報酬、指紋、分數與 AI／fallback
+  敘事，並在明確同意後保存 `LEO` 的仍持有候選。
+
+API client 位於 `src/shared/api/client.ts`，以 TypeScript + Zod 驗證回應；
+目前是手寫 typed client，尚未導入 OpenAPI codegen。預設 base URL 為
+`/api/v2`：本機由 Vite proxy 轉送，正式 Compose 由 nginx proxy 轉送。
+
+啟動與測試見 [`../../DEVELOPMENT.md`](../../DEVELOPMENT.md)，API 合約與資料流
+見 [`../../docs/09`](../../docs/09_FRONTEND_BACKEND_ARCHITECTURE.md)。正式身份、
+註冊認領與 Portfolio Radar 尚未實作；`LEO` 僅為 Demo identity。

@@ -22,11 +22,14 @@ architecture: `08`/`09`.
 
 ## Current state
 
-Monorepo scaffolded by the team (`feat(v2): initialize React FastAPI AI
-workspace`). Present: `apps/{web,api,ai-training}`, `packages/mindfolio-core`,
-Makefile, pnpm workspace, a FastAPI skeleton (`/api/v2/health`), and the built
-market catalog. Backend feature work is in progress — see
-`V2/docs/api/001-market-data-foundation/` (data foundation + read endpoints).
+The acquisition vertical slice is implemented end to end. `apps/web` contains
+the React landing, five-stock builder, per-stock reconstruction wizard, result,
+share-card and explicit-consent UI. `apps/api` exposes all eight `/api/v2`
+operations; `packages/mindfolio-core` owns deterministic validation,
+reconstruction, persona and scoring. Market data is the built file catalog and
+confirmed holdings persist in PostgreSQL. `docker-compose.yml` runs web, API
+and PostgreSQL together on one EC2. `apps/ai-training` remains an untrained
+offline scaffold, and the UI still uses demo identity `LEO`.
 
 ## Toolchain & commands (NOT uv)
 
@@ -64,24 +67,30 @@ routers/schemas/services/repositories + Bedrock orchestration live in
 
 ## API contract is law
 
-The FastAPI OpenAPI schema is the frozen integration surface — the frontend
-generates its typed client from it, so any endpoint/field change is made in the
-schema and communicated first. Target v2 endpoints (docs/09):
+The FastAPI OpenAPI schema is the frozen integration surface. The current
+frontend uses a hand-written TypeScript + Zod client; OpenAPI codegen and a
+generated-client contract test remain production hardening. Any endpoint/field
+change is still made in the schema and communicated first. Implemented v2
+endpoints (docs/09):
 
 - `GET /api/v2/stocks/popular` · `GET /api/v2/stocks/search`
 - `GET /api/v2/stocks/{id}/months/{yyyy_mm}/envelope`
 - `POST /api/v2/reconstructions/validate` · `POST /api/v2/reconstructions/complete`
-- `POST /api/v2/confirmed-holdings` · `GET /api/v2/health`
+- `POST /api/v2/confirmed-holdings`
+- `GET /api/v2/users/{user_id}/confirmed-holdings` · `GET /api/v2/health`
 
 ## Engine boundaries (hard rules)
 
 - **Server-authoritative & deterministic**: every number (price validity,
   adjustment factor, return, fingerprint, persona code, confidence, score) is
   computed in the backend. The frontend decides none of them. Same input →
-  same result (property tests).
+  same result (deterministic regression coverage; broader property-based
+  coverage remains a hardening item).
 - **Re-validate on complete**: `reconstructions/complete` re-validates all five
   trades from raw input and never trusts a prior `validate` response;
-  `confirmed-holdings` re-verifies the candidate belongs to the session.
+  `confirmed-holdings` statelessly re-runs those five trades and derives only
+  `holding_candidates`. Durable reconstruction/session binding is not yet
+  implemented and remains an identity-hardening gap.
 - **AI only narrates verified results**: Bedrock receives a verified DTO
   (never raw prices, credentials, full event history, or PII), its output is
   Pydantic-validated, and on any failure a deterministic fixed-template
@@ -98,16 +107,18 @@ schema and communicated first. Target v2 endpoints (docs/09):
 - Catalog built from the organizer CSVs in `V2/data/Delivery_…/`
   (raw data lives under the active version; gitignored) by
   `V2/tools/build_market_catalog.py` → `V2/data/market-catalog.json`
-  (300 stocks, ~3584 month envelopes, asOf 2025-12-31). MVP has **no DB** — the
-  backend reads this file via `MINDFOLIO_MARKET_DATA_PATH`.
+  (300 stocks, 3584 month envelopes, asOf 2025-12-31). Read-only market data
+  stays file-based via `MINDFOLIO_MARKET_DATA_PATH`; PostgreSQL stores only
+  user-confirmed holdings selected through the consent gate.
 - Pinned constants (from `V2/data/README.md`, already in the build tool): band
   representative price = **1/6 (低) · 1/2 (中) · 5/6 (高)** of the month's raw
   range; corporate action = intra-month adjustment-factor change **> 5%** →
   split raw-price regimes, `corporateAction=true`, band mode refused for that
   month (exact price only). `adjustment_factor = 月末還原收盤 / 月末原始收盤`.
-- Persona axis thresholds, `normalized_return` range, and decision-score buckets
-  are still qualitative in the docs — feature specs MUST pin them before use
-  (they are defects until pinned; Constitution).
+- Persona thresholds, `normalized_return`, confidence and decision-score
+  formulas are pinned in `docs/02_QUIZ_PERSONALITY_AND_SCORING.md` and
+  `docs/api/002-reconstruction-engine/spec.md`, then implemented in
+  `packages/mindfolio-core`.
 - Note: `V2/demo/market-data.js` (full 300-stock price snapshot) is committed by
   the team; confirm redistribution licensing before making the repo public.
 

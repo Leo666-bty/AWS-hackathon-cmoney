@@ -36,7 +36,11 @@ V2/
 └── demo/                       # 現有靜態 UX reference，非正式架構
 ```
 
-以上骨架已建立。**正式 MVP vertical slice 已完成**：8 支 API、deterministic 重建引擎、AI 敘事 fallback、Postgres confirmed holdings，以及 React 四 route 串接。V2 Python suite 58 tests、React smoke test 與 production build 通過。**尚未完成**：離線模型訓練（`apps/ai-training` 仍是 scaffold）、真身份、即時行情與 AWS/Docker 部署（藍圖見 `11_DEPLOYMENT.md`）。
+以上骨架已建立。**正式 MVP vertical slice 已完成**：8 支 API、deterministic
+重建引擎、AI 敘事 fallback、Postgres confirmed holdings，以及 React 四 route
+串接。Docker Compose 已包含 nginx web、API 與 PostgreSQL，並完成本機容器驗收。
+**尚未完成**：實際 EC2 上線、HTTPS／網域、真實 Bedrock 權限驗證、離線模型
+訓練（`apps/ai-training` 仍是 scaffold）、真身份與即時行情。
 
 ## Initialization checkpoint
 
@@ -50,15 +54,17 @@ V2/
 - [x] reconstruction／holding API contracts
 - [x] deterministic return／fingerprint services
 - [x] React 選股、逐檔重建、結果與持股同意流程
+- [x] 單一 EC2 用 Docker Compose（web + api + PostgreSQL）部署定義與本機驗收
 - [ ] 第一版 regime／anomaly model training
-- [ ] PostgreSQL 與 AWS runtime
+- [ ] 實際 EC2／IAM Role／HTTPS runtime 驗收
 
 ## 已完成：FastAPI backend
 
 - 將 `market-data.js` 改成後端讀取版本化 `market-catalog.json`；黑客松不把只讀行情搬入 PostgreSQL。
 - 建立 `/stocks/popular`、`/stocks/search`、`/stocks/{id}/months/{ym}/envelope`、`/reconstructions/validate`、`/reconstructions/complete` API。
 - 由後端重算報酬與可信度，前端結果不可作為可信來源。
-- anonymous session 與 member profile 使用不同識別與資料表。
+- 目前不保存 anonymous session／member profile；正式身份階段必須使用不同識別
+  與資料表，不能沿用 client 傳入的 Demo `user_id` 作授權邊界。
 - 將 deterministic calculation、AI narrative 與 API 放在同一個 Python environment，但保持不同 module。
 
 ## 已完成：React Frontend Phase

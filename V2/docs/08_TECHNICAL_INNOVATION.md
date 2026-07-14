@@ -4,7 +4,10 @@
 
 Landing Page 只能收表單；本引擎會把模糊的人類記憶轉為有可信度的結構化 Portfolio event，並能解釋每一步如何產生。
 
-正式技術力集中在 FastAPI Python backend，不能把前端 JavaScript 計算當作最終成果。Python 同一環境同時容納 deterministic finance calculation、資料處理、模型推論與 Bedrock/LLM orchestration，減少跨語言重複公式；各能力仍透過 service boundary 分離。
+正式技術力集中在 FastAPI Python backend，不能把前端 JavaScript 計算當作最終成果。
+目前 Python runtime 容納 deterministic finance calculation 與 Bedrock／fallback
+orchestration；離線 training 與核准 artifact inference 已保留 package boundary，
+但模型尚未訓練或載入。各能力透過 service boundary 分離。
 
 ```text
 Stock Search
@@ -61,29 +64,30 @@ comparable_user_price = raw_user_price × factor
 
 只有使用者明確選擇「仍持有」並同意保存時，才建立 confirmed holding。這避免把測驗答案污染正式 Portfolio。
 
-## Production API sketch
+## Implemented API surface
 
 ```text
+GET  /api/v2/health
 GET  /api/v2/stocks/search?q=台積
 GET  /api/v2/stocks/popular?limit=12
 GET  /api/v2/stocks/2330/months/2025-04/envelope
 POST /api/v2/reconstructions/validate
 POST /api/v2/reconstructions/complete
 POST /api/v2/confirmed-holdings
+GET  /api/v2/users/{user_id}/confirmed-holdings
 ```
 
 報酬、驗證與可信度必須由後端重算；LLM 只負責根據已驗證 vector 產生受 schema 限制的自然語言，不直接接收原始未驗證價格。
 
 ## Python 同環境，不同責任
 
-| 模組 | 責任 | 是否可用 LLM |
+| 實際模組 | 責任 | 是否可用 LLM |
 |---|---|---|
-| `market_repository` | 股票、行情與 company-action regimes | 否 |
-| `price_validation` | Schema、時間與價格 envelope 驗證 | 否 |
-| `reconstruction` | adjustment、報酬與可信度 | 否 |
-| `fingerprint` | vector、人格代碼與可重算分數 | 否 |
-| `ai_narrative` | 將已驗證結果轉為自然語言 | 是 |
-| `holding_service` | 同意與 confirmed holding 寫入 | 否 |
+| `repositories/market_data.py` | 檔案 catalog、搜尋與月份 envelope | 否 |
+| `mindfolio-core/market/validation.py` | 精確價格與 company-action regime 驗證 | 否 |
+| `mindfolio-core/market/reconstruction.py` | adjustment、報酬、confidence、vector、人格與分數 | 否 |
+| `ai/narrative.py` + `fallback.py` | 將已驗證結果轉為 schema-valid 敘事 | 是 |
+| `services/reconstruction.py` + `repositories/holdings.py` | 重驗五檔並寫入 consented confirmed holdings | 否 |
 
 AI 服務不可重新計算數字，也不可覆寫 persona code；LLM 失敗時使用固定模板，核心結果仍可正常回傳。
 

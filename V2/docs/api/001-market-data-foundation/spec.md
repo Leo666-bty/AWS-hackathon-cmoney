@@ -4,7 +4,7 @@
 
 **Created**: 2026-07-14
 
-**Status**: Draft (open decisions listed at end — confirm before /plan)
+**Status**: Implemented (decisions resolved and tasks completed 2026-07-14)
 
 **Input**: First backend vertical slice for Mindfolio V2. Load the 300-stock
 2025 market catalog into the FastAPI backend and expose the three read
@@ -89,8 +89,8 @@ message.
 **Acceptance Scenarios**:
 
 1. **Given** `V2/tools/build_market_catalog.py`, **When** run, **Then** it
-   produces a structured catalog the backend can read as JSON (see Open
-   Decision 1) covering all 300 stocks and their monthly envelopes.
+   produces a structured JSON catalog covering all 300 stocks and their monthly
+   envelopes.
 2. **Given** `MINDFOLIO_MARKET_DATA_PATH` pointing at the catalog, **When** the
    API starts, **Then** the catalog is loaded once and held in memory.
 3. **Given** a missing/unreadable catalog, **When** the API starts, **Then**
@@ -129,7 +129,7 @@ message.
   envelope shaping live in `packages/mindfolio-core`; routers in `apps/api`.
 - **FR-005**: The catalog MUST be built by `V2/tools/build_market_catalog.py`
   from the organizer CSVs in `V2/data/`, output in a backend-readable JSON form
-  (Open Decision 1), and loaded once at startup via
+  (resolved JSON delivery decision below), and loaded once at startup via
   `MINDFOLIO_MARKET_DATA_PATH`; a missing catalog fails fast.
 - **FR-006**: Unknown `stock_id`/month → 404 with `detail`; malformed
   `yyyy_mm` → 422. No endpoint returns the full month tables for all stocks in
@@ -151,8 +151,9 @@ message.
 - **SC-003**: envelope for a known corporate-action month returns
   `allowed_price_modes = ["exact"]`; a normal month returns
   `["band", "exact"]`.
-- **SC-004**: All three endpoints validate against the OpenAPI schema in
-  contract tests (3/3).
+- **SC-004**: All three endpoints publish Pydantic response models in generated
+  OpenAPI and endpoint tests assert their response shapes. A generated-client
+  contract test remains a future hardening item.
 - **SC-005**: With the catalog removed, the API fails to start with a clear
   message (no silent empty responses).
 - **SC-006**: The built catalog covers 300 stocks and reproduces byte-identical
@@ -160,8 +161,8 @@ message.
 
 ## Assumptions
 
-- No PostgreSQL in this slice; the read-only file catalog is the data source
-  (Constitution: MVP fixture).
+- This feature performs no PostgreSQL reads; the read-only file catalog is its
+  data source. The wider application uses PostgreSQL only for confirmed holdings.
 - The frontend's `demo/market-data.js` stays as the teammate's frontend fixture;
   the backend consumes a separate JSON output (no shared JS import).
 - Band representative prices (1/6, 1/2, 5/6 of the month range) and the >5%

@@ -4,7 +4,8 @@
 
 **Created**: 2026-07-14
 
-**Status**: Draft — constants pinned from `V2/demo/script.js` (the de-facto oracle)
+**Status**: Implemented — constants pinned from the shipped reference and
+implemented in `packages/mindfolio-core`
 
 **Input**: The deterministic core of Mindfolio V2. Given five stocks, each with a
 buy month + price (band or exact) and a still-holding/sold state, rebuild
@@ -62,8 +63,9 @@ validation state, without creating any holding.
 1. Exact price inside the month range → valid; outside → invalid with the range
    in the message.
 2. Corporate-action month + exact price: valid only if the price falls in a
-   regime; the response names the regime factor that will apply. Band mode is
-   rejected for a corporate-action month.
+   regime; the response names the accepted raw-price range and states that the
+   matching adjustment factor will be used. Band mode is rejected for a
+   corporate-action month.
 3. Missing/negative price → invalid. Unknown stock/month → 404.
 
 ### User Story 2 - Complete five-stock reconstruction (Priority: P1)
@@ -94,8 +96,12 @@ with a deterministic fixed-template fallback so the result always returns.
 
 ### Edge Cases
 - `sellMonth ≤ buyMonth` → invalid (a sold trade must exit after entry).
-- Fewer than five trades, or a stock repeated → 422.
-- Reproducibility: identical input yields byte-identical persona/scores (property test).
+- Fewer or more than five trades → 422. The React builder prevents duplicate
+  selection, but the current API does not enforce unique `stock_id` values; a
+  direct client can submit duplicates and they are treated as five equal-weight
+  trade rows. Adding backend uniqueness is a future contract/validation decision.
+- Reproducibility: identical input yields identical persona/scores (covered by a
+  deterministic regression test; broader property-based coverage is pending).
 
 ## Requirements *(mandatory)*
 
@@ -113,7 +119,9 @@ with a deterministic fixed-template fallback so the result always returns.
   (no raw prices, credentials, or PII), validates Bedrock output against a
   Pydantic schema, and falls back to a fixed template on any failure; content
   guardrails per Constitution III.
-- **FR-006**: Identical input MUST produce identical output (property tests).
+- **FR-006**: Identical input MUST produce an identical deterministic
+  `ReconstructionResult`. Bedrock narrative wording is outside that
+  reproducibility guarantee; fallback narrative is deterministic.
 
 ### Result DTO (the contract the AI narrative consumes)
 
@@ -139,12 +147,14 @@ ReconstructionResult:
   provider disabled (fixed-template narrative).
 - **SC-003**: Invalid trades never yield a confirmed holding; watch/sold never
   appear in `holding_candidates`.
-- **SC-004**: Both endpoints validate against the OpenAPI schema in contract tests.
+- **SC-004**: Both endpoints publish Pydantic response models in generated
+  OpenAPI and endpoint tests assert their response shapes. A generated-client
+  contract test remains a future hardening item.
 
 ## Assumptions
 
 - `confirmed-holdings` (consent + persistence) is feature 003, not here.
 - No DB; the engine is pure over the file catalog (feature 001 repository).
-- The demo (`V2/demo/script.js`) is the formula oracle; where docs/02 and the
-  demo differ, the demo wins (it is what the frontend ships) and docs/02 is
-  updated.
+- `packages/mindfolio-core` plus the pinned formulas in docs/02 are now the
+  formal runtime source of truth. `V2/demo/script.js` is a historical parity
+  reference only and cannot override the FastAPI result.

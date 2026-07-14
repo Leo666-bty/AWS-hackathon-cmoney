@@ -13,7 +13,7 @@
 | [`08_TECHNICAL_INNOVATION.md`](08_TECHNICAL_INNOVATION.md) | Portfolio Reconstruction Engine 與正式 API 邊界 |
 | [`09_FRONTEND_BACKEND_ARCHITECTURE.md`](09_FRONTEND_BACKEND_ARCHITECTURE.md) | 前後端分離、FastAPI 模組、API contract 與部署邊界 |
 | [`10_AI_TRAINING_PLAN.md`](10_AI_TRAINING_PLAN.md) | 可實作模型、features、labels、artifact、inference 與評估 |
-| [`11_DEPLOYMENT.md`](11_DEPLOYMENT.md) | 部署決策：Docker Compose（api + postgres）on EC2 與雷點 |
+| [`11_DEPLOYMENT.md`](11_DEPLOYMENT.md) | 部署決策：單一 EC2 上以 Docker Compose 執行 web + api + postgres |
 | [`12_V2_END_TO_END_SPEC.md`](12_V2_END_TO_END_SPEC.md) | V2 React × FastAPI vertical slice、契約、狀態與驗收條件 |
 | [`13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md`](13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md) | Time Machine 獲客銜接 Portfolio Radar 留存的需求基準與後續 SDD 拆分 |
 

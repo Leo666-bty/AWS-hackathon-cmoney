@@ -23,14 +23,14 @@
 
 ## Phase 4: Endpoints (apps/api)
 
-- [x] T009 Contract + behavior tests in `apps/api/tests/test_stocks_endpoints.py` (FastAPI TestClient + fixture catalog): popular 200 ordered/capped (SC-001); search 200 incl. empty-q→[] (SC-002); envelope 200 with `allowed_price_modes` = `["exact"]` on corporate-action month / `["band","exact"]` otherwise (SC-003); unknown stock/month → 404 detail; malformed `yyyy_mm` → 422
+- [x] T009 Endpoint behavior + response-shape tests in `apps/api/tests/test_stocks_endpoints.py` (FastAPI TestClient + fixture catalog): popular 200 ordered/capped (SC-001); search 200 incl. empty-q→[] (SC-002); envelope 200 with `allowed_price_modes` = `["exact"]` on corporate-action month / `["band","exact"]` otherwise (SC-003); unknown stock/month → 404 detail; malformed `yyyy_mm` → 422
 - [x] T010 Implement `routers/stocks.py` (GET popular / search / `{stock_id}/months/{yyyy_mm}/envelope`) with Pydantic response models mirroring the OpenAPI schema; include under `/api/v2` in `main.py`
 - [x] T011 Startup fail-fast test in `apps/api/tests/test_startup.py`: missing catalog path → app creation/startup raises with the path in the message (SC-005)
 
 ## Phase 5: Verify
 
 - [x] T012 `make test` green; add coverage for core + repo + routers; `curl` the three endpoints per spec (popular/search/envelope incl. a corporate-action month) and confirm shapes match the OpenAPI schema
-- [x] T013 Sync the OpenAPI: ensure `apps/api` auto-generated `/api/v2/openapi.json` documents the three endpoints so the frontend can generate its typed client (Constitution I)
+- [x] T013 Sync the OpenAPI: ensure `apps/api` auto-generated `/api/v2/openapi.json` documents the three endpoints. The current frontend client remains hand-written Zod; codegen is follow-up hardening (Constitution I).
 
 ## Dependencies
 

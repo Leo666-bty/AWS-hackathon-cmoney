@@ -1,10 +1,10 @@
 # Reconstruction, Personality & Scoring
 
 > Aligned with the implemented engine (`packages/mindfolio-core/market/reconstruction.py`),
-> which mirrors the shipped reference `V2/demo/script.js` exactly. All rounding
-> is **round-half-up** (JS `Math.round` / Python `floor(x + 0.5)`) — banker's
-> rounding would drift scores by 1. Where a number is pinned below, the backend
-> and the frontend compute it identically.
+> which was parity-checked against the shipped reference `V2/demo/script.js`.
+> All rounding is **round-half-up** (JS `Math.round` / Python
+> `floor(x + 0.5)`) — banker's rounding would drift scores by 1. The formal
+> React frontend does not compute these formulas; it displays the FastAPI result.
 
 ## Portfolio Fingerprint
 

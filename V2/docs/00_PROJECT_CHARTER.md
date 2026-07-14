@@ -48,7 +48,8 @@ FAQ／ChatGPT 型應用還有另一個根本限制：使用者必須先想到問
 
 ## North Star
 
-**Verified Holding Activation**：完成重建並主動標記至少一檔「2025-12-31 仍持有」的匿名或已註冊使用者數。
+**Verified Holding Activation**：完成重建、明確同意，且後端成功保存至少一檔
+「2025-12-31 仍持有」關係的匿名或已註冊使用者數。
 
 ## Demo 必須證明
 

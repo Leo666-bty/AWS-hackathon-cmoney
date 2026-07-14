@@ -30,11 +30,12 @@ V2 正式版本採前後端分離：
 │ AI Narrative Service        │
 │ Bedrock or schema LLM       │
 ├──────────────┬──────────────┤
-│ Repositories │ Event writes │
+│ Market file  │ Holding repo │
 └───────┬──────┴───────┬──────┘
         │              │
 ┌───────▼──────┐ ┌─────▼────────────┐
-│ PostgreSQL   │ │ CMoney data feed │
+│ Catalog JSON │ │ PostgreSQL       │
+│ snapshot     │ │ confirmed only  │
 └──────────────┘ └──────────────────┘
 ```
 
@@ -49,9 +50,12 @@ V2 正式版本採前後端分離：
 ## Why React + TypeScript
 
 - 五檔選股、逐檔表單、非同步驗證與結果頁適合拆成 feature components。
-- TypeScript 可直接使用 FastAPI OpenAPI 產生 typed API client，降低前後端 contract 漂移。
-- React Query 類型的 server-state layer 可處理搜尋、envelope、validation 與 reconstruction request cache。
-- React Hook Form 類型的 form layer 管理欄位與前端基本格式；金融規則仍由後端判定。
+- TypeScript 搭配 Zod 在 runtime 驗證 FastAPI response；目前 client 為手寫，
+  後續可由 OpenAPI codegen 取代以進一步降低 contract 漂移。
+- React Query 管理搜尋、envelope query 與 validation／reconstruction mutation
+  lifecycle。
+- 目前以 component `useState` 管理欄位與前端基本格式；雖已安裝
+  React Hook Form，但尚未導入。金融規則仍由後端判定。
 - 靜態分享畫面與結果頁可以元件化，不需要把整個流程塞進單一 script。
 
 ## Frontend module design
@@ -59,36 +63,36 @@ V2 正式版本採前後端分離：
 ```text
 apps/web/
 ├── package.json
+├── Dockerfile
+├── nginx.conf
 ├── vite.config.ts
 ├── src/
 │   ├── app/
 │   │   ├── App.tsx
-│   │   ├── App.tsx
 │   │   └── providers.tsx
 │   ├── routes/
 │   │   ├── LandingRoute.tsx
+│   │   ├── LandingRoute.test.tsx
 │   │   ├── BuilderRoute.tsx
 │   │   ├── ReconstructionRoute.tsx
 │   │   └── ResultRoute.tsx
 │   ├── features/
 │   │   └── reconstruction/    # cross-route reducer/context
 │   ├── shared/
-│   │   ├── api/               # Zod runtime validation + typed client
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   └── types/
+│   │   ├── api/               # Zod runtime validation + typed client/error
+│   │   └── components/        # shared header
+│   ├── assets/personality-cards/
 │   └── styles/
-└── tests/
 ```
 
 ### React state boundary（已實作）
 
 | State | 建議位置 | 例子 |
 |---|---|---|
-| Server state | Query cache | 熱門股票、搜尋結果、price envelope、final result |
-| Wizard draft | `useReducer` + Context | 已選五檔、每檔 trade draft、complete result |
-| Field state | Form library／component | 月份、價格模式、實際價格 |
-| Durable identity | Backend session | anonymous reconstruction ID、member ID |
+| Server state | Query cache／mutation | 熱門股票、搜尋結果、price envelope、validation request |
+| Wizard state | `useReducer` + Context | 已選五檔、每檔 trade draft、後端 complete response |
+| Field state | Component `useState` | 月份、價格模式、實際價格 |
+| Durable identity | 尚未實作 | 目前 confirmed holdings 固定使用 Demo `LEO` |
 | Calculated result | 不存本地真相 | 一律使用 FastAPI response |
 
 目前以小型 reducer/context 實作，不導入大型 global store。重新整理會回到入口，這是匿名 MVP 的已知取捨；正式產品可加入 server-side draft session。
@@ -97,6 +101,7 @@ apps/web/
 
 ```text
 apps/api/
+├── Dockerfile
 ├── pyproject.toml
 ├── src/mindfolio_api/
 │   ├── main.py
@@ -107,29 +112,22 @@ apps/api/
 │   │   ├── reconstructions.py
 │   │   └── holdings.py
 │   ├── schemas/
-│   │   ├── stock.py
-│   │   ├── reconstruction.py
-│   │   └── holding.py
+│   │   └── reconstruction.py
 │   ├── services/
-│   │   ├── price_validation.py
-│   │   ├── reconstruction.py
-│   │   ├── fingerprint.py
-│   │   └── holding.py
+│   │   └── reconstruction.py
 │   ├── ai/
 │   │   ├── narrative.py
 │   │   ├── prompts.py
 │   │   └── fallback.py
 │   └── repositories/
-│       ├── stocks.py
 │       ├── market_data.py
-│       └── portfolios.py
-└── tests/
-    ├── unit/
-    ├── integration/
-    └── contract/
+│       └── holdings.py
+└── tests/                     # startup/repository/endpoint/narrative tests
 ```
 
-Routers 只處理 HTTP、authentication、schema 與 status code；所有金融規則放在 services。Repositories 不產生人格或報酬，只做資料存取。
+Routers 只處理 HTTP、schema 與 status code；目前沒有 authentication layer。
+Service 負責 orchestration 與重驗，純金融規則在 `mindfolio-core`。
+Repositories 不產生人格或報酬，只做資料存取。
 
 AI training 與 FastAPI 共用 Python virtual environment 和 shared feature package，但 training command 不在 Web request 內執行。詳細見 `10_AI_TRAINING_PLAN.md`。
 
@@ -140,7 +138,7 @@ AI training 與 FastAPI 共用 Python virtual environment 和 shared feature pac
 - debounce 搜尋與顯示熱門股票。
 - 暫存尚未送出的五檔表單。
 - 顯示 API 回傳的 envelope、validation message 與 result。
-- loading、retry、empty、expired session 與 consent UI。
+- loading、retry、empty 與 consent UI。
 - 產生不含敏感明細的分享畫面。
 
 前端不可以做：
@@ -181,7 +179,7 @@ Response（實作為超集，含還原/factor/regime 供除錯與 UI）：
   "raw_low": 780.0,
   "raw_high": 952.0,
   "close": 908.0,
-  "adjusted_close": 892.0,
+  "adjusted_close": 892.27,
   "factor": 0.98267621,
   "corporate_action": false,
   "regimes": [{ "low": 780.0, "high": 952.0, "factor": 0.98267621 }],
@@ -250,9 +248,9 @@ Frontend → FastAPI: confirm holdings after explicit consent
 
 AI 與計算共用 Python environment，不代表兩者混成同一函式：
 
-1. `reconstruction` 完成 deterministic result。
-2. `fingerprint` 產生固定 vector 與 persona code。
-3. `ai_narrative` 只接收上述 verified DTO。
+1. `services/reconstruction.py` 重驗輸入並呼叫 `mindfolio-core`。
+2. Core 同一次 deterministic 計算產生 trade result、vector、persona 與 scores。
+3. `ai/narrative.py` 只接收上述 verified DTO。
 4. AI output 必須通過 Pydantic schema。
 5. Timeout、schema error 或 provider failure 時回傳 deterministic fallback。
 
@@ -263,32 +261,36 @@ LLM 不得接收資料庫 credential、完整匿名 event history、未驗證價
 ### Local development
 
 ```text
-Frontend dev server → http://localhost:8000/api/v2
-FastAPI/Uvicorn     → PostgreSQL or local read-only fixture
+Browser → Vite :5173 /api/* proxy → FastAPI/Uvicorn :8000
+FastAPI → data/market-catalog.json
+FastAPI → in-memory holdings store（DATABASE_URL 未設定時）
 ```
 
 由 FastAPI 設定明確 CORS allowlist；不使用 `*` 搭配 credentials。
 
-### AWS-oriented target
+### Deployment target（已建立 Compose 定義）
 
-- Frontend：S3 + CloudFront，或既有 Web hosting。
-- FastAPI：App Runner 或 ECS Fargate container。
-- Database：RDS PostgreSQL／Aurora PostgreSQL。
-- AI：Amazon Bedrock，由 backend IAM role 存取。
-- Secrets：AWS Secrets Manager；不得打包進前端。
+- 一台 EC2 執行 Docker Compose：`web`（nginx）、`api`（Uvicorn）、
+  `postgres`（PostgreSQL 16）。
+- nginx 對外提供 React static build，並將 `/api/*` proxy 到 API container。
+- API 從 image 內的 `market-catalog.json` 讀市場資料，以 Compose service name
+  `postgres` 連資料庫。
+- PostgreSQL 不發布 5432；named volume `pgdata` 落在 EC2 EBS。
+- Bedrock 為可選功能，只能由 API 經 EC2 IAM Role 存取；不得在 `.env` 放 AWS key。
 
-黑客松 Demo 可先以單一 FastAPI process＋唯讀資料 fixture 執行，不必為了展示技術力加入不必要的 queue 或 microservices。
+完整啟動、驗收、安全組與備份注意事項見 `11_DEPLOYMENT.md`。目前已完成本機
+Compose 驗收；實際 EC2、IAM Role、網域與 HTTPS 仍需在目標主機驗證。
 
-## Testing strategy
+## Testing and verification
 
-- **Unit**：價格 envelope、regime、adjustment、報酬、confidence、fingerprint。
-- **Property tests**：賣出月不得早於買進月；異常價格不得通過；相同輸入產生相同 deterministic result。
-- **Integration**：FastAPI + repository + database fixture。
-- **Contract**：OpenAPI response 與前端 typed client。
-- **React unit**：表單狀態、錯誤呈現、loading 與 consent gate。
-- **React integration**：mock FastAPI contract，驗證選股到結果流程。
-- **E2E**：React frontend + FastAPI test database 的關鍵 happy path 與異常價格 path。
-- **AI tests**：schema、guardrail、timeout fallback；不拿 LLM 文案 snapshot 當金融計算測試。
+- **目前 Python suite**：core envelope／validation／reconstruction、artifact
+  metadata、market/holding repository、FastAPI endpoint、startup 與 narrative fallback。
+- **目前 React test**：Landing route smoke；production TypeScript +
+  Vite build是主要整合檢查。
+- **目前部署驗收**：Compose build、nginx proxy health、五檔 complete 與
+  PostgreSQL volume persistence。
+- **後續補強**：OpenAPI-generated client contract test、完整 wizard React
+  integration、瀏覽器 E2E、真實 Bedrock IAM／timeout 測試與 EC2 smoke test。
 
 ## Current status
 

@@ -1,6 +1,6 @@
 <!--
 Sync Impact Report
-- Version change: (template) → 1.0.0 (V2 ratification; derived from V1 constitution 1.1.0)
+- Version change: 1.0.0 → 1.0.1 (implementation-status alignment; no principle change)
 - Product pivot: V1 "Reverse Portfolio Onboarding" → V2 "2025 投資時光機 ×
   投資人格實驗室" (Portfolio Reconstruction Engine). Principles re-authored for
   the reconstruction/persona domain; V1's engineering discipline carries over.
@@ -8,9 +8,12 @@ Sync Impact Report
   Engine · III AI Narrative Guardrails · IV Test-First · V Confirmed-Holding
   Gate & Data Honesty · VI Demo-Complete Degradation
 - Templates: plan/spec/tasks templates compatible as-is (generic gates)
-- Follow-up: feature specs must PIN the currently-undefined constants
-  (persona axis thresholds, band representative price, normalization ranges,
-  decision-score buckets) — see Technical Constraints.
+- Resolved follow-up: persona thresholds, band representative prices,
+  normalization and decision-score formulas are pinned in docs/02 and feature
+  002, then implemented in `packages/mindfolio-core`.
+- Recorded compliance gaps: the current frontend client is hand-written
+  TypeScript + Zod rather than generated from OpenAPI; broader property-based
+  coverage and durable reconstruction/session binding remain follow-ups.
 -->
 
 # Mindfolio V2 Constitution
@@ -127,11 +130,18 @@ reconstruction result itself.
   `comparable_user_price = raw_user_price × factor`; if intra-month factor
   varies > 5%, flag `corporateAction=true`, split raw-price regimes, and reject
   fuzzy bands that cross a regime.
-- **Constants that feature specs MUST pin** (currently qualitative in the docs;
-  same discipline as any deterministic number): persona four-axis thresholds
-  (L/T, H/A, D/C, X/E cutoffs), band-mode representative price
-  (偏低/中間/偏高 → which number), `normalized_return` normalization range,
-  and decision-score bucket boundaries. Unpinned constants are a defect.
+- **Pinned deterministic constants**: persona four-axis thresholds (L/T, H/A,
+  D/C, X/E), band-mode representative prices, `normalized_return`, confidence
+  and decision-score formulas are fixed in
+  `V2/docs/02_QUIZ_PERSONALITY_AND_SCORING.md` and feature 002. Any future
+  formula change is an API/domain change that must update the spec, tests and
+  implementation together; unpinned constants remain a defect.
+- **Current compliance gaps**: `apps/web` currently uses a hand-written Zod
+  client; OpenAPI codegen/generated-client contract coverage is required before
+  production. The engine has deterministic regression coverage but broader
+  property-based coverage remains; confirmed holdings statelessly re-run the
+  five trades but are not yet bound to a durable reconstruction/session. These
+  are tracked gaps, not permission to weaken Principles I, II, IV or V.
 - Training exception (offline only): `V2/apps/ai-training` may train
   UNSUPERVISED market-regime clustering and an anomaly detector over the 2025
   stock-month features. It MUST NOT predict holdings, price direction, or
@@ -158,8 +168,9 @@ reconstruction result itself.
   If a doc conflicts with the charter on scope, the charter wins and this
   constitution is amended.
 - Parallel-dev discipline (monorepo now pushed): the FastAPI OpenAPI schema is
-  the frozen integration surface — the frontend generates its typed client from
-  it, so any endpoint/field change is made in the schema and communicated first.
+  the frozen integration surface, so any endpoint/field change is made there
+  and communicated first. The current hand-written Zod client must track it;
+  OpenAPI codegen remains the production compliance target noted above.
   Backend work is scoped to `V2/apps/api/` and `V2/packages/mindfolio-core`;
   shared roots (`V2/python-requirements.txt`, `Makefile`, `pnpm-workspace.yaml`)
   are edited minimally and coordinated with the teammate.
@@ -175,4 +186,4 @@ verify Principles I–VI; violations require a justified entry in the plan's
 Complexity Tracking table. Runtime agent guidance (a V2 CLAUDE.md, when added)
 must stay consistent with this document.
 
-**Version**: 1.0.0 | **Ratified**: 2026-07-14 | **Last Amended**: 2026-07-14
+**Version**: 1.0.1 | **Ratified**: 2026-07-14 | **Last Amended**: 2026-07-15

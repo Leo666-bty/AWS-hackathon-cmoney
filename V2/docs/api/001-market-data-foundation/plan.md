@@ -30,14 +30,15 @@ in `apps/api/tests`); FastAPI TestClient + a small fixture catalog.
 
 | Principle | Gate | Status |
 |---|---|---|
-| I. Contract-First | 3 endpoints/fields fixed in OpenAPI; contract tests validate | ✅ |
+| I. Contract-First | 3 endpoints/fields fixed in generated OpenAPI; endpoint tests cover response shapes; generated-client contract test remains | ⚠ follow-up |
 | II. Server-Authoritative Deterministic | numbers come from the built catalog; endpoints only select/shape; shaping in core | ✅ |
 | III. AI Guardrails | no AI in this slice | ✅ (n/a) |
 | IV. Test-First | core rules + endpoints tested before implementation; envelope/allowed-modes property-ish tests | ✅ |
 | V. Confirmed-Holding Gate | no writes/holdings in this slice | ✅ (n/a) |
 | VI. Demo Degradation | fail-fast on missing catalog at startup | ✅ |
 
-No violations → no Complexity Tracking entries.
+No architecture exception was introduced. The remaining generated-client
+contract test is tracked as test hardening rather than a contract change.
 
 ## Code placement
 

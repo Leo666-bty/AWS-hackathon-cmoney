@@ -47,11 +47,12 @@ cd V2
 cp .env.example .env
 ```
 
-Before starting the stack, replace `change-this-before-deploy` in `.env` with a
-long random database password in both `DB_PASSWORD` and the password portion of
-`DATABASE_URL`. The Compose stack constructs the API's `DATABASE_URL` from
-`DB_PASSWORD`; the explicit `DATABASE_URL` entry is also available for local
-administration commands and must be kept consistent.
+Before starting the stack, replace `change-this-before-deploy` in `DB_PASSWORD`
+with a long random password. Compose constructs the API container's
+`DATABASE_URL` from that value, so `DB_PASSWORD` is the deployment authority.
+The `DATABASE_URL` line in `.env.example` is only a container-network reference;
+Compose does not inject that line into the API service. If you manually use it
+from a process attached to the Compose network, update its password too.
 
 Do not commit `.env`. AWS access keys do not belong in this file either.
 
@@ -218,6 +219,10 @@ instance.
    the underlying EBS volume depending on its delete-on-termination setting.
 8. **Bedrock uses the EC2 IAM Role.** `MINDFOLIO_BEDROCK_ENABLED=false` is the
    safe default and requires no AWS model access.
-9. **The current React app is still the foundation UI.** Containerization and
-   `/api` proxying are complete here; connecting the full static-demo workflow
-   to the FastAPI contract remains a separate frontend task.
+9. **The React vertical slice is connected.** Landing, stock selection,
+   reconstruction, result and consent all use `/api/v2` through nginx. The
+   remaining product gap is identity: confirmed holdings still use the fixed
+   Demo user `LEO`; registration/report claim/Portfolio Radar are later work.
+10. **Root `.env` is not a Vite build input.** The production image intentionally
+    builds with the client's default relative `/api/v2`; do not bake
+    `http://localhost:8000` into an `apps/web/.env*` file.

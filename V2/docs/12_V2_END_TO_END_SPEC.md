@@ -6,7 +6,8 @@
 
 > 陌生使用者不聊天、不上傳截圖、不連券商，只用五檔股票與模糊交易記憶，換取經 2025 行情驗證的投資人格；若自願同意，再把仍持有關係轉成 CMoney 可用的 confirmed holding。
 
-正式 runtime 為 `apps/web` + `apps/api`。`demo/` 只作為視覺、簡報與離線備援 reference，不是金融計算來源。
+正式 runtime 為 `apps/web` + `apps/api`。`demo/` 只作為 presentation-only 的
+視覺／簡報 reference，不是 runtime fallback 或正式金融計算來源。
 
 ## 2. 使用者流程
 
@@ -121,7 +122,8 @@ AI 不做：
 - [x] Bedrock 關閉或失敗時仍有 deterministic narrative。
 - [x] 使用者未勾同意時不可保存 confirmed holdings。
 - [x] React production build 與 Python test suite 通過。
-- [ ] 正式身份驗證、rate limit、event analytics、Docker／AWS 部署。
+- [x] 單一 EC2 用 Docker Compose 定義（web + api + PostgreSQL）與本機容器驗收。
+- [ ] 實際 EC2／IAM Role／HTTPS 驗收、正式身份驗證、rate limit 與 event analytics。
 
 ## 9. 模組路徑
 
