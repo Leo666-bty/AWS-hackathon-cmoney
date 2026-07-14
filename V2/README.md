@@ -1,6 +1,6 @@
 # Mindfolio Time Machine V2
 
-> 從 300 檔股票重建五檔投資軌跡，讓陌生用戶在得到投資人格與投報率的同時，主動確認仍持有的股票。
+> 從 300 檔股票重建五檔投資軌跡，讓陌生用戶先匿名獲得價值，再認領報告、明確確認持股並進入 Portfolio Radar。
 
 V2 不再是固定五檔歷史選擇題。使用者可以從 CMoney 熱門推薦開始，也能搜尋主辦方 300 檔股票資料庫；每檔只需提供買進月份、價格區間或實際價格，以及仍持有或賣出月份。`Portfolio Reconstruction Engine` 會驗證價格合理性、處理公司行動、重建投報率並生成投資指紋。
 
@@ -25,7 +25,9 @@ V2 不再是固定五檔歷史選擇題。使用者可以從 CMoney 熱門推薦
 | 進場（冷流量） | `GET /stocks/popular`、`search` | 讓陌生人低門檻挑熟悉的股票 |
 | 資料品質 | `GET /stocks/{id}/months/{ym}/envelope`、`POST /reconstructions/validate` | 把模糊記憶變成具行情合理性與可信度的重建資料、擋亂填——「不只是娛樂測驗」的關鍵 |
 | 爽點＋病毒鉤子 | `POST /reconstructions/complete` | 回傳人格／報酬／指紋／分數＋分享卡 |
-| North Star（資產） | `POST /confirmed-holdings`、`GET …/confirmed-holdings` | 玩家同意後留下明確確認的持股關係 |
+| Activation | `POST /auth/session`、`POST /reports/{id}/claim` | 邀請碼換短效 session，將匿名報告歸屬會員 |
+| North Star（資產） | `POST /reports/{id}/confirmed-holdings` | 第二次明確同意後留下確認持股關係 |
+| 留存 | `GET /me/dashboard`、卡片 feedback、event batch | Radar、可追溯證據、低門檻回饋與重試安全事件 |
 
 > **一句話 pitch**：陌生人把模糊記憶變成**經行情驗證的投資重建 + 可分享的人格**，並主動確認仍持有的股票；AI 負責解讀，護城河是重建引擎。API 合約細節見 [前後端架構](docs/09_FRONTEND_BACKEND_ARCHITECTURE.md)。
 
@@ -47,15 +49,17 @@ React + TypeScript Frontend
 
 ## 目前完成範圍
 
-- **`apps/api`（後端 API）：已完成** — 8 支端點（health、stocks popular/search/envelope、reconstructions validate/complete、confirmed-holdings POST/list）；deterministic 引擎在 `packages/mindfolio-core`，AI 敘事含 fallback，確認持股走 Postgres；V2 Python suite 共 58 tests 綠。
+- **`apps/api`（後端 API）：P0 已完成** — 包含行情重建、短效 session、匿名報告認領、持股授權、Portfolio Radar aggregate、卡片偏好與 idempotent event batch；deterministic 引擎與 AI fallback 不依賴 Bedrock 可用性；Python suite 共 64 tests 綠。
 - `packages/mindfolio-core`：API 與離線訓練共用的 deterministic domain（envelope、reconstruction、validation、models）。
-- **`apps/web`（正式前端）：已完成 V2 vertical slice** — Landing、300 檔搜尋／熱門五檔、逐檔重建、後端 validation／complete、人格結果、匿名分享卡與 LEO 持股同意流程；React smoke test 與 production build 通過。
+- **`apps/web`（正式前端）：Acquisition + Retention P0 已完成** — Landing、300 檔搜尋、逐檔重建、匿名人格結果、報告認領、獨立持股授權與四模組 Portfolio Radar；React tests、strict TypeScript build 與 ESLint 零警告通過。
 - `apps/ai-training`：離線模型 scaffold（feature 契約 + CLI 狀態）；目前未訓練模型，也不產生假 metrics。
 - 根目錄 workspace、Python 共用 virtual environment 設定與前後端測試／建置指令。
 
 部署程式已完成：`api + web + postgres` 可由 Docker Compose 在單一 EC2
-執行，且本機容器驗收已通過。尚未完成的是實際 EC2 上線、HTTPS／網域、
-真實 Bedrock 線上驗證、離線模型訓練、正式身份驗證與即時行情 feed
+執行，且本機容器驗收已通過。Bedrock `openai.gpt-oss-120b` Converse
+已完成線上驗證與後端整合；本機可用 Bearer token，正式部署改用 IAM
+Role，所有失敗路徑保留 deterministic fallback。尚未完成的是實際 EC2
+上線、HTTPS／網域、CMoney SSO、離線模型訓練與即時行情 feed
 （操作見 [部署決策](docs/11_DEPLOYMENT.md)）。
 
 ## 核心閉環
@@ -72,8 +76,9 @@ React + TypeScript Frontend
 → 只將「仍持有」寫入 LEO Demo Portfolio
 ```
 
-註冊認領與 Portfolio Radar 是下一階段需求，目前尚未實作；現行前端使用
-固定 Demo identity `LEO` 驗證 consent 與 PostgreSQL 持久化閉環。
+Demo 以邀請碼換取短效 session，完成匿名報告認領、獨立持股授權與
+Portfolio Radar 閉環；正式產品仍需將邀請碼入口替換為 CMoney SSO，並由
+既有會員系統提供 identity 與授權生命週期。
 
 ## 快速入口
 

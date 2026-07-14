@@ -9,3 +9,4 @@ def test_health() -> None:
     assert response.status_code == 200
     assert response.json()["service"] == "mindfolio-api"
     assert response.json()["model_status"] == "not_loaded"
+    assert response.json()["narrative_status"] == "fallback_ready"

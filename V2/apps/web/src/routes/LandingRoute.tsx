@@ -32,7 +32,7 @@ export function LandingRoute() {
           <p><i /> market catalog: 300 stocks</p>
           <p><i /> corporate action adjustment: enabled</p>
           <p><i /> financial truth: FastAPI verified</p>
-          <p><i /> AI narrative: {health.data?.model_status ?? "fallback ready"}</p>
+          <p><i /> AI narrative: {health.data?.narrative_status ?? "fallback_ready"}</p>
         </div>
         <div className="fingerprint-mini"><small>INVESTMENT FINGERPRINT</small><strong>LHDX</strong><span>低接・長抱・分散・精準</span></div>
       </aside>

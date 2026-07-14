@@ -1,9 +1,11 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ReconstructionProvider } from "../features/reconstruction/ReconstructionContext";
 import { BuilderRoute } from "../routes/BuilderRoute";
+import { ActivateRoute } from "../routes/ActivateRoute";
 import { LandingRoute } from "../routes/LandingRoute";
 import { ReconstructionRoute } from "../routes/ReconstructionRoute";
 import { ResultRoute } from "../routes/ResultRoute";
+import { PortfolioRadarRoute } from "../routes/PortfolioRadarRoute";
 import { AppHeader } from "../shared/components/AppHeader";
 
 export function App() {
@@ -15,6 +17,8 @@ export function App() {
         <Route path="/builder" element={<BuilderRoute />} />
         <Route path="/reconstruct/:index" element={<ReconstructionRoute />} />
         <Route path="/result" element={<ResultRoute />} />
+        <Route path="/activate" element={<ActivateRoute />} />
+        <Route path="/app" element={<PortfolioRadarRoute />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </ReconstructionProvider>

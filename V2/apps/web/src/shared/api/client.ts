@@ -1,12 +1,14 @@
 import { z } from "zod";
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "/api/v2";
+const configuredApiBaseUrl: unknown = import.meta.env.VITE_API_BASE_URL;
+const apiBaseUrl = typeof configuredApiBaseUrl === "string" ? configuredApiBaseUrl : "/api/v2";
 
 const healthSchema = z.object({
   status: z.literal("ok"),
   service: z.string(),
   version: z.string(),
   model_status: z.string(),
+  narrative_status: z.string(),
 });
 
 const stockSchema = z.object({
@@ -77,11 +79,19 @@ const narrativeSchema = z.object({
   headline: z.string(),
   summary: z.string(),
   insight: z.string(),
+  source: z.enum(["bedrock", "fallback"]).default("fallback"),
+});
+
+const reportHandleSchema = z.object({
+  report_id: z.string(),
+  claim_token: z.string(),
+  expires_at: z.string(),
 });
 
 const completeResponseSchema = z.object({
   result: reconstructionResultSchema,
   narrative: narrativeSchema,
+  report: reportHandleSchema.nullable(),
 });
 
 const confirmedHoldingSchema = z.object({
@@ -91,6 +101,77 @@ const confirmedHoldingSchema = z.object({
   confirmed_at: z.string(),
 });
 
+const sessionSchema = z.object({
+  access_token: z.string(),
+  token_type: z.literal("bearer"),
+  member_id: z.string(),
+  display_name: z.string(),
+});
+
+const claimSchema = z.object({
+  report_id: z.string(),
+  member_id: z.string(),
+  claimed_at: z.string(),
+  holding_candidates: z.array(z.string()),
+});
+
+const dashboardSchema = z.object({
+  member_id: z.string(),
+  display_name: z.string(),
+  report: z.object({
+    report_id: z.string(),
+    persona_code: z.string(),
+    persona_name: z.string(),
+    persona_headline: z.string(),
+    confidence: z.number().int(),
+    average_return: z.number(),
+    scores: z.object({ outcome: z.number(), entry: z.number(), capture: z.number(), data: z.number() }),
+    narrative: narrativeSchema,
+    created_at: z.string(),
+  }).nullable(),
+  portfolio: z.array(z.object({
+    stock_id: z.string(),
+    name: z.string(),
+    industry: z.string(),
+    source: z.string(),
+    confirmed_at: z.string(),
+    shares: z.null(),
+    average_cost: z.null(),
+  })),
+  priority_card: z.object({
+    card_id: z.string(),
+    stock_id: z.string(),
+    stock_name: z.string(),
+    title: z.string(),
+    summary: z.string(),
+    as_of: z.string(),
+    provenance: z.string(),
+    narrative_source: z.enum(["bedrock", "fallback"]),
+    evidence: z.array(z.object({
+      label: z.string(),
+      value: z.string(),
+      tone: z.enum(["neutral", "positive", "warning"]),
+    })),
+    suggested_questions: z.array(z.string()),
+    current_preference: z.string().nullable(),
+  }).nullable(),
+  weekly_review: z.object({
+    title: z.string(),
+    summary: z.string(),
+    next_review_at: z.string(),
+    data_as_of: z.string(),
+    source: z.enum(["snapshot", "fixture"]),
+  }),
+});
+
+const feedbackSchema = z.object({
+  card_id: z.string(),
+  preference: z.string(),
+  saved_at: z.string(),
+});
+
+const eventBatchSchema = z.object({ accepted_event_ids: z.array(z.string()) });
+
 const errorSchema = z.object({ detail: z.unknown().optional() });
 
 export type HealthResponse = z.infer<typeof healthSchema>;
@@ -99,6 +180,20 @@ export type MonthEnvelope = z.infer<typeof monthEnvelopeSchema>;
 export type PriceValidation = z.infer<typeof validationSchema>;
 export type CompleteResponse = z.infer<typeof completeResponseSchema>;
 export type ConfirmedHolding = z.infer<typeof confirmedHoldingSchema>;
+export type SessionResponse = z.infer<typeof sessionSchema>;
+export type ClaimResponse = z.infer<typeof claimSchema>;
+export type MemberDashboard = z.infer<typeof dashboardSchema>;
+export type CardPreference = "review_evidence" | "routine" | "mute";
+export type InteractionEvent = {
+  event_id: string;
+  session_id: string;
+  event_type: string;
+  surface: string;
+  action?: string;
+  stock_id?: string;
+  occurred_at: string;
+  metadata: Record<string, unknown>;
+};
 
 export type TradeConfig = {
   stock_id: string;
@@ -186,5 +281,63 @@ export function confirmHoldings(
   return request("/confirmed-holdings", z.array(confirmedHoldingSchema), {
     method: "POST",
     body: JSON.stringify({ user_id: userId, trades }),
+  });
+}
+
+export function createMemberSession(inviteCode: string): Promise<SessionResponse> {
+  return request("/auth/session", sessionSchema, {
+    method: "POST",
+    body: JSON.stringify({ invite_code: inviteCode }),
+  });
+}
+
+export function claimReport(
+  reportId: string,
+  claimToken: string,
+  accessToken: string,
+): Promise<ClaimResponse> {
+  return request(`/reports/${reportId}/claim`, claimSchema, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ claim_token: claimToken }),
+  });
+}
+
+export function confirmReportHoldings(
+  reportId: string,
+  stockIds: string[],
+  accessToken: string,
+): Promise<ConfirmedHolding[]> {
+  return request(`/reports/${reportId}/confirmed-holdings`, z.array(confirmedHoldingSchema), {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ stock_ids: stockIds }),
+  });
+}
+
+export function getMemberDashboard(accessToken: string, signal?: AbortSignal): Promise<MemberDashboard> {
+  return request("/me/dashboard", dashboardSchema, {
+    signal,
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export function saveCardFeedback(
+  cardId: string,
+  preference: CardPreference,
+  accessToken: string,
+) {
+  return request(`/me/action-cards/${cardId}/feedback`, feedbackSchema, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ preference }),
+  });
+}
+
+export function submitEventBatch(events: InteractionEvent[], accessToken?: string) {
+  return request("/events/batch", eventBatchSchema, {
+    method: "POST",
+    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+    body: JSON.stringify({ events }),
   });
 }

@@ -12,6 +12,7 @@ class HealthResponse(BaseModel):
     service: str
     version: str
     model_status: str
+    narrative_status: str
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -22,4 +23,5 @@ def health() -> HealthResponse:
         service="mindfolio-api",
         version=__version__,
         model_status=settings.model_status,
+        narrative_status=settings.narrative_status,
     )

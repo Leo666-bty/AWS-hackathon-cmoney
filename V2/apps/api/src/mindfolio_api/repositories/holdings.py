@@ -22,7 +22,12 @@ class HoldingsUnavailable(RuntimeError):
 
 @runtime_checkable
 class HoldingsRepository(Protocol):
-    def add_holdings(self, user_id: str, stock_ids: list[str]) -> list[ConfirmedHolding]: ...
+    def add_holdings(
+        self,
+        user_id: str,
+        stock_ids: list[str],
+        source_report_id: str | None = None,
+    ) -> list[ConfirmedHolding]: ...
     def list_holdings(self, user_id: str) -> list[ConfirmedHolding]: ...
 
 
@@ -32,7 +37,13 @@ class InMemoryHoldingsRepository:
     def __init__(self) -> None:
         self._data: dict[tuple[str, str], ConfirmedHolding] = {}
 
-    def add_holdings(self, user_id: str, stock_ids: list[str]) -> list[ConfirmedHolding]:
+    def add_holdings(
+        self,
+        user_id: str,
+        stock_ids: list[str],
+        source_report_id: str | None = None,
+    ) -> list[ConfirmedHolding]:
+        del source_report_id
         now = datetime.now(UTC)
         for stock_id in stock_ids:
             self._data[(user_id, stock_id)] = ConfirmedHolding(
@@ -49,8 +60,9 @@ class PgHoldingsRepository:
     """PostgreSQL-backed store using a fresh connection per request."""
 
     _INSERT = (
-        "INSERT INTO confirmed_holdings (user_id, stock_id) VALUES (%s, %s) "
-        "ON CONFLICT (user_id, stock_id) DO UPDATE SET confirmed_at = NOW()"
+        "INSERT INTO confirmed_holdings (user_id, stock_id, source_report_id) VALUES (%s, %s, %s) "
+        "ON CONFLICT (user_id, stock_id) DO UPDATE SET confirmed_at = NOW(), "
+        "source_report_id = EXCLUDED.source_report_id, last_reviewed_at = NOW()"
     )
     _SELECT = (
         "SELECT user_id, stock_id, source, confirmed_at FROM confirmed_holdings "
@@ -60,14 +72,19 @@ class PgHoldingsRepository:
     def __init__(self, dsn: str) -> None:
         self._dsn = dsn
 
-    def add_holdings(self, user_id: str, stock_ids: list[str]) -> list[ConfirmedHolding]:
+    def add_holdings(
+        self,
+        user_id: str,
+        stock_ids: list[str],
+        source_report_id: str | None = None,
+    ) -> list[ConfirmedHolding]:
         import psycopg
 
         try:
             with psycopg.connect(self._dsn, connect_timeout=3) as conn:
                 with conn.cursor() as cur:
                     for stock_id in stock_ids:
-                        cur.execute(self._INSERT, (user_id, stock_id))
+                        cur.execute(self._INSERT, (user_id, stock_id, source_report_id))
                 conn.commit()
         except psycopg.OperationalError as exc:
             raise HoldingsUnavailable(str(exc)) from exc

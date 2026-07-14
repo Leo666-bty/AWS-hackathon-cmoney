@@ -54,9 +54,27 @@ Docker Compose 與 EC2 操作請改看
 
 ```bash
 cd V2
+make lint
 make test
 make build
 .venv/bin/mindfolio-training-status
 ```
 
+封測邀請登入使用 `.env` 的 `MINDFOLIO_INVITE_IDENTITIES`。正式環境還必須設定至少 32 字元的隨機 `MINDFOLIO_SESSION_SECRET`；API 會拒絕使用 development default 啟動 production。
+
 training status 只顯示 feature contract 與預計模型；在真正完成資料切割、訓練與評估前，不會發布模型版本或 metrics。
+
+## Bedrock narrative
+
+本機或黑客松環境可在 gitignored 的 `V2/.env` 啟用 Bedrock API key：
+
+```dotenv
+AWS_REGION=us-east-1
+AWS_BEARER_TOKEN_BEDROCK=<rotated-bedrock-api-key>
+MINDFOLIO_BEDROCK_ENABLED=true
+MINDFOLIO_BEDROCK_MODEL_ID=openai.gpt-oss-120b-1:0
+```
+
+`make dev-api` 會由 boto3 自動讀取 `AWS_BEARER_TOKEN_BEDROCK`。若金鑰、網路、模型或輸出 schema 發生問題，API 仍會回傳 deterministic fallback，不中斷重建流程。
+
+正式 AWS 環境不要配置 API key；改由 EC2／ECS Task IAM Role 授權 `bedrock:InvokeModel`，其餘設定不變。

@@ -5,6 +5,7 @@
   "scripts": {
     "dev:web": "pnpm --filter @mindfolio/web dev",
     "build:web": "pnpm --filter @mindfolio/web build",
+    "lint:web": "pnpm --filter @mindfolio/web lint",
     "test:web": "pnpm --filter @mindfolio/web test"
   }
 }

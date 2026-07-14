@@ -1,6 +1,7 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useReducer,
   type Dispatch,
@@ -23,6 +24,7 @@ type Action =
 type ReconstructionStore = ReconstructionState & { dispatch: Dispatch<Action> };
 
 const initialState: ReconstructionState = { selected: [], trades: {}, result: null };
+const STORAGE_KEY = "mindfolio_v2_reconstruction_draft";
 const ReconstructionContext = createContext<ReconstructionStore | null>(null);
 
 function reducer(state: ReconstructionState, action: Action): ReconstructionState {
@@ -56,7 +58,26 @@ function reducer(state: ReconstructionState, action: Action): ReconstructionStat
 }
 
 export function ReconstructionProvider({ children }: PropsWithChildren) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState, (fallback) => {
+    try {
+      const raw = window.sessionStorage.getItem(STORAGE_KEY);
+      if (!raw) return fallback;
+      const parsed: unknown = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object") return fallback;
+      const candidate = parsed as Partial<ReconstructionState>;
+      if (!Array.isArray(candidate.selected) || typeof candidate.trades !== "object") return fallback;
+      return {
+        selected: candidate.selected,
+        trades: candidate.trades,
+        result: candidate.result ?? null,
+      };
+    } catch {
+      return fallback;
+    }
+  });
+  useEffect(() => {
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }, [state]);
   const value = useMemo(() => ({ ...state, dispatch }), [state]);
   return <ReconstructionContext.Provider value={value}>{children}</ReconstructionContext.Provider>;
 }

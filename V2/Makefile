@@ -1,7 +1,7 @@
 PYTHON ?= python3
 PNPM ?= pnpm
 
-.PHONY: install dev-web dev-api test build
+.PHONY: install dev-web dev-api lint test build
 
 install:
 	$(PNPM) install
@@ -13,6 +13,9 @@ dev-web:
 
 dev-api:
 	.venv/bin/uvicorn mindfolio_api.main:app --reload --port 8000
+
+lint:
+	$(PNPM) lint:web
 
 test:
 	$(PNPM) test:web

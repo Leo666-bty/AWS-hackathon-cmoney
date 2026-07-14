@@ -1,9 +1,6 @@
-import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useReconstruction } from "../features/reconstruction/ReconstructionContext";
-import { confirmHoldings } from "../shared/api/client";
-import { getErrorMessage } from "../shared/api/errors";
 import lacCard from "../assets/personality-cards/lac-contrarian-scout.webp";
 import ladCard from "../assets/personality-cards/lad-low-entry-rotator.webp";
 import lhcCard from "../assets/personality-cards/lhc-deep-concentrator.webp";
@@ -28,10 +25,8 @@ const formatReturn = (value: number) => `${value >= 0 ? "+" : ""}${value.toFixed
 const formatPrice = (value: number) => value.toLocaleString("zh-TW", { maximumFractionDigits: 2 });
 
 export function ResultRoute() {
-  const { result: response, selected, trades } = useReconstruction();
-  const [consent, setConsent] = useState(false);
+  const { result: response } = useReconstruction();
   const [copied, setCopied] = useState(false);
-  const holdings = useMutation({ mutationFn: () => confirmHoldings("LEO", selected.map((stock) => trades[stock.id])) });
 
   if (!response) return <Navigate to="/builder" replace />;
   const { result, narrative } = response;
@@ -72,7 +67,7 @@ export function ResultRoute() {
           <img src={cardImage} alt={`${result.persona_name}人格分享圖卡`} />
           <div><p className="eyebrow">ANONYMOUS SHARE CARD</p><h2>分享人格，不公開持股</h2><p>圖卡不包含股票、價格、月份或報酬明細。</p></div>
         </article>
-        <article className="narrative-card panel-card"><p className="eyebrow">AI NARRATIVE</p><h2>{narrative.insight}</h2><p>AI 只敘述後端驗證完成的 DTO；模型失敗時自動改用固定模板，不重新計算金融數字。</p></article>
+        <article className="narrative-card panel-card"><p className="eyebrow">AI NARRATIVE · {narrative.source === "bedrock" ? "BEDROCK 生成" : "安全備援文案"}</p><h2>{narrative.insight}</h2><p>AI 只敘述後端驗證完成的 DTO；模型失敗時自動改用固定模板，不重新計算金融數字。</p></article>
       </section>
 
       <section className="panel-card report-panel">
@@ -92,11 +87,8 @@ export function ResultRoute() {
       </section>
 
       <section className="consent-panel panel-card">
-        <div><p className="eyebrow">EXPLICIT CONSENT</p><h2>把「仍持有」股票加入 LEO 的庫存</h2><p>只有上方 {result.holding_candidates.length} 檔候選會由後端再次驗證後寫入 PostgreSQL；不保存買價與報酬。</p></div>
-        <label><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} /> 我同意保存本次確認的持股關係</label>
-        <button className="button primary" type="button" disabled={!consent || holdings.isPending || result.holding_candidates.length === 0} onClick={() => holdings.mutate()}>{holdings.isPending ? "儲存中…" : "確認並建立庫存"}</button>
-        {holdings.isSuccess && <div className="success-box">已保存 {holdings.data.length} 檔 LEO 的確認持股。</div>}
-        {holdings.isError && <div className="error-box">{getErrorMessage(holdings.error)}</div>}
+        <div><p className="eyebrow">FROM ACQUISITION TO RETENTION</p><h2>保存報告，開啟 Portfolio Radar</h2><p>先認領這份匿名報告，再逐檔確認「仍持有」候選。認領不等於同意建立持股，兩個動作會分開處理。</p><div className="value-list"><span>跨階段保存人格報告</span><span>只追蹤本人確認持股</span><span>每週整理有來源日期的證據</span></div></div>
+        {response.report ? <Link className="button primary" to="/activate">保存報告並開啟 Radar →</Link> : <button className="button primary" type="button" disabled>報告保存服務暫時不可用</button>}
       </section>
 
       <p className="disclaimer">此結果依使用者回憶的月份與價格重建，屬估算情境；人格不是心理診斷，分數不代表未來績效，內容不構成投資建議。</p>

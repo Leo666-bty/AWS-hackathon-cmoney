@@ -10,7 +10,11 @@ from mindfolio_api.repositories.holdings import (
     build_holdings_repository,
 )
 from mindfolio_api.repositories.market_data import MarketCatalog
-from mindfolio_api.routers import health, holdings, reconstructions, stocks
+from mindfolio_api.repositories.retention import (
+    RetentionRepository,
+    build_retention_repository,
+)
+from mindfolio_api.routers import health, holdings, reconstructions, retention, stocks
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +30,17 @@ def build_bedrock_client() -> Any | None:
         return None
     try:
         import boto3
+        from botocore.config import Config
 
-        return boto3.client("bedrock-runtime", region_name=settings.aws_region)
+        return boto3.client(
+            "bedrock-runtime",
+            region_name=settings.aws_region,
+            config=Config(
+                connect_timeout=3,
+                read_timeout=20,
+                retries={"max_attempts": 1, "mode": "standard"},
+            ),
+        )
     except Exception:  # noqa: BLE001 — startup must retain fallback capability.
         logger.warning("Bedrock client initialization failed; fallback enabled", exc_info=True)
         return None
@@ -36,8 +49,13 @@ def build_bedrock_client() -> Any | None:
 def create_app(
     catalog: MarketCatalog | None = None,
     holdings_repo: HoldingsRepository | None = None,
+    retention_repo: RetentionRepository | None = None,
 ) -> FastAPI:
     settings = get_settings()
+    if settings.env.casefold() == "production" and (
+        settings.session_secret == "development-only-change-me" or len(settings.session_secret) < 32
+    ):
+        raise RuntimeError("MINDFOLIO_SESSION_SECRET must be a random value of at least 32 characters in production.")
     if catalog is None:
         # Fail fast at startup if the market catalog is missing/unreadable.
         catalog = MarketCatalog.from_file(settings.market_data_path)
@@ -45,6 +63,8 @@ def create_app(
         # No connection is made here — Postgres is reached lazily per request so
         # a DB outage yields 503, never a startup crash.
         holdings_repo = build_holdings_repository(settings.database_url)
+    if retention_repo is None:
+        retention_repo = build_retention_repository(settings.database_url)
 
     app = FastAPI(
         title="Mindfolio Time Machine API",
@@ -54,6 +74,7 @@ def create_app(
     )
     app.state.catalog = catalog
     app.state.holdings = holdings_repo
+    app.state.retention = retention_repo
     app.state.bedrock_client = build_bedrock_client()
     app.add_middleware(
         CORSMiddleware,
@@ -66,6 +87,7 @@ def create_app(
     app.include_router(stocks.router, prefix="/api/v2")
     app.include_router(reconstructions.router, prefix="/api/v2")
     app.include_router(holdings.router, prefix="/api/v2")
+    app.include_router(retention.router, prefix="/api/v2")
     return app
 
 

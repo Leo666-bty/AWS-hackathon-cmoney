@@ -1,511 +1,419 @@
-# Mindfolio Acquisition-to-Retention Integration Requirements Spec
+# Mindfolio 獲客至留存整合需求規格
 
-**Document ID**: `MF-RET-001`
-**Created**: 2026-07-14
-**Status**: Draft — requirements baseline, implementation not started
-**Primary implementation root**: `V2/`
-**Reference source**: archived `V1/` product concepts and contracts
-**Depends on**: `12_V2_END_TO_END_SPEC.md`, `api/003-confirmed-holdings/spec.md`
+**文件編號**：`MF-RET-001`
 
-## 1. Decision and purpose
+**建立日期**：2026-07-14
 
-Mindfolio is one product with two consecutive lifecycle stages:
+**狀態**：P0 會員介面與留存閉環已完成 — 2026-07-15
+
+**主要實作根目錄**：`V2/`
+
+**參考來源**：已封存的 `V1/` 產品概念與契約
+
+**依賴文件**：`12_V2_END_TO_END_SPEC.md`、`api/003-confirmed-holdings/spec.md`
+
+## 1. 決策與目的
+
+Mindfolio 是同一個產品，包含前後相接的兩個生命週期階段：
 
 ```text
-Time Machine acquisition experience (current V2)
-→ anonymous reconstruction and immediate value
-→ registration / report claim / explicit holding consent
-→ Portfolio Radar retention experience (selected V1 capabilities)
-→ recurring evidence, feedback and return visits
+Time Machine 獲客體驗（目前 V2）
+→ 匿名投資重建與立即價值
+→ 註冊／認領報告／明確持股授權
+→ Portfolio Radar 留存體驗（選用 V1 能力）
+→ 週期性證據、回饋與回訪
 ```
 
-The current `V2/` directory remains the only active implementation root. This
-spec does **not** authorize reviving `V1/` as a second application, copying its
-runtime wholesale, or maintaining two API versions. V1 is a product and domain
-reference from which selected retention requirements are re-specified for the
-V2 React + FastAPI architecture.
+目前 `V2/` 仍是唯一有效的實作根目錄。本規格**不授權**將 `V1/` 恢復為第二套應用、不允許直接複製其完整執行環境，也不維護兩套 API 版本。V1 僅作為產品與領域參考；選定的留存需求必須重新規格化，以符合 V2 的 React + FastAPI 架構。
 
-This document is the requirements baseline for later SDD work. Each delivery
-slice must produce its own `spec.md`, `plan.md`, `tasks.md`, OpenAPI changes,
-schema migration and acceptance trace before implementation begins.
+本文件是後續 SDD 工作的需求基準。每個交付切片在進入實作前，都必須產出自己的 `spec.md`、`plan.md`、`tasks.md`、OpenAPI 變更、Schema Migration 與驗收追蹤。
 
-## 2. Problem statement
+## 2. 問題定義
 
-The Time Machine currently proves anonymous acquisition:
+目前 Time Machine 已驗證匿名獲客流程：
 
-- a stranger can choose five familiar stocks;
-- FastAPI validates month and price inputs;
-- the reconstruction engine returns portfolio results, confidence and persona;
-- the user can share an anonymous personality card;
-- explicitly marked holdings can be saved with consent.
+- 陌生使用者可選擇五檔熟悉的股票；
+- FastAPI 會驗證月份與價格輸入；
+- 重建引擎會回傳投資組合結果、可信度與人格；
+- 使用者可分享匿名人格圖卡；
+- 經明確標示的持股可在使用者同意後保存。
 
-If the journey ends at the result page, Mindfolio remains a one-time campaign.
-The system still lacks a durable reason to register, return and progressively
-improve portfolio data. The retention stage must convert a claimed Time Machine
-report and confirmed holdings into a recurring Portfolio Radar without weakening
-the acquisition flow or treating inferred interest as a real holding.
+若旅程停在結果頁，Mindfolio 仍只是一個一次性活動。系統缺少讓使用者註冊、回訪並逐步改善 Portfolio 資料的長期理由。留存階段必須把已認領的 Time Machine 報告與已確認持股，轉換成可持續回訪的 Portfolio Radar，同時不得削弱獲客流程，也不得把推測興趣當成真實持股。
 
-## 3. Product boundaries and terminology
+## 3. 產品邊界與名詞
 
-| Term | Meaning in the active V2 product |
+| 名詞 | 在目前 V2 產品中的定義 |
 |---|---|
-| Time Machine | Anonymous acquisition surface: five-stock reconstruction, persona, report and share card |
-| Member Activation | The explicit transition in which a user authenticates or creates an account and claims an anonymous report |
-| Portfolio Radar | Member retention surface: confirmed holdings, prioritized market moments and recurring review |
-| Reconstruction candidate | A stock selected in the quiz; it is not a holding by itself |
-| Confirmed holding | A holding relationship explicitly approved by the user and revalidated by the backend |
-| Market Moment | A deterministic or model-assisted evidence bundle that may deserve attention |
-| Action Card | A member-facing explanation generated from a verified Market Moment DTO |
-| Concern preference | Explicit reminder preference such as routine or mute; never an inferred psychological state |
+| Time Machine | 匿名獲客介面：五檔股票重建、人格、報告與分享圖卡 |
+| 會員啟用（Member Activation） | 使用者完成身份驗證或建立帳號，並認領匿名報告的明確轉換階段 |
+| Portfolio Radar | 會員留存介面：已確認持股、優先市場時刻與週期性回顧 |
+| 重建候選（Reconstruction Candidate） | 測驗中選取的股票；本身不代表持股 |
+| 已確認持股（Confirmed Holding） | 使用者明確同意，且經後端重新驗證的持股關係 |
+| 市場時刻（Market Moment） | 由確定性規則或模型協助產生，值得使用者注意的證據組合 |
+| 行動卡（Action Card） | 根據已驗證 Market Moment DTO 產生的會員端說明卡片 |
+| 關注偏好（Concern Preference） | 使用者明確設定的提醒偏好，例如 `routine` 或 `mute`；不可當成推測的心理狀態 |
 
-External product and pitch language should use **Time Machine** and
-**Portfolio Radar**. `V1` and `V2` remain repository-history labels only.
+對外產品與提案語言應使用 **Time Machine** 與 **Portfolio Radar**。`V1` 和 `V2` 僅是儲存庫歷史標籤。
 
-## 4. Goals and success criteria
+## 4. 目標與成功標準
 
-### 4.1 Goals
+### 4.1 目標
 
-1. Preserve the low-friction anonymous V2 acquisition experience.
-2. Give the result-page registration CTA a concrete member value exchange.
-3. Allow a member to claim an immutable 2025 report across devices.
-4. Convert only explicitly approved candidates into confirmed holdings.
-5. Use confirmed holdings to select evidence-grounded Action Cards.
-6. Provide a compact member home that supports recurring visits.
-7. Capture explicit feedback and interaction events for future ranking models.
-8. Reuse V1 product lessons without creating a parallel V1 runtime.
+1. 保留 V2 低門檻的匿名獲客體驗。
+2. 讓結果頁的註冊 CTA 提供明確會員價值交換。
+3. 允許會員跨裝置認領不可變更的 2025 年報告。
+4. 只有經使用者明確同意的候選，才能轉成已確認持股。
+5. 使用已確認持股選擇具證據依據的 Action Card。
+6. 提供支援週期性回訪的精簡會員首頁。
+7. 收集明確回饋與互動事件，供未來排序模型使用。
+8. 重用 V1 的產品經驗，但不建立平行的 V1 執行環境。
 
-### 4.2 Product success metrics
+### 4.2 產品成效指標
 
-| Stage | Primary metric | Supporting metrics |
+| 階段 | 主要指標 | 輔助指標 |
 |---|---|---|
-| Acquisition | reconstruction completion rate | start rate, time-to-result, validation correction rate |
-| Referral | anonymous card share rate | share click, download, referred sessions |
-| Activation | claimed-report rate | registration CTA rate, claim completion rate |
-| Portfolio activation | verified holding activation | consent rate, confirmed holdings per activated member |
-| Retention | D7 / D30 Portfolio Radar return | Action Card open, evidence open, weekly review open |
-| Data quality | explicit relationship coverage | correction, removal, mute and stale-holding review rates |
+| 獲客 | 重建完成率 | 開始率、取得結果時間、驗證修正率 |
+| 推薦傳播 | 匿名圖卡分享率 | 分享點擊、下載、推薦流量 Session |
+| 啟用 | 報告認領率 | 註冊 CTA 點擊率、認領完成率 |
+| Portfolio 啟用 | 已驗證持股啟用數 | 授權率、每位啟用會員的確認持股數 |
+| 留存 | D7／D30 Portfolio Radar 回訪率 | Action Card 開啟、證據展開、週報開啟 |
+| 資料品質 | 明確關係覆蓋率 | 修正、移除、靜音與過期持股複核率 |
 
-Demo sessions prove instrumentation and the end-to-end state transition only;
-they must not be presented as achieved market conversion rates.
+Demo Session 只能證明事件量測與端到端狀態轉移成立，不得宣稱為已達成的市場轉換率。
 
-## 5. End-to-end user journey
+## 5. 端到端使用者旅程
 
-### 5.1 Anonymous acquisition
+### 5.1 匿名獲客
 
 ```text
 Landing
-→ choose five stocks
-→ reconstruct five trades
-→ receive immutable 2025 report
-→ view persona card, radar and AI narrative
-→ share anonymously or choose "Save report and open Portfolio Radar"
+→ 選擇五檔股票
+→ 重建五筆交易
+→ 取得不可變更的 2025 年報告
+→ 查看人格圖卡、雷達與 AI 敘事
+→ 匿名分享，或選擇「保存報告並開啟 Portfolio Radar」
 ```
 
-No login is required before the user receives the core result.
+使用者取得核心結果前，不需要登入。
 
-### 5.2 Member activation
+### 5.2 會員啟用
 
 ```text
-Result CTA
-→ authenticate / create account
-→ claim anonymous reconstruction report
-→ review "still holding" candidates
-→ provide explicit consent
-→ backend revalidates candidates
-→ create confirmed holdings
-→ enter Portfolio Radar
+結果頁 CTA
+→ 驗證身份／建立帳號
+→ 認領匿名重建報告
+→ 檢視「仍持有」候選
+→ 提供明確授權
+→ 後端重新驗證候選
+→ 建立已確認持股
+→ 進入 Portfolio Radar
 ```
 
-Authentication failure or cancellation must not delete the anonymous report or
-falsely mark it as claimed.
+身份驗證失敗或使用者取消時，不得刪除匿名報告，也不得錯誤標記為已認領。
 
-### 5.3 Retention loop
+### 5.3 留存循環
 
 ```text
-Member opens Portfolio Radar
-→ sees current portfolio snapshot
-→ opens highest-priority Action Card
-→ reviews deterministic evidence and source date
-→ gives relationship / reminder feedback
-→ system records an idempotent event
-→ future cards and weekly review reflect explicit preferences
+會員開啟 Portfolio Radar
+→ 查看目前 Portfolio 快照
+→ 開啟最高優先級 Action Card
+→ 檢視確定性證據與資料日期
+→ 提交關係／提醒偏好回饋
+→ 系統記錄冪等事件
+→ 後續卡片與每週回顧反映明確偏好
 ```
 
-Historical 2025 reconstruction and current market context are separate data
-products. Live context must never silently rewrite the immutable Time Machine
-report.
+2025 年歷史重建與目前市場情境是兩種獨立資料產品。即時情境不得默默改寫不可變更的 Time Machine 報告。
 
-## 6. Information architecture
+## 6. 資訊架構
 
-### 6.1 Required surfaces
+### 6.1 必要介面
 
-| Route / surface | Audience | Responsibility | Delivery priority |
+| 路由／介面 | 對象 | 責任 | 交付優先級 |
 |---|---|---|---|
-| `/result` | anonymous | Existing report, share, member-value preview and activation CTA | P0 existing + copy update |
-| `/activate` | anonymous → member | Authentication handoff, report claim and holding-consent review | P0 |
-| `/app` | member | Portfolio Radar home: fingerprint, portfolio, priority card and weekly review | P0 |
-| `/app/portfolio` | member | Confirmed relationships, completeness, correction and removal | P1 |
-| `/app/stocks/:stockId` | member | Evidence detail for a confirmed or watch-only stock | P1 |
-| Internal funnel view | internal demo / operator | Verify events, activation and holding counts | P2 |
+| `/result` | 匿名使用者 | 既有報告、分享、會員價值預覽與啟用 CTA | P0 既有功能＋文案調整 |
+| `/activate` | 匿名 → 會員 | 身份驗證銜接、報告認領與持股授權檢視 | P0 |
+| `/app` | 會員 | Portfolio Radar 首頁：投資指紋、Portfolio、優先卡片與每週回顧 | P0 |
+| `/app/portfolio` | 會員 | 已確認關係、完整度、修正與移除 | P1 |
+| `/app/stocks/:stockId` | 會員 | 已確認或僅觀察股票的證據詳情 | P1 |
+| 內部漏斗頁 | 內部 Demo／營運人員 | 驗證事件、啟用數與持股數 | P2 |
 
-The hackathon P0 may implement `/app` as one route with expandable sections.
-It does not require a complete multi-page member application.
+黑客松 P0 可將 `/app` 實作為單一路由搭配可展開區塊，不要求完整的多頁會員應用。
 
-### 6.2 Portfolio Radar home requirements
+### 6.2 Portfolio Radar 首頁需求
 
-The P0 member home must contain four modules:
+P0 會員首頁必須包含四個模組：
 
-1. **Portfolio Fingerprint** — claimed persona, four-axis score, report date and
-   reconstruction confidence.
-2. **Confirmed Portfolio** — confirmed holdings only, with source and last
-   confirmation time; missing share count and cost must remain visibly unknown.
-3. **Priority Action Card** — one evidence-grounded market moment for a
-   confirmed holding, with source date, evidence and fallback state.
-4. **Weekly Review preview** — a compact summary of portfolio events and the
-   next value exchange; it may use fixture/current-snapshot data in the demo if
-   clearly labelled.
+1. **Portfolio Fingerprint**：已認領人格、四軸分數、報告日期與重建可信度。
+2. **Confirmed Portfolio**：只顯示已確認持股，包含來源與最後確認時間；缺少股數與成本時必須明確顯示未知。
+3. **Priority Action Card**：針對已確認持股提供一張有證據依據的市場時刻卡，包含資料日期、證據與降級狀態。
+4. **Weekly Review Preview**：Portfolio 事件與下一次價值交換的精簡摘要；Demo 可使用 Fixture 或目前快照資料，但必須清楚標示。
 
-## 7. Functional requirements
+P0 實作採單一路由與獨立區塊導覽，四個模組不可混成線性教學流程。介面必須補足下列可驗證狀態：
 
-### 7.1 Activation and report claim
+- 四軸分數使用中文名稱，並提供可被輔助工具辨識的數值語意；
+- 每筆持股清楚顯示本人確認來源、複核日期，以及股數／成本未知狀態；
+- Action Card 顯示資料日期、證據來源與 `Bedrock 生成`／`規則備援` 狀態；
+- 情境式 Follow-up 使用有限選項，回答只能由現有證據決定，不提供自由投資問答；
+- Weekly Review 明確標示目前快照或 Demo Fixture，不暗示已完成排程與即時資料能力；
+- Feedback、載入與錯誤狀態必須有可見訊息，且重要更新使用 `aria-live` 或等效無障礙語意。
 
-- **FR-ACT-001**: The system MUST issue an opaque reconstruction/report ID when
-  an anonymous reconstruction completes; client-computed persona or result
-  values MUST NOT be sufficient to create a claim.
-- **FR-ACT-002**: A successful member activation MUST bind the report ID to the
-  authenticated member on the backend and MUST be idempotent.
-- **FR-ACT-003**: A report already claimed by a different member MUST NOT be
-  claimable and MUST return a conflict without exposing the other identity.
-- **FR-ACT-004**: The existing hard-coded `LEO` identity is demo-only. The
-  retention SDD MUST replace client-supplied arbitrary user IDs with an
-  authenticated server identity or an explicit demo identity adapter.
-- **FR-ACT-005**: Claiming a report MUST NOT automatically create holdings.
-  Holding consent is a distinct, explicit action.
-- **FR-ACT-006**: The claimed 2025 reconstruction result MUST remain immutable;
-  later market data may add context but MUST NOT alter its historical numbers.
-- **FR-ACT-007**: Activation cancellation or provider failure MUST leave the
-  anonymous report readable for its configured lifetime and MUST NOT record a
-  successful activation event.
+## 7. 功能需求
 
-### 7.2 Confirmed portfolio
+### 7.1 會員啟用與報告認領
 
-- **FR-POR-001**: Only candidates marked `relation=holding`, explicitly selected
-  during consent and successfully revalidated by FastAPI may become confirmed
-  holdings.
-- **FR-POR-002**: Search, page view, share, reconstruction selection and model
-  inference MUST NOT create a confirmed holding.
-- **FR-POR-003**: Each relationship MUST record member ID, stock ID, type,
-  `source=user_confirmed`, source report ID, confirmation time and latest review
-  time.
-- **FR-POR-004**: Share count, average cost and broker MUST remain nullable and
-  optional; the first activation MUST NOT require them.
-- **FR-POR-005**: Members MUST be able to correct a relationship to `watch_only`
-  or remove it. The latest explicit response wins and the prior state remains
-  auditable.
-- **FR-POR-006**: Portfolio UI MUST distinguish confirmed, watch-only and stale
-  relationships and MUST never label candidates as holdings.
+- **FR-ACT-001**：匿名重建完成時，系統必須簽發不透明的重建／報告 ID；不得只憑前端計算的人格或結果值建立認領。
+- **FR-ACT-002**：會員成功啟用時，後端必須將報告 ID 綁定至已驗證會員，且操作必須具備冪等性。
+- **FR-ACT-003**：已由其他會員認領的報告不得再次認領；API 必須回傳衝突，但不得洩漏另一位會員身份。
+- **FR-ACT-004**：目前寫死的 `LEO` 身份僅供 Demo。留存 SDD 必須以伺服器端驗證身份或明確的 Demo Identity Adapter，取代前端任意傳入的 User ID。
+- **FR-ACT-005**：認領報告不得自動建立持股。持股授權必須是另一個獨立且明確的操作。
+- **FR-ACT-006**：已認領的 2025 年重建結果必須維持不可變更；後續市場資料可以增加情境，但不得修改歷史數字。
+- **FR-ACT-007**：取消啟用或身份供應者失敗時，匿名報告在設定期限內仍必須可讀，且不得記錄成功啟用事件。
 
-### 7.3 Market Moment and Action Card
+### 7.2 已確認 Portfolio
 
-- **FR-MOM-001**: Action Card candidates MUST be created from verified market,
-  institutional, valuation or community aggregate evidence with an `as_of`
-  date and source keys.
-- **FR-MOM-002**: Candidate ranking MUST be deterministic and inspectable before
-  AI narration. The baseline is `relevance × impact × novelty −
-  interruption_cost`.
-- **FR-MOM-003**: Confirmed holdings may increase relevance; `watch_only`,
-  `irrelevant` and `mute` feedback MUST change priority according to documented
-  rules.
-- **FR-MOM-004**: Market Regime or anomaly-model results may enrich a moment,
-  but MUST include model version, feature version and evidence hints.
-- **FR-MOM-005**: Raw anomaly scores MUST NOT be presented as prediction
-  accuracy or a buy/sell signal. UI uses understandable levels and evidence.
-- **FR-MOM-006**: If model artifacts are unavailable or incompatible, the
-  service MUST fall back to deterministic evidence without blocking the member
-  home.
-- **FR-MOM-007**: P0 requires at most one priority card on the member home; a
-  full feed and notification scheduler are not required.
+- **FR-POR-001**：只有標記為 `relation=holding`、在授權階段經使用者明確選取，且由 FastAPI 成功重新驗證的候選，才能成為已確認持股。
+- **FR-POR-002**：搜尋、瀏覽頁面、分享、重建選股與模型推論都不得建立已確認持股。
+- **FR-POR-003**：每筆關係必須記錄會員 ID、股票 ID、類型、`source=user_confirmed`、來源報告 ID、確認時間與最近複核時間。
+- **FR-POR-004**：股數、平均成本與券商必須保持 nullable 且選填；首次啟用不得強制要求。
+- **FR-POR-005**：會員必須能將關係修正為 `watch_only` 或移除。最新明確回覆優先，但先前狀態必須可稽核。
+- **FR-POR-006**：Portfolio UI 必須區分已確認、僅觀察與待複核關係，且不得把候選標示成持股。
 
-### 7.4 Bedrock narrative
+### 7.3 Market Moment 與 Action Card
 
-- **FR-AI-001**: Bedrock MUST receive only a verified DTO; it MUST NOT calculate
-  returns, assign holdings, alter model classifications or query credentials.
-- **FR-AI-002**: AI output MUST pass a typed schema and prohibited-language
-  checks before display.
-- **FR-AI-003**: Provider timeout, refusal, invalid schema or unavailable AWS
-  credentials MUST result in a deterministic fallback card with identical
-  numeric evidence.
-- **FR-AI-004**: Output MUST NOT contain buy/sell direction, target price,
-  return guarantee, psychological diagnosis or claims that community aggregates
-  represent the member's personal emotion.
-- **FR-AI-005**: The UI MUST expose evidence date and a fallback/generated
-  provenance state without presenting the LLM as the source of financial facts.
+- **FR-MOM-001**：Action Card 候選必須來自經驗證的市場、法人、估值或社群彙總證據，並包含 `as_of` 日期與來源 Key。
+- **FR-MOM-002**：AI 產生敘事之前，候選排序必須具確定性且可檢查。基準公式為 `relevance × impact × novelty − interruption_cost`。
+- **FR-MOM-003**：已確認持股可提高關聯性；`watch_only`、`irrelevant` 與 `mute` 回饋必須依文件化規則改變優先級。
+- **FR-MOM-004**：Market Regime 或異常模型結果可以補充市場時刻，但必須包含模型版本、特徵版本與證據提示。
+- **FR-MOM-005**：原始異常分數不得呈現為預測準確率或買賣訊號。UI 應使用可理解的等級與證據。
+- **FR-MOM-006**：模型產物不可用或版本不相容時，服務必須降級使用確定性證據，不得阻擋會員首頁。
+- **FR-MOM-007**：P0 會員首頁最多需要一張優先卡，不要求完整 Feed 或通知排程器。
 
-### 7.5 Feedback, preferences and events
+### 7.4 Bedrock 敘事
 
-- **FR-EVT-001**: The system MUST capture activation, report claim, portfolio
-  view, card impression, evidence open, relationship feedback, reminder
-  preference and holding removal as typed events.
-- **FR-EVT-002**: Client events MUST use a stable event ID and batch ingest MUST
-  be idempotent; retries MUST NOT increase metrics.
-- **FR-EVT-003**: Events are behavioral signals, not holding truth. Only explicit
-  relationship feedback may update portfolio relationships.
-- **FR-EVT-004**: Reminder feedback such as `routine` or `mute` MUST be described
-  as a content preference, not an inferred emotional condition.
-- **FR-EVT-005**: A queued client event becomes synced only after API acceptance;
-  offline or API failure MUST remain visible to the client retry mechanism.
-- **FR-EVT-006**: Future supervised ranking may use explicit labels, but viewed
-  or ignored content MUST remain unlabeled unless the label policy says
-  otherwise.
+- **FR-AI-001**：Bedrock 只能接收已驗證 DTO；不得計算報酬、指定持股、修改模型分類或查詢憑證。
+- **FR-AI-002**：AI 輸出在顯示前必須通過型別 Schema 與禁用語句檢查。
+- **FR-AI-003**：供應者逾時、拒絕、Schema 無效或 AWS 憑證不可用時，必須回傳具有相同數值證據的確定性降級卡片。
+- **FR-AI-004**：輸出不得包含買賣方向、目標價、獲利保證、心理診斷，或宣稱社群彙總代表會員個人情緒。
+- **FR-AI-005**：UI 必須顯示證據日期與 fallback／generated 來源狀態，不得把 LLM 描述為金融事實來源。
 
-## 8. Proposed service and API boundaries
+### 7.5 回饋、偏好與事件
 
-The exact OpenAPI surface is decided in each SDD feature. The following is the
-required capability map, not yet a frozen HTTP contract.
+- **FR-EVT-001**：系統必須以型別化事件記錄啟用、報告認領、Portfolio 查看、卡片曝光、證據展開、關係回饋、提醒偏好與持股移除。
+- **FR-EVT-002**：前端事件必須使用穩定 Event ID，批次寫入必須冪等；重試不得增加指標計數。
+- **FR-EVT-003**：事件是行為訊號，不是持股事實。只有明確的關係回饋可以更新 Portfolio Relationship。
+- **FR-EVT-004**：`routine`、`mute` 等提醒回饋必須描述為內容偏好，不得描述為推測的情緒狀態。
+- **FR-EVT-005**：排隊中的前端事件只能在 API 接受後標記為已同步；離線或 API 失敗必須保留在前端重試機制中。
+- **FR-EVT-006**：未來監督式排序可使用明確標籤，但已查看或忽略內容必須維持未標記，除非標籤政策另有定義。
 
-| Capability | Candidate endpoint | Authority |
+## 8. 服務與 API 邊界
+
+以下 P0 OpenAPI 已完成實作。P1 能力在 Feature SDD 核准前仍屬候選。
+
+| 能力 | 端點 | 權責 |
 |---|---|---|
-| Create durable anonymous report | `POST /api/v2/reports` | Reconstruction service |
-| Claim report | `POST /api/v2/reports/{report_id}/claim` | Activation service + authenticated identity |
-| Read claimed report | `GET /api/v2/me/reports/{report_id}` | Report repository |
-| Confirm report holdings | `POST /api/v2/reports/{report_id}/confirmed-holdings` | Holding service |
-| Member home aggregate | `GET /api/v2/me/dashboard` | Portfolio Radar query service |
-| List relationships | `GET /api/v2/me/portfolio` | Portfolio repository |
-| Get priority Action Card | `GET /api/v2/me/action-cards/next` | Moment ranking service |
-| Submit card feedback | `POST /api/v2/me/action-cards/{card_id}/feedback` | Feedback service |
-| Submit reminder preference | `POST /api/v2/me/reminder-preferences` | Preference service |
-| Batch events | `POST /api/v2/events/batch` | Event service |
+| 建立可保存的匿名報告 | `POST /api/v2/reconstructions/complete` | Reconstruction Service |
+| 將邀請碼交換為 Session | `POST /api/v2/auth/session` | Demo Identity Adapter |
+| 認領報告 | `POST /api/v2/reports/{report_id}/claim` | Activation Service＋已驗證身份 |
+| 確認報告持股 | `POST /api/v2/reports/{report_id}/confirmed-holdings` | Holding Service |
+| 會員首頁 Aggregate | `GET /api/v2/me/dashboard` | Portfolio Radar Query Service |
+| 提交卡片回饋 | `POST /api/v2/me/action-cards/{card_id}/feedback` | Feedback Service |
+| 批次提交事件 | `POST /api/v2/events/batch` | Event Service |
 
-`/me` means the server derives identity from authentication. The current
-`/users/{user_id}` and request-body `user_id` patterns must not become the
-production member authorization boundary.
+P0 刻意透過 `GET /api/v2/me/dashboard` 聚合會員報告、Portfolio、優先卡片與每週回顧，以維持第一次會員頁 Render 的一致性並減少 Request Fan-out。關係維護與獨立卡片端點保留至 P1。
 
-## 9. Data model requirements
+`/me` 代表伺服器從身份驗證結果取得身份。目前 `/users/{user_id}` 或 Request Body `user_id` 的模式不得成為正式會員授權邊界。
 
-### 9.1 Required entities
+## 9. 資料模型需求
 
-| Entity | Required purpose |
+### 9.1 必要實體
+
+| 實體 | 用途 |
 |---|---|
-| Reconstruction Report | Immutable verified result, anonymous owner token, claim state and expiry |
-| Report Claim | Idempotent report-to-member binding with claimed time |
-| Portfolio Relationship | Confirmed/watch-only relationship, source, status and review timestamps |
-| Market Moment | Deterministic/model evidence, source date, feature/model version and severity |
-| Action Card | Moment reference, member context, narrative provenance and served state |
-| Relationship Feedback | Explicit latest-wins response plus audit history |
-| Reminder Preference | Routine/mute or later frequency values; never emotion |
-| Interaction Event | Idempotent telemetry with occurred and received timestamps |
+| Reconstruction Report | 不可變更的驗證結果、匿名擁有者 Token、認領狀態與到期時間 |
+| Report Claim | 具冪等性的報告至會員綁定與認領時間 |
+| Portfolio Relationship | 已確認／僅觀察關係、來源、狀態與複核時間 |
+| Market Moment | 確定性／模型證據、來源日期、特徵／模型版本與嚴重度 |
+| Action Card | 市場時刻參照、會員情境、敘事來源與送達狀態 |
+| Relationship Feedback | 最新回覆優先的明確回應與稽核歷史 |
+| Reminder Preference | `routine`／`mute` 或後續頻率值；不得代表情緒 |
+| Interaction Event | 具有事件發生時間與接收時間的冪等 Telemetry |
 
-### 9.2 State transitions
+### 9.2 狀態轉移
 
 ```text
-anonymous report:
+匿名報告：
 created → completed_unclaimed → claimed
                          ↘ expired
 
-holding candidate:
+持股候選：
 candidate → consented → backend_revalidated → confirmed
                                       ↘ rejected
 
-portfolio relationship:
+Portfolio 關係：
 confirmed ↔ watch_only → removed
      ↘ stale_review_required
 ```
 
-Every transition that changes identity or holding truth must be server-side,
-idempotent where retry is expected, and auditable.
+所有會改變身份歸屬或持股事實的狀態轉移都必須在伺服器端完成；預期會重試的操作必須冪等，且必須可稽核。
 
-### 9.3 Data minimization
+### 9.3 資料最小化
 
-- The immutable report may store verified reconstruction outputs needed for
-  replay, but exact trade input persistence requires explicit retention policy.
-- Confirmed holdings do not require price, share count, broker or total assets.
-- Public share cards never contain stock IDs, prices, report IDs or returns by
-  default.
-- Model-training exports must replace direct identity with scoped pseudonymous
-  identifiers and document consent and label origin.
-- A later production phase must provide report/relationship deletion, export
-  and consent withdrawal.
+- 不可變更的報告可保存重播所需的已驗證重建輸出，但保存精確交易輸入前必須先定義保留政策。
+- 已確認持股不要求價格、股數、券商或總資產。
+- 公開分享圖卡預設不得包含股票 ID、價格、報告 ID 或報酬率。
+- 模型訓練匯出資料必須以具範圍限制的假名識別碼取代直接身份，並記錄授權與標籤來源。
+- 後續正式產品階段必須提供報告／關係刪除、匯出與撤回授權能力。
 
-## 10. Non-functional requirements
+## 10. 非功能需求
 
-- **NFR-001 — Security**: Member endpoints must derive identity server-side and
-  prevent cross-member report or portfolio access.
-- **NFR-002 — Reliability**: Bedrock/model failure must not block deterministic
-  portfolio and evidence views.
-- **NFR-003 — Reproducibility**: Historical reports and model artifacts carry
-  data range, feature version, model version and generation time.
-- **NFR-004 — Performance**: P0 member-home aggregate target is p95 under 1.5 s
-  excluding an optional asynchronous AI refresh; cached/fallback narrative may
-  render first.
-- **NFR-005 — Accessibility**: Cards, scores and charts require textual
-  equivalents and keyboard-operable actions.
-- **NFR-006 — Observability**: Activation, claim, card selection, AI fallback
-  and persistence failures require structured logs without sensitive inputs.
-- **NFR-007 — Privacy**: Logs and analytics must not record exact trade prices,
-  authentication tokens or full generated prompts containing personal data.
-- **NFR-008 — Compatibility**: The retention implementation remains inside the
-  existing React, FastAPI, PostgreSQL and shared Python package boundaries.
+- **NFR-001 — 安全性**：會員端點必須由伺服器取得身份，並防止跨會員存取報告或 Portfolio。
+- **NFR-002 — 可靠性**：Bedrock／模型失敗不得阻擋確定性 Portfolio 與證據畫面。
+- **NFR-003 — 可重現性**：歷史報告與模型產物必須包含資料範圍、特徵版本、模型版本與產生時間。
+- **NFR-004 — 效能**：P0 會員首頁 Aggregate 目標為 p95 小於 1.5 秒，不含選配的非同步 AI 更新；可優先顯示快取或降級敘事。
+- **NFR-005 — 無障礙**：卡片、分數與圖表必須具有文字替代內容，且操作可透過鍵盤完成。
+- **NFR-006 — 可觀測性**：啟用、認領、卡片選擇、AI 降級與持久化失敗必須留下結構化 Log，但不得包含敏感輸入。
+- **NFR-007 — 隱私**：Log 與 Analytics 不得記錄精確交易價格、身份 Token，或包含個資的完整生成 Prompt。
+- **NFR-008 — 相容性**：留存實作必須維持在既有 React、FastAPI、PostgreSQL 與共用 Python Package 邊界內。
 
-## 11. Acceptance scenarios
+## 11. 驗收情境
 
-### AS-01 — Anonymous value remains first
+### AS-01 — 匿名價值優先
 
-**Given** a stranger has not authenticated, **when** all five trades pass
-validation, **then** the complete personality report and share card are shown
-before any registration is required.
+**假設**陌生使用者尚未登入，**當**五筆交易全部通過驗證，**則**系統必須在要求註冊前顯示完整人格報告與分享圖卡。
 
-### AS-02 — Claim does not imply holding consent
+### AS-02 — 認領不代表同意建立持股
 
-**Given** a user claims a report, **when** holding consent has not been
-submitted, **then** the member account owns the report but has no new confirmed
-holdings.
+**假設**使用者已認領報告，**當**尚未提交持股授權，**則**會員帳號只擁有報告，不得新增任何已確認持股。
 
-### AS-03 — Explicit handoff creates portfolio value
+### AS-03 — 明確銜接產生 Portfolio 價值
 
-**Given** a claimed report contains three `holding` candidates, **when** the
-member selects two and consents, **then** FastAPI revalidates the report and
-creates exactly two confirmed holdings with `source=user_confirmed`.
+**假設**已認領報告包含三檔 `holding` 候選，**當**會員選擇其中兩檔並同意，**則** FastAPI 必須重新驗證報告，並建立恰好兩筆 `source=user_confirmed` 的已確認持股。
 
-### AS-04 — Member home is personalized from confirmed truth
+### AS-04 — 會員首頁只依已確認事實個人化
 
-**Given** a member has two confirmed holdings, **when** `/app` opens, **then**
-the portfolio module lists those two relationships and the priority card is
-selected only from eligible evidence; an unconfirmed quiz selection is not
-labelled as a holding.
+**假設**會員已有兩檔已確認持股，**當**開啟 `/app`，**則** Portfolio 模組必須只列出這兩筆關係，優先卡片也只能從符合條件的證據選取；未確認的測驗選股不得標示為持股。
 
-### AS-05 — AI failure is fail-soft
+### AS-05 — AI 失敗時柔性降級
 
-**Given** Bedrock times out and the model artifact is unavailable, **when** the
-member opens Portfolio Radar, **then** deterministic portfolio/evidence content
-and a fixed-template Action Card still render with no fabricated values.
+**假設** Bedrock 逾時且模型產物不可用，**當**會員開啟 Portfolio Radar，**則**確定性 Portfolio／證據內容與固定模板 Action Card 仍必須顯示，且不得捏造數值。
 
-### AS-06 — Feedback changes future interruption, not history
+### AS-06 — 回饋改變未來打擾策略，不改寫歷史
 
-**Given** a member marks an Action Card `mute`, **when** the next card is
-selected, **then** interruption cost reflects the preference, while the claimed
-2025 report and confirmed relationship history remain unchanged.
+**假設**會員將 Action Card 設為 `mute`，**當**系統選擇下一張卡片，**則**打擾成本必須反映該偏好，但已認領的 2025 年報告與已確認關係歷史不得變更。
 
-### AS-07 — Identity isolation
+### AS-07 — 身份隔離
 
-**Given** report A belongs to member A, **when** member B requests or claims it,
-**then** the API rejects the operation without exposing member A's identity or
-report content.
+**假設**報告 A 屬於會員 A，**當**會員 B 要求存取或認領該報告，**則** API 必須拒絕操作，且不得洩漏會員 A 的身份或報告內容。
 
-### AS-08 — Instrumentation is retry-safe
+### AS-08 — 事件量測可安全重試
 
-**Given** the same event batch is submitted twice after a network retry,
-**when** the dashboard metrics are recomputed, **then** every event is counted
-once.
+**假設**網路重試造成同一批事件提交兩次，**當**重新計算 Dashboard 指標，**則**每個事件只能計算一次。
 
-## 12. Delivery slices for later SDD
+## 12. 後續 SDD 交付切片
 
-The recommended feature sequence extends the existing V2 API SDD numbering:
+建議的 Feature 順序延續既有 V2 API SDD 編號：
 
-| Feature | Proposed directory | Scope | Depends on |
+| Feature | 建議目錄 | 範圍 | 依賴 |
 |---|---|---|---|
-| 004 | `docs/api/004-member-activation` | durable report, claim, identity adapter, consent handoff | existing 002/003 |
-| 005 | `docs/api/005-portfolio-radar-home` | `/app` aggregate, claimed fingerprint and confirmed portfolio | 004 |
-| 006 | `docs/api/006-market-moments-action-cards` | V1 Moment Engine concepts, ranking, Bedrock narrative and fallback | 005 + AI artifact |
-| 007 | `docs/api/007-events-preferences` | idempotent events, relationship feedback, reminder preference, metrics | 004–006 |
+| 004 | `docs/api/004-member-activation` | 可保存報告、認領、Identity Adapter 與持股授權銜接 | 既有 002／003 |
+| 005 | `docs/api/005-portfolio-radar-home` | `/app` Aggregate、已認領指紋與已確認 Portfolio | 004 |
+| 006 | `docs/api/006-market-moments-action-cards` | V1 Moment Engine 概念、排序、Bedrock 敘事與降級 | 005＋AI Artifact |
+| 007 | `docs/api/007-events-preferences` | 冪等事件、關係回饋、提醒偏好與 Metrics | 004–006 |
 
-Each SDD feature must include:
+每個 SDD Feature 必須包含：
 
-1. clarified user stories and failure cases;
-2. frozen OpenAPI request/response schemas;
-3. database migration and ownership rules;
-4. frontend route/component and loading/empty/error states;
-5. service/repository/AI boundaries;
-6. unit, integration, contract and acceptance tests;
-7. requirement-to-test traceability;
-8. explicit rollback and demo fallback behavior.
+1. 已釐清的 User Story 與失敗案例；
+2. 凍結的 OpenAPI Request／Response Schema；
+3. Database Migration 與資料擁有權規則；
+4. 前端 Route／Component 與 Loading／Empty／Error 狀態；
+5. Service／Repository／AI 邊界；
+6. Unit、Integration、Contract 與 Acceptance Test；
+7. 需求至測試的 Traceability；
+8. 明確的 Rollback 與 Demo 降級行為。
 
-Implementation must not begin merely from this umbrella document. Feature 004
-is the first alignment gate because identity, report ownership and consent affect
-all later retention work.
+不得只依本整合文件直接開始後續實作。Feature 004 是第一個 Alignment Gate，因為身份、報告所有權與授權會影響所有後續留存工作。
 
-## 13. Scope by delivery horizon
+## 13. 各交付階段範圍
 
-### Hackathon P0
+### 黑客松 P0
 
-- Result-page value preview and activation CTA.
-- Explicit demo authentication or identity adapter.
-- Claim one reconstruction report.
-- Confirm selected holding candidates after backend revalidation.
-- One `/app` Portfolio Radar page with four required modules.
-- One evidence-grounded Action Card with deterministic fallback.
-- Minimum activation, portfolio-view and card-open events.
+- 結果頁會員價值預覽與啟用 CTA。
+- 明確的 Demo Authentication 或 Identity Adapter。
+- 認領一份重建報告。
+- 後端重新驗證後，確認使用者選取的持股候選。
+- 一個包含四個必要模組的 `/app` Portfolio Radar 頁面。
+- 一張有證據依據且具確定性降級能力的 Action Card。
+- 最小啟用、Portfolio 查看與卡片開啟事件。
 
-### P1 after the hackathon
+### 黑客松後 P1
 
-- Production authentication integration.
-- Portfolio relationship correction/removal and stale review.
-- Stock evidence detail route.
-- Event outbox/retry and internal funnel metrics.
-- Scheduled weekly review and reminder preferences.
-- Real-time/current-data adapter isolated from 2025 reconstruction.
+- 正式身份驗證整合。
+- Portfolio 關係修正／移除與過期複核。
+- 個股證據詳情頁。
+- Event Outbox／重試與內部漏斗指標。
+- 排程式每週回顧與提醒偏好。
+- 與 2025 年重建隔離的即時／目前資料 Adapter。
 
-### Explicit non-goals for this spec baseline
+### 本規格基準明確不包含
 
-- Reviving or deploying the archived V1 application.
-- Maintaining separate V1 and V2 databases or APIs.
-- Free-form investment chatbot.
-- Brokerage connection, mandatory share count/cost or total-asset upload.
-- Price prediction, buy/sell advice, target prices or return guarantees.
-- Full notification infrastructure in the first slice.
-- Training a holding-prediction or emotion model without valid labels.
-- A large multi-page dashboard before the one-page retention loop is proven.
+- 恢復或部署已封存的 V1 應用。
+- 維護兩套 V1／V2 Database 或 API。
+- 自由輸入式投資聊天機器人。
+- 串接券商、強制要求股數／成本或上傳總資產。
+- 股價預測、買賣建議、目標價或獲利保證。
+- 第一個切片內的完整通知基礎設施。
+- 在沒有有效標籤的情況下訓練持股預測或情緒模型。
+- 在單頁留存循環尚未驗證前建立大型多頁 Dashboard。
 
-## 14. Reuse and migration guidance
+## 14. 重用與遷移指引
 
-V1 may be reused as a requirements and interaction reference for:
+V1 可作為下列需求與互動的參考：
 
-- Market Moment evidence contracts;
-- deterministic card ranking;
-- Action Card schema and fallback behavior;
-- explicit relationship and reminder feedback;
-- confirmed Portfolio and event-pipeline semantics.
+- Market Moment 證據契約；
+- 確定性卡片排序；
+- Action Card Schema 與降級行為；
+- 明確關係與提醒偏好回饋；
+- 已確認 Portfolio 與事件管線語意。
 
-Before any code is reused, SDD planning must verify compatibility with the
-current V2 domain models, `/api/v2` contracts, React state, PostgreSQL schema and
-privacy rules. V1 route names, demo identity, database schema and generated
-artifacts are not automatically authoritative.
+重用任何程式碼前，SDD 規劃必須驗證其與目前 V2 Domain Model、`/api/v2` 契約、React State、PostgreSQL Schema 與隱私規則相容。V1 Route 名稱、Demo 身份、Database Schema 與生成產物不會自動成為權威來源。
 
-## 15. Open decisions for SDD clarification
+## 15. 待 SDD 釐清事項
 
-1. Which authentication mechanism is used in the hackathon demo and which is
-   the production target?
-2. How long does an anonymous completed report remain claimable?
-3. Which exact reconstruction inputs are persisted for report replay, and for
-   how long?
-4. Does P0 create a report before or during `/reconstructions/complete`?
-5. Is holding consent part of activation or the first action on `/app`?
-6. Which current market dataset can legally and technically power the first
-   Portfolio Radar card?
-7. Is Bedrock narration synchronous, cached or generated asynchronously?
-8. What makes a holding relationship stale and when is reconfirmation required?
-9. Which event definitions and funnel metrics are required for judging versus
-   production analytics?
-10. Which P0 sections use clearly labelled fixtures when current data is absent?
+1. 黑客松 Demo 使用哪一種身份驗證機制？正式產品目標為何？
+2. 完成的匿名報告可在多久內認領？
+3. 為了重播報告，應保存哪些重建輸入？保留多久？
+4. P0 應在 `/reconstructions/complete` 之前或執行期間建立報告？
+5. 持股授權屬於啟用流程，還是 `/app` 的第一個操作？
+6. 哪一份目前市場資料可在法律與技術上支援第一張 Portfolio Radar 卡？
+7. Bedrock 敘事採同步、快取或非同步產生？
+8. 如何定義持股關係已過期？何時需要重新確認？
+9. 評審展示與正式 Analytics 分別需要哪些事件定義與漏斗指標？
+10. 無目前資料時，P0 哪些區塊可以使用清楚標示的 Fixture？
 
-## 16. Decision log and development record
+## 16. 決策紀錄與開發歷程
 
-| Date | Decision | Consequence |
+| 日期 | 決策 | 影響 |
 |---|---|---|
-| 2026-07-14 | V2 remains the active project root | All new runtime code and SDD artifacts live under `V2/` |
-| 2026-07-14 | Time Machine owns acquisition; Portfolio Radar owns retention | V1 and V2 concepts become consecutive product stages, not competing versions |
-| 2026-07-14 | V1 is an archived reference, not a second runtime | Selected capabilities are re-specified against React + FastAPI + PostgreSQL |
-| 2026-07-14 | This document is requirements-only | No retention implementation is considered authorized or complete |
+| 2026-07-14 | V2 維持為有效專案根目錄 | 所有新 Runtime Code 與 SDD Artifact 都放在 `V2/` |
+| 2026-07-14 | Time Machine 負責獲客；Portfolio Radar 負責留存 | V1 與 V2 概念成為連續產品階段，不是競爭版本 |
+| 2026-07-14 | V1 是封存參考，不是第二套 Runtime | 選定能力必須依 React + FastAPI + PostgreSQL 重新規格化 |
+| 2026-07-14 | 本文件最初僅作需求文件 | 當時不將任何留存實作視為完成 |
+| 2026-07-15 | P0 Time Machine → 啟用 → Portfolio Radar 已實作 | `/activate` 與 `/app` 成為有效會員旅程 |
+| 2026-07-15 | 邀請碼交換為短效簽章 Session Token | 瀏覽器不保存可重複使用的邀請碼；正式產品仍以 CMoney SSO 為目標 |
+| 2026-07-15 | 報告認領與持股授權分成兩次寫入 | 報告所有權不會默默建立持股關係 |
+| 2026-07-15 | P0 使用一張明確標示 `as_of` 的歷史證據卡 | 不把 2025 年資料描述為即時市場情境 |
+| 2026-07-15 | 前端 Analytics 使用冪等 Local Outbox | 失敗批次保留排隊並可重試，不重複計數 |
+| 2026-07-15 | `/app` 完成四模組獨立導覽與介面狀態補強 | 補齊來源、未知欄位、低門檻 Follow-up、曝光事件與無障礙語意；不擴張至 P1 多頁 Dashboard |
 
-## 17. Definition of requirements-ready
+## 17. 需求就緒定義
 
-This umbrella requirement is ready to enter feature-level SDD when:
+當符合下列條件時，本整合需求即可進入 Feature-Level SDD：
 
-- product owner confirms the Time Machine → Portfolio Radar handoff;
-- P0 versus P1 scope is accepted;
-- identity and report-claim strategy is selected;
-- current-data source and demo-fixture policy are selected;
-- feature 004 receives its own spec with no unresolved ownership or consent
-  ambiguity.
+- Product Owner 確認 Time Machine → Portfolio Radar 銜接方式；
+- P0 與 P1 範圍獲得確認；
+- Identity 與 Report Claim 策略已選定；
+- 目前資料來源與 Demo Fixture 政策已選定；
+- Feature 004 已有獨立 Spec，且不存在未解決的所有權或授權歧義。
 
-Until then, current V2 acquisition behavior remains the implementation source
-of truth and V1 remains read-only reference material.
+在上述條件完成前，目前 V2 獲客行為仍是實作真實來源，V1 維持唯讀參考。

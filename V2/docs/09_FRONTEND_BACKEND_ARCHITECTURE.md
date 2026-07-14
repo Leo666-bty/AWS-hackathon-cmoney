@@ -153,7 +153,10 @@ AI training 與 FastAPI 共用 Python virtual environment 和 shared feature pac
 
 All under base path `/api/v2`. OpenAPI schema at `/api/v2/openapi.json`;
 interactive docs at `/api/v2/docs`. Liveness: `GET /api/v2/health` →
-`{ status, service, version, model_status }`.
+`{ status, service, version, model_status, narrative_status }`。其中
+`narrative_status` 只表示 `bedrock_enabled` 或 `fallback_ready` 的設定模式，
+不會由 health endpoint 發出可計費的模型探測請求；實際生成來源由
+`narrative.source` 回傳 `bedrock` 或 `fallback`。
 
 ### Popular and search
 

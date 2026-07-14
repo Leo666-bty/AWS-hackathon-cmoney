@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -28,6 +28,7 @@ class NarrativeDraft(BaseModel):
     headline: str = Field(min_length=1)
     summary: str = Field(min_length=1)
     insight: str = Field(min_length=1)
+    source: Literal["bedrock", "fallback"] = "fallback"
 
 
 # Forbidden content (Constitution III). Chinese terms match verbatim; English
@@ -81,10 +82,16 @@ def _trips_guardrail(draft: NarrativeDraft) -> bool:
 def _extract_text(response: dict[str, Any]) -> str:
     """Pull the assistant text out of a Bedrock Converse response.
 
-    Shape assumed:
-        response["output"]["message"]["content"][0]["text"]
+    Reasoning-capable models such as gpt-oss may emit a ``reasoningContent``
+    block before the user-visible ``text`` block, so content order cannot be
+    assumed.
     """
-    return response["output"]["message"]["content"][0]["text"]
+    content = response["output"]["message"]["content"]
+    for block in content:
+        text = block.get("text")
+        if isinstance(text, str) and text.strip():
+            return text
+    raise ValueError("Bedrock Converse response contains no text block")
 
 
 def generate_narrative(
@@ -113,7 +120,9 @@ def generate_narrative(
             messages=[{"role": "user", "content": [{"text": prompt}]}],
         )
         text = _extract_text(response)
-        draft = NarrativeDraft.model_validate(json.loads(text))
+        draft = NarrativeDraft.model_validate(json.loads(text)).model_copy(
+            update={"source": "bedrock"}
+        )
     except Exception:  # noqa: BLE001 — any failure must degrade, never raise.
         logger.warning("Bedrock narrative failed; using fallback", exc_info=True)
         return fallback_narrative(result)

@@ -3,6 +3,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from mindfolio_api.ai.narrative import NarrativeDraft
+from mindfolio_api.schemas.retention import ReportHandle
 from mindfolio_core.domain.models import ReconstructionResult
 
 _MONTH = r"^(0[1-9]|1[0-2])$"
@@ -29,6 +30,7 @@ class CompleteRequest(BaseModel):
 class CompleteResponse(BaseModel):
     result: ReconstructionResult
     narrative: NarrativeDraft
+    report: ReportHandle | None = None
 
 
 class ConfirmHoldingsRequest(BaseModel):

@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from mindfolio_api.ai.narrative import generate_narrative
 from mindfolio_api.config import get_settings
 from mindfolio_api.repositories.market_data import MarketCatalog
+from mindfolio_api.repositories.retention import RetentionRepository, RetentionUnavailable
 from mindfolio_api.routers.stocks import get_catalog
 from mindfolio_api.schemas.reconstruction import (
     CompleteRequest,
@@ -19,6 +20,10 @@ from mindfolio_api.services.reconstruction import (
 from mindfolio_core.domain.models import PriceValidation
 
 router = APIRouter(tags=["reconstructions"])
+
+
+def get_retention(request: Request) -> RetentionRepository:
+    return request.app.state.retention
 
 
 @router.post("/reconstructions/validate", response_model=PriceValidation)
@@ -42,6 +47,7 @@ def complete(
     payload: CompleteRequest,
     request: Request,
     catalog: MarketCatalog = Depends(get_catalog),
+    retention: RetentionRepository = Depends(get_retention),
 ) -> CompleteResponse:
     try:
         result = complete_reconstruction(catalog, payload.trades)
@@ -58,4 +64,16 @@ def complete(
         client=request.app.state.bedrock_client,
         settings=get_settings(),
     )
-    return CompleteResponse(result=result, narrative=narrative)
+    report = None
+    try:
+        report = retention.create_report(
+            payload.trades,
+            result,
+            narrative,
+            ttl_hours=get_settings().report_ttl_hours,
+        )
+    except RetentionUnavailable:
+        # Anonymous value must remain available even if activation persistence
+        # is temporarily unavailable.
+        report = None
+    return CompleteResponse(result=result, narrative=narrative, report=report)

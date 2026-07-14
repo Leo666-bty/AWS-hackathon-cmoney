@@ -32,6 +32,24 @@ class FakeBedrockClient:
         return {"output": {"message": {"role": "assistant", "content": [{"text": self._text}]}}}
 
 
+class FakeReasoningBedrockClient(FakeBedrockClient):
+    """Matches gpt-oss Converse output: reasoning first, final text second."""
+
+    def converse(self, **kwargs) -> dict:
+        self.called = True
+        return {
+            "output": {
+                "message": {
+                    "role": "assistant",
+                    "content": [
+                        {"reasoningContent": {"reasoningText": {"text": "internal"}}},
+                        {"text": self._text},
+                    ],
+                }
+            }
+        }
+
+
 @pytest.fixture
 def result() -> ReconstructionResult:
     return ReconstructionResult(
@@ -84,6 +102,17 @@ def test_valid_bedrock_json_is_narrated(result, enabled_settings):
     assert draft.headline == "你的投資人格是穩健佈局者"
     assert "18.4" in draft.summary
     assert draft.insight
+    assert draft.source == "bedrock"
+
+
+def test_gpt_oss_reasoning_block_is_skipped(result, enabled_settings):
+    client = FakeReasoningBedrockClient(text=_bedrock_json())
+
+    draft = generate_narrative(result, client=client, settings=enabled_settings)
+
+    assert client.called is True
+    assert draft.headline == "你的投資人格是穩健佈局者"
+    assert draft.source == "bedrock"
 
 
 def test_malformed_json_falls_back(result, enabled_settings):
@@ -147,6 +176,7 @@ def test_fallback_is_clean_and_non_empty(result):
     draft = fallback_narrative(result)
 
     assert isinstance(draft, NarrativeDraft)
+    assert draft.source == "fallback"
     assert draft.headline and draft.summary and draft.insight
     blob = f"{draft.headline}{draft.summary}{draft.insight}".lower()
     for term in ["買進", "賣出", "目標價", "保證", "獲利保證", "焦慮", "憂鬱", "診斷",

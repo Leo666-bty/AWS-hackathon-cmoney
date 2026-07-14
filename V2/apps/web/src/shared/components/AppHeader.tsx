@@ -1,13 +1,15 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useReconstruction } from "../../features/reconstruction/ReconstructionContext";
+import { clearMemberSession, hasMemberSession } from "../auth/session";
 
 export function AppHeader() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { dispatch } = useReconstruction();
 
   const reset = () => {
     dispatch({ type: "reset" });
-    navigate("/");
+    void navigate("/");
   };
 
   return (
@@ -18,7 +20,8 @@ export function AppHeader() {
       </Link>
       <div className="topbar-actions">
         <span className="db-status"><i />300 檔 2025 行情</span>
-        <button className="text-button" type="button" onClick={reset}>重新開始</button>
+        {hasMemberSession() && location.pathname !== "/app" && <Link className="header-link" to="/app">Portfolio Radar</Link>}
+        {location.pathname === "/app" ? <button className="text-button" type="button" onClick={() => { clearMemberSession(); reset(); }}>登出</button> : <button className="text-button" type="button" onClick={reset}>重新開始</button>}
       </div>
     </header>
   );

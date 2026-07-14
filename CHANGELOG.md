@@ -1,5 +1,13 @@
 # Changelog & Product Journey
 
+## 2026-07-15 — V2.9：獲客 × 留存閉環與單機部署整合
+
+- 完成 Time Machine 匿名獲客到 Portfolio Radar 留存的 P0 vertical slice：短效 session、報告認領、獨立持股同意、個人化 dashboard、卡片回饋與 idempotent event batch。
+- React 正式前端新增啟用流程與 Portfolio Radar；FastAPI 新增 retention repository／service／router，並以 PostgreSQL 保存報告、持股與互動事件。
+- 整合單一 EC2 的 Docker Compose 部署，包含 Nginx、FastAPI、PostgreSQL、health check、production session secret 與 Bedrock IAM／fallback 契約。
+- 合併遠端部署文件與本地留存功能，修正 README 的完成範圍與測試數，消除「Radar 尚未實作」的過時敘述。
+- 發布前驗證：Python 64 tests、React 3 tests、ESLint、TypeScript production build 與 `docker compose config` 全數通過。
+
 ## 2026-07-14 — V2.8：強化非 FAQ 定位、10x 機制與技術護城河敘事
 
 - 將 Zero Prompt、AI 敘事層與 Reconstruction Engine 技術護城河寫入 Project Charter。

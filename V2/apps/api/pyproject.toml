@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "FastAPI backend for Mindfolio Time Machine V2"
 requires-python = ">=3.11"
 dependencies = [
-  "boto3>=1.35,<2",
+  "boto3>=1.43,<2",
   "fastapi>=0.115,<1",
   "mindfolio-core>=0.1.0",
   "psycopg[binary]>=3.2,<4",
