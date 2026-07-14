@@ -13,13 +13,6 @@ class ModelArtifactMetadata(BaseModel):
     generated_at: datetime
 
 
-class MarketInference(BaseModel):
-    regime_id: str
-    anomaly_level: str
-    evidence_keys: list[str]
-    model_version: str
-
-
 class StockSummary(BaseModel):
     """UI-facing stock summary for popular/search lists."""
 

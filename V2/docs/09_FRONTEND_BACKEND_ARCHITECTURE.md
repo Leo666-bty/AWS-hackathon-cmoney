@@ -157,6 +157,10 @@ AI training 與 FastAPI 共用 Python virtual environment 和 shared feature pac
 
 ## API contract
 
+All under base path `/api/v2`. OpenAPI schema at `/api/v2/openapi.json`;
+interactive docs at `/api/v2/docs`. Liveness: `GET /api/v2/health` →
+`{ status, service, version, model_status }`.
+
 ### Popular and search
 
 ```http
@@ -172,7 +176,7 @@ GET /api/v2/stocks/search?q=台積&limit=20
 GET /api/v2/stocks/{stock_id}/months/{yyyy_mm}/envelope
 ```
 
-Response：
+Response（實作為超集，含還原/factor/regime 供除錯與 UI）：
 
 ```json
 {
@@ -180,12 +184,16 @@ Response：
   "month": "2025-04",
   "raw_low": 780.0,
   "raw_high": 952.0,
+  "close": 908.0,
+  "adjusted_close": 892.0,
+  "factor": 0.98267621,
   "corporate_action": false,
+  "regimes": [{ "low": 780.0, "high": 952.0, "factor": 0.98267621 }],
   "allowed_price_modes": ["band", "exact"]
 }
 ```
 
-若有公司行動，可回傳多個可輸入 raw-price regime，但不把內部 adjustment calculation 權限交給前端。
+公司行動月 `corporate_action=true` 且 `allowed_price_modes=["exact"]`（區間估算被拒），`regimes` 列出前後段 raw-price 區段與其 factor；adjustment 計算不交給前端。未知股票/月份 → 404，月份格式錯（非 `YYYY-MM`）→ 422。
 
 ### Validate one reconstructed trade
 
@@ -201,23 +209,31 @@ Request 只含 stock、月份、持有狀態與使用者輸入價格。Response 
 POST /api/v2/reconstructions/complete
 ```
 
-FastAPI 必須重新驗證全部五檔，不信任先前 validate response。成功後回傳：
+Request：`{ "trades": [ TradeConfig × 5 ] }`（`TradeConfig`：`stock_id`、`relation`
+holding/sold、`buy_month` "01".."12"、`buy_mode` band/exact、`buy_band`
+low/mid/high、`buy_exact`、`sell_month`、`sell_mode` estimate/exact、`sell_exact`）。
 
-- 每檔重建結果。
-- 五檔等權重推估報酬。
-- reconstruction confidence。
-- Portfolio Fingerprint vector。
-- persona code 與 deterministic description key。
-- AI narrative 或 fallback narrative。
-- 可被確認為仍持有的 candidate list。
+FastAPI 必須重新驗證全部五檔，不信任先前 validate response。回傳
+`{ "result": ReconstructionResult, "narrative": NarrativeDraft }`：
+
+- `result.trades` — 每檔重建結果（含 return_pct、confidence）。
+- `result.average_return`、`result.confidence`。
+- `result.fingerprint` — 五維向量。
+- `result.persona_code` / `persona_name` / `persona_headline`（**直接回顯示文案**，前端不需 map key）。
+- `result.scores` — `{ outcome, entry, capture, data }`。
+- `result.holding_candidates` — 可被確認為仍持有的股票代號。
+- `narrative` — `{ headline, summary, insight }`（Bedrock 或固定模板 fallback）。
+
+未知股票 → 404；任一筆無效或非 5 筆 → 422。
 
 ### Confirm holdings
 
 ```http
 POST /api/v2/confirmed-holdings
+GET  /api/v2/users/{user_id}/confirmed-holdings
 ```
 
-只有使用者完成 consent 後呼叫。Backend 再次確認 candidate 屬於該 reconstruction/session，避免前端任意寫入其他股票。
+POST：`{ "user_id", "trades": [ ×5 ] }`。使用者 consent 後呼叫；後端**無狀態重新驗證**——重跑重建算出 `holding_candidates`，**只寫入這些**（前端無法夾帶非持有股票）。回傳該使用者的確認持股清單。GET 列出某使用者已確認持股。持久層（Postgres）不可用 → 503。
 
 ## Request sequence
 
@@ -280,4 +296,8 @@ FastAPI/Uvicorn     → PostgreSQL or local read-only fixture
 
 ## Current status
 
-目前 workspace 的 `V2/demo/` 仍是靜態互動 reference，尚未完成此文件描述的 FastAPI 實作與前端 API 串接。這是刻意的文件決策，不應在簡報中宣稱後端已完成。
+**FastAPI 後端已實作完成**（8 支端點：health、stocks popular/search/envelope、
+reconstructions validate/complete、confirmed-holdings POST/list；58 tests 綠，
+對真實 300 檔 catalog 端到端驗證）。市場資料走檔案 catalog、確認持股走 Postgres。
+`V2/demo/` 仍是前端的靜態互動 reference；**前端 React 與此 API 的串接尚未完成**
+（隊友進行中）。`apps/ai-training/` 是離線模型的 scaffold（狀態 stub，尚未訓練）。

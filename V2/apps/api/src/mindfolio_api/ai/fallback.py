@@ -9,10 +9,6 @@ from mindfolio_api.ai.narrative import NarrativeDraft
 from mindfolio_core.domain.models import ReconstructionResult
 
 
-def build_fallback_narrative(persona_name: str) -> str:
-    return f"你的 2025 投資人格是「{persona_name}」。完整說明暫時使用固定模板。"
-
-
 def fallback_narrative(result: ReconstructionResult) -> NarrativeDraft:
     """Build a fixed-template ``NarrativeDraft`` from the result alone."""
     headline = f"你的 2025 投資人格是「{result.persona_name}」"
