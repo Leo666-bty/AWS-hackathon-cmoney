@@ -63,9 +63,17 @@
 
       <section class="screen result" id="resultScreen">
         <header class="result-hero">
-          <div><p class="eyebrow">YOUR INVESTMENT FINGERPRINT</p><div class="type-row"><strong id="personaCode">LHDX</strong><span id="personaName">低接收藏家</span></div><h1 id="personaHeadline"></h1><p id="personaCopy"></p><div class="action-row"><button class="primary" id="shareBtn">複製匿名分享文案</button><button class="secondary" data-reset>重新建立</button></div></div>
+          <div><p class="eyebrow">YOUR INVESTMENT FINGERPRINT</p><div class="type-row"><strong id="personaCode">LHDX</strong><span id="personaName">低接收藏家</span></div><h1 id="personaHeadline"></h1><p id="personaCopy"></p><div class="action-row"><button class="primary" id="shareBtn">分享人格結果圖卡</button><button class="secondary" data-reset>重新建立</button></div></div>
           <aside class="confidence-card"><small>資料重建可信度</small><strong id="confidenceScore">88</strong><span>/ 100</span><p>依價格驗證、月份完整度與輸入精度計算</p></aside>
         </header>
+
+        <section class="share-funnel share-funnel-featured">
+          <figure class="share-card-preview">
+            <img id="shareCardImage" src="./assets/personality-cards/lhd-low-entry-collector.png" alt="Mindfolio LHD 低接收藏家投資人格分享圖卡" />
+            <figcaption><div><strong id="shareCardLabel">LHD 低接收藏家</strong><small>圖卡不包含持股、價格與報酬明細</small></div><div class="share-card-actions"><button class="secondary" id="downloadCardBtn">下載圖卡</button><button class="text-btn" id="copyShareTextBtn">複製匿名文案</button></div></figcaption>
+          </figure>
+          <div><p class="eyebrow">SHARE YOUR INVESTMENT PERSONA</p><h2>先分享人格，再解鎖完整投資回放</h2><ol><li class="done"><b>匿名測驗完成</b><span>人格＋投報率＋分享卡</span></li><li><b>註冊解鎖完整回放</b><span>查看每月軌跡與同人格比較</span></li><li><b>同步真實持股雷達</b><span>只針對已確認持股提供後續提醒</span></li></ol><button class="primary" id="unlockBtn">儲存報告並開啟持股雷達</button></div>
+        </section>
 
         <section class="result-grid">
           <article class="return-card"><p class="eyebrow">2025 RECONSTRUCTED RETURN</p><h2>五檔等權重推估報酬</h2><strong id="portfolioReturn">+18.5%</strong><p>以使用者輸入價格轉換為公司行動調整後的可比較價格；未計稅費與滑價。</p></article>
@@ -79,12 +87,7 @@
           <div class="vector-box"><span>Portfolio Fingerprint</span><code id="fingerprintVector">[0.22, 0.80, 0.34, 0.92, 0.18]</code></div>
         </section>
 
-        <section class="panel"><header class="panel-head"><div><p class="eyebrow">DECISION BREAKDOWN</p><h2>2025 情境決策力</h2></div><span>不等於真實投資能力</span></header><div class="ability-grid" id="abilityGrid"></div></section>
-
-        <section class="share-funnel">
-          <article class="share-card"><small>MINDFOLIO 2025</small><p>我的投資人格是</p><strong id="sharePersona">低接收藏家</strong><b id="shareCode">LHDX</b><span id="shareHeadline"></span><footer>不曬持股，也能分享。 #投資時光機</footer></article>
-          <div><p class="eyebrow">FROM STRANGER TO PORTFOLIO USER</p><h2>先匿名看見自己，再換取長期價值</h2><ol><li class="done"><b>匿名測驗完成</b><span>人格＋投報率＋分享卡</span></li><li><b>註冊解鎖完整回放</b><span>查看每月軌跡與同人格比較</span></li><li><b>同步真實持股雷達</b><span>只針對已確認持股提供後續提醒</span></li></ol><button class="primary" id="unlockBtn">儲存報告並開啟持股雷達</button></div>
-        </section>
+        <section class="panel"><header class="panel-head"><div><p class="eyebrow">DECISION BREAKDOWN</p><h2>2025 情境決策力</h2></div><span>不等於真實投資能力</span></header><div class="decision-layout"><figure class="radar-card"><canvas id="abilityRadar" width="420" height="420" role="img" aria-label="2025 情境決策力四軸雷達圖"></canvas><figcaption>四項分數已轉為相同比例呈現，外圈代表該項滿分。</figcaption></figure><div class="ability-grid" id="abilityGrid"></div></div></section>
 
         <p class="disclaimer">此結果依使用者回憶的月份與價格重建，屬估算情境；人格不是心理診斷，分數不代表未來績效，內容不構成投資建議。手動價格只做行情合理性檢查，不代表交易真實性已被券商驗證。</p>
       </section>
@@ -92,6 +95,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="./market-data.js"></script>
+    <script src="./personality-cards.js"></script>
     <script src="./script.js"></script>
   </body>
 </html>

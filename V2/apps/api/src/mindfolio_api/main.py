@@ -1,3 +1,6 @@
+import logging
+from typing import Any
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -8,6 +11,26 @@ from mindfolio_api.repositories.holdings import (
 )
 from mindfolio_api.repositories.market_data import MarketCatalog
 from mindfolio_api.routers import health, holdings, reconstructions, stocks
+
+logger = logging.getLogger(__name__)
+
+
+def build_bedrock_client() -> Any | None:
+    """Create the Bedrock runtime client only when explicitly enabled.
+
+    Client construction is fail-soft: the narrative layer has a deterministic
+    fallback and the core reconstruction must never depend on AWS availability.
+    """
+    settings = get_settings()
+    if not settings.bedrock_enabled or not settings.bedrock_model_id:
+        return None
+    try:
+        import boto3
+
+        return boto3.client("bedrock-runtime", region_name=settings.aws_region)
+    except Exception:  # noqa: BLE001 — startup must retain fallback capability.
+        logger.warning("Bedrock client initialization failed; fallback enabled", exc_info=True)
+        return None
 
 
 def create_app(
@@ -31,6 +54,7 @@ def create_app(
     )
     app.state.catalog = catalog
     app.state.holdings = holdings_repo
+    app.state.bedrock_client = build_bedrock_client()
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,

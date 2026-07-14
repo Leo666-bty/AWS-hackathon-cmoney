@@ -5,7 +5,7 @@
 `reconstructions/validate｜complete`、`confirmed-holdings`（POST + 列表）。
 deterministic 計算在 `packages/mindfolio-core`；AI 敘事（Bedrock + 固定模板
 fallback，絕不 raise）在 `ai/`；確認持股走 PostgreSQL（`repositories/holdings.py`，
-DB 不可用 → 503）。58 tests 綠，對真實 300 檔 catalog 端到端驗證。
+DB 不可用 → 503）。V2 Python suite 58 tests 綠，並對真實 300 檔 catalog 驗證。
 
 分層：`routers/`（HTTP、狀態碼）→ `services/`（orchestration、重新驗證五檔）→
 `repositories/`（`market_data` 檔案 catalog、`holdings` DB）→ `mindfolio-core`

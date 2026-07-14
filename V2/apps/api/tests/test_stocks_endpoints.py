@@ -60,7 +60,8 @@ def test_popular_ordered_and_capped(client: TestClient) -> None:
     assert res.status_code == 200
     body = res.json()
     assert [s["id"] for s in body] == ["2330"]
-    assert set(body[0]) >= {"id", "name", "industry", "views", "popular"}
+    assert set(body[0]) >= {"id", "name", "industry", "views", "popular", "available_months"}
+    assert body[0]["available_months"] == ["04"]
 
 
 def test_search_and_empty_query(client: TestClient) -> None:

@@ -4,6 +4,24 @@
 
 一般投資報告要求使用者先有問題、先輸入資料；人格測驗提供明確承諾、完成時間短、結果與自我認同有關，也自然適合分享。CMoney 的差異是結果不只靠文案，而是用真實 2025 報酬節點計算。
 
+這不是 FAQ／ChatGPT 型入口：使用者不必先想問題或輸入 prompt，而是完成一個有明確終點的互動任務。AI 敘事提高理解與傳播，真正累積資料價值的是 Reconstruction Engine 與 confirmed holding consent。
+
+## 10x 的兩個成長機制
+
+### ① 匿名分享卡：Referral loop
+
+人格卡提供可公開的身分標籤，但預設不包含股票、月份、價格、持股與報酬。每一次分享都能成為下一位陌生用戶的 Acquisition 入口：
+
+```text
+完成結果 → 分享圖卡 → 朋友點入 → 再完成一次 → 再分享
+```
+
+必須追蹤 `share_click`、`share_download`、referral source 與 referred reconstruction completion，不能只計算按鈕點擊就宣稱病毒成長。
+
+### ② Progressive Profiling：Value-for-data ladder
+
+每一層先交付可見價值，才請使用者提供下一層資料。任何一層拒絕都不得回收前一層已承諾的結果，也不得把候選／瀏覽誤記為真實持股。
+
 ## Pirate Funnel
 
 | 階段 | 產品事件 | 核心指標 |
@@ -33,6 +51,19 @@
 - 將重建時明確標記「仍持有」的股票帶入確認；股數與成本延後、可選填。
 - 解鎖個人化法人／價格／社群背離與每週投資回顧。
 - 目標：提高資料完整度與持續使用。
+
+三層交換形成同一產品生命週期：Time Machine 負責 Free／Member acquisition，Portfolio Radar 負責 Portfolio retention。詳細 handoff 與 SDD requirements 見 `13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md`。
+
+## North Star 與漏斗資產
+
+North Star 是 **Verified Holding Activation**：完成重建，且主動確認至少一檔仍持有股票的人數。
+
+它比回答數、生成次數或人格測驗完成數更接近 CMoney 的商業價值，因為它同時代表：
+
+- 使用者已收到足夠價值，願意完成資料交換；
+- 股票關係來自明確同意，不是模型猜測；
+- 後續 Portfolio Radar 有合法且相關的個人化基礎；
+- CMoney 可以衡量從陌生流量到持股資料資產的完整轉換。
 
 ## 社群分享設計
 

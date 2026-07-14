@@ -45,8 +45,8 @@
 - 通過價格檢查就代表交易是真的。
 - 測驗分數代表真實投資能力。
 - Demo 已經串接使用者券商帳戶。
-- 現在畫面背後已經完成 FastAPI 或正式資料庫。
+- 靜態 `V2/demo/` 畫面背後已經完成正式 FastAPI 串接。
 
 ## 現階段展示口徑
 
-`V2/demo/` 是前端靜態 UX reference。**FastAPI 後端已實作完成**，可用 `make dev-api` 起服務、在 `/api/v2/docs` 現場展示真實驗證／報酬／人格重算（例如 5 檔熱門股 → 回人格＋報酬＋分數＋敘事）。前端 React 與此 API 的串接進行中，故 Demo 目前仍以 `V2/demo/` 呈現完整互動。
+正式 Live Demo 使用 `V2/apps/web`：先以 `make dev-api` 啟動 FastAPI，再以 `make dev-web` 啟動 React。畫面中的熱門／搜尋、月份 envelope、validation、complete、AI narrative 與 confirmed holdings 都走 `/api/v2`。`V2/demo/` 僅作為無網路或服務故障時的靜態備援，不得把其前端計算描述成正式金融結果。

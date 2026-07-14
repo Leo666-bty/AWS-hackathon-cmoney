@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from mindfolio_api.ai.narrative import generate_narrative
 from mindfolio_api.config import get_settings
@@ -40,6 +40,7 @@ def validate(
 @router.post("/reconstructions/complete", response_model=CompleteResponse)
 def complete(
     payload: CompleteRequest,
+    request: Request,
     catalog: MarketCatalog = Depends(get_catalog),
 ) -> CompleteResponse:
     try:
@@ -52,5 +53,9 @@ def complete(
         )
 
     # Bedrock disabled by default → deterministic fallback narrative (demo-safe).
-    narrative = generate_narrative(result, settings=get_settings())
+    narrative = generate_narrative(
+        result,
+        client=request.app.state.bedrock_client,
+        settings=get_settings(),
+    )
     return CompleteResponse(result=result, narrative=narrative)

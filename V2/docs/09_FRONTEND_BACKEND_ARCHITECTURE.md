@@ -2,7 +2,7 @@
 
 ## Current implementation status
 
-架構底座已初始化：React frontend、FastAPI application、共用 Python core 與 offline AI training package 均已建立。現在僅實作 `/api/v2/health` 與前端 foundation route；其餘本文件 API 是下一階段 contract，不應被視為已上線能力。
+V2 vertical slice 已完成：React frontend 已串接 FastAPI 的熱門／搜尋、月行情 envelope、逐筆 validation、五檔 complete 與 confirmed holdings；共用 Python core 負責所有正式金融計算。`demo/` 仍是靜態 UX reference，不是正式 runtime。
 
 ## Architecture decision
 
@@ -10,7 +10,7 @@ V2 正式版本採前後端分離：
 
 - **Frontend**：使用 React + TypeScript，負責股票搜尋介面、五檔表單、進度、結果呈現、分享與錯誤狀態。
 - **Backend**：使用 FastAPI + Python，負責資料存取、驗證、金融計算、Portfolio Fingerprint、AI narrative 與持股保存。
-- **Database**：保存股票主檔、月份行情 envelope、匿名重建事件與 confirmed holdings。
+- **Data store**：2025 股票主檔與月份 envelope 由版本化 JSON snapshot 提供；PostgreSQL 只保存使用者明確同意的 confirmed holdings。
 - **AI provider**：由 Python backend 呼叫；前端不直接持有模型憑證或組裝模型 context。
 
 ```text
@@ -44,7 +44,7 @@ V2 正式版本採前後端分離：
 - Pydantic 可作為 request、domain input、AI output schema 的共同驗證層。
 - 自動 OpenAPI 方便前端產生 typed client 與評審檢視 contract。
 - 同一 runtime 可使用 NumPy/Pandas、傳統模型與 AWS Bedrock SDK。
-- `async` 適合資料庫與模型呼叫；CPU-heavy 批次工作仍應移到 background job，不阻塞 request。
+- 目前 route 為同步函式，deterministic 計算量小且可預測；Bedrock 或高延遲 I/O 正式上線時再改 async／worker，避免黑客松階段引入不必要並行複雜度。
 
 ## Why React + TypeScript
 
@@ -63,7 +63,7 @@ apps/web/
 ├── src/
 │   ├── app/
 │   │   ├── App.tsx
-│   │   ├── router.tsx
+│   │   ├── App.tsx
 │   │   └── providers.tsx
 │   ├── routes/
 │   │   ├── LandingRoute.tsx
@@ -71,13 +71,9 @@ apps/web/
 │   │   ├── ReconstructionRoute.tsx
 │   │   └── ResultRoute.tsx
 │   ├── features/
-│   │   ├── stock-search/
-│   │   ├── portfolio-builder/
-│   │   ├── trade-reconstruction/
-│   │   ├── result-report/
-│   │   └── holding-consent/
+│   │   └── reconstruction/    # cross-route reducer/context
 │   ├── shared/
-│   │   ├── api/               # OpenAPI generated client
+│   │   ├── api/               # Zod runtime validation + typed client
 │   │   ├── components/
 │   │   ├── hooks/
 │   │   └── types/
@@ -85,17 +81,17 @@ apps/web/
 └── tests/
 ```
 
-### React state boundary
+### React state boundary（已實作）
 
 | State | 建議位置 | 例子 |
 |---|---|---|
 | Server state | Query cache | 熱門股票、搜尋結果、price envelope、final result |
-| Wizard draft | `useReducer` + Context | 已選五檔、目前步驟、尚未送出的欄位 |
+| Wizard draft | `useReducer` + Context | 已選五檔、每檔 trade draft、complete result |
 | Field state | Form library／component | 月份、價格模式、實際價格 |
 | Durable identity | Backend session | anonymous reconstruction ID、member ID |
 | Calculated result | 不存本地真相 | 一律使用 FastAPI response |
 
-不建議一開始導入大型 global store；只有跨 route wizard draft 確實需要時，才以小型 store 取代 Context。
+目前以小型 reducer/context 實作，不導入大型 global store。重新整理會回到入口，這是匿名 MVP 的已知取捨；正式產品可加入 server-side draft session。
 
 ## Backend module design
 
@@ -296,8 +292,8 @@ FastAPI/Uvicorn     → PostgreSQL or local read-only fixture
 
 ## Current status
 
-**FastAPI 後端已實作完成**（8 支端點：health、stocks popular/search/envelope、
-reconstructions validate/complete、confirmed-holdings POST/list；58 tests 綠，
-對真實 300 檔 catalog 端到端驗證）。市場資料走檔案 catalog、確認持股走 Postgres。
-`V2/demo/` 仍是前端的靜態互動 reference；**前端 React 與此 API 的串接尚未完成**
-（隊友進行中）。`apps/ai-training/` 是離線模型的 scaffold（狀態 stub，尚未訓練）。
+**React × FastAPI vertical slice 已完成**（8 支端點：health、stocks
+popular/search/envelope、reconstructions validate/complete、confirmed-holdings
+POST/list；V2 Python suite 58 tests 與 React production build 通過）。市場資料走檔案
+catalog、確認持股走 Postgres。`V2/demo/` 是靜態互動 reference；
+`apps/ai-training/` 仍是離線模型 scaffold（狀態 stub，尚未訓練）。

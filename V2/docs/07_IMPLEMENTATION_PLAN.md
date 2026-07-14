@@ -36,7 +36,7 @@ V2/
 └── demo/                       # 現有靜態 UX reference，非正式架構
 ```
 
-以上骨架已建立。**正式 MVP API 與金融規則已完成**：8 支端點、deterministic 重建引擎（區間驗證、公司行動還原、人格／分數）、AI 敘事 fallback、確認持股（Postgres），58 tests 綠並對真實 300 檔 catalog 端到端驗證。**尚未完成**：前端 React 與 API 的串接、離線模型訓練（`apps/ai-training` 仍是 scaffold）、AWS/Docker 部署（藍圖見 `11_DEPLOYMENT.md`）。
+以上骨架已建立。**正式 MVP vertical slice 已完成**：8 支 API、deterministic 重建引擎、AI 敘事 fallback、Postgres confirmed holdings，以及 React 四 route 串接。V2 Python suite 58 tests、React smoke test 與 production build 通過。**尚未完成**：離線模型訓練（`apps/ai-training` 仍是 scaffold）、真身份、即時行情與 AWS/Docker 部署（藍圖見 `11_DEPLOYMENT.md`）。
 
 ## Initialization checkpoint
 
@@ -46,24 +46,25 @@ V2/
 - [x] API／Training 共用 `mindfolio-core`
 - [x] Offline training package 與無假數據 artifact contract
 - [x] Frontend build／test 與 Python test baseline
-- [ ] 股票與月份行情 repositories
-- [ ] reconstruction／holding API contracts
-- [ ] deterministic return／fingerprint services
+- [x] 股票與月份行情 repositories
+- [x] reconstruction／holding API contracts
+- [x] deterministic return／fingerprint services
+- [x] React 選股、逐檔重建、結果與持股同意流程
 - [ ] 第一版 regime／anomaly model training
 - [ ] PostgreSQL 與 AWS runtime
 
-## 正式 MVP Phase 1：FastAPI backend
+## 已完成：FastAPI backend
 
-- 將 `market-data.js` 改成 PostgreSQL `stock_master` 與 `monthly_price_envelope`。
-- 建立 `/stocks/popular`、`/stocks/search`、`/price-envelope`、`/reconstructions/validate`、`/reconstructions/complete` API。
+- 將 `market-data.js` 改成後端讀取版本化 `market-catalog.json`；黑客松不把只讀行情搬入 PostgreSQL。
+- 建立 `/stocks/popular`、`/stocks/search`、`/stocks/{id}/months/{ym}/envelope`、`/reconstructions/validate`、`/reconstructions/complete` API。
 - 由後端重算報酬與可信度，前端結果不可作為可信來源。
 - anonymous session 與 member profile 使用不同識別與資料表。
 - 將 deterministic calculation、AI narrative 與 API 放在同一個 Python environment，但保持不同 module。
 
-## Frontend Phase
+## 已完成：React Frontend Phase
 
 - 使用 React + TypeScript 建立 route 與 feature-based structure。
-- 由 FastAPI OpenAPI 產生 typed API client。
+- 以 strict TypeScript + Zod 建立 typed API client；後續 CI 可再改為 OpenAPI codegen。
 - server state 與 wizard draft 分離，避免把 API response 複製成多份 local state。
 - 前端只保存尚未送出的表單草稿與畫面狀態。
 - 股票搜尋、熱門清單與月份 envelope 全部由 FastAPI 提供。
@@ -89,10 +90,12 @@ V2/
 
 ## Phase 3：CMoney 個人化
 
-- confirmed holding 接 V1 Moment Engine。
-- 加入法人、估值、社群與基本面訊號。
-- 依持股與使用者偏好產生每週 Portfolio Radar。
+- 依 `13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md` 將 Time Machine 獲客銜接 Portfolio Radar 留存。
+- 先完成匿名報告認領、身份邊界與 confirmed holding consent handoff。
+- 在 V2 重新實作需要的 V1 Moment Engine／Action Card 能力，不恢復第二套 V1 runtime。
+- 加入法人、估值、社群與基本面訊號，依持股與使用者偏好產生每週 Portfolio Radar。
 - A/B Test「人格分享」與「挑戰大盤」獲客訊息。
+- 後續 SDD 順序為 004 member activation、005 Portfolio Radar home、006 market moments、007 events/preferences。
 
 ## 三天黑客松切割線
 

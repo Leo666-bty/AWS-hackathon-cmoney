@@ -1,5 +1,34 @@
 # Changelog & Product Journey
 
+## 2026-07-14 — V2.8：強化非 FAQ 定位、10x 機制與技術護城河敘事
+
+- 將 Zero Prompt、AI 敘事層與 Reconstruction Engine 技術護城河寫入 Project Charter。
+- 明確定義匿名分享卡 referral loop 與 Progressive Profiling value-for-data ladder。
+- 將 Verified Holding Activation 對齊 CMoney 從陌生流量取得明確持股資料的 North Star。
+- Pitch Deck 故事調整為 Time Machine 獲客、Portfolio Radar 留存；AI 負責解讀，金融真相仍由可重算引擎產生。
+- 本次只整理附件中的產品論述與既有文件，未修改產品功能或程式。
+
+## 2026-07-14 — V2.7：定義 Time Machine 獲客 × Portfolio Radar 留存需求
+
+- 新增 `13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md` 作為後續 SDD 的 umbrella requirements baseline。
+- 確認 V2 仍是唯一主要專案與 runtime；V1 僅作為 Moment Engine、Action Card、Portfolio 與事件語意參考。
+- 定義匿名報告認領、會員啟用、持股同意、Portfolio Radar、Market Moment、Bedrock 敘事與事件資料邊界。
+- 建立 FR／NFR、狀態轉移、驗收情境、隱私要求與 P0／P1 切割線。
+- 規劃後續 SDD feature 004–007；本次只更新需求文件，未開始留存功能實作。
+
+## 2026-07-14 — V2.6：圖卡提前與決策力雷達圖
+
+- 將人格分享圖卡移到結果頁上方，優先於投報、持股與情境決策分數呈現。
+- 新增四軸情境決策力雷達圖，依報酬結果、進場位置、報酬捕捉與資料完整度即時計算。
+- 雷達圖將各指標換算為相同比例，並保留原始分數卡供使用者核對。
+
+## 2026-07-14 — V2.5：結果分享改用八型人格圖卡
+
+- 將 `demo/assets/personality-cards` 八張直式圖卡建立為人格圖卡資料表。
+- 結果頁依 Portfolio Fingerprint 前三碼自動顯示對應圖卡。
+- 分享流程優先使用裝置原生圖片分享；不支援時改為下載圖卡並複製匿名文案。
+- 增加獨立下載圖卡與複製文案操作，所有分享內容均不包含持股、價格與報酬明細。
+
 ## 2026-07-14 — V2.4：React／FastAPI／AI Training 專案初始化
 
 - 建立 pnpm workspace 與 React + TypeScript + Vite frontend。

@@ -94,4 +94,5 @@ def _to_summary(stock: dict[str, Any]) -> StockSummary:
         industry=stock.get("industry", ""),
         views=int(stock.get("views", 0)),
         popular=bool(stock.get("popular", False)),
+        available_months=sorted(stock.get("months", {}).keys()),
     )

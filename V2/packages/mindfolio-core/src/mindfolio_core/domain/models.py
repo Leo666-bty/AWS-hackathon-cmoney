@@ -21,6 +21,7 @@ class StockSummary(BaseModel):
     industry: str
     views: int = Field(ge=0)
     popular: bool = False
+    available_months: list[str] = Field(default_factory=list)
 
 
 class PriceRegime(BaseModel):

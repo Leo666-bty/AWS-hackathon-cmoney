@@ -2,6 +2,7 @@ const database = MARKET_DATABASE;
 const stockMap = new Map(database.stocks.map((stock) => [stock.id, stock]));
 const monthLabels = {"01":"1 月","02":"2 月","03":"3 月","04":"4 月","05":"5 月","06":"6 月","07":"7 月","08":"8 月","09":"9 月","10":"10 月","11":"11 月","12":"12 月"};
 const allMonths = Object.keys(monthLabels);
+const personalityCards = window.PERSONALITY_CARD_DATA || {};
 
 const screens = {
   hero: document.querySelector("#heroScreen"),
@@ -62,6 +63,38 @@ function formatPrice(value) {
 
 function formatReturn(value) {
   return `${value >= 0 ? "+" : ""}${value.toFixed(1)}%`;
+}
+
+function resultCard(result = state.result) {
+  if (!result) return personalityCards.LHD;
+  return personalityCards[result.code.slice(0, 3)] || personalityCards.LHD;
+}
+
+function shareText(result = state.result) {
+  return `我的 2025 投資人格是「${result.persona} ${result.code}」！${result.headline} 不曬持股也能分享，你是哪一型？ #投資時光機 #Mindfolio`;
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    window.prompt("複製匿名分享文案：", text);
+    return false;
+  }
+}
+
+function downloadResultCard() {
+  if (!state.result) return;
+  const card = resultCard();
+  const link = document.createElement("a");
+  link.href = card.image;
+  link.download = `mindfolio-${card.code.toLowerCase()}-${state.result.code.toLowerCase()}.png`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  track("share_card_download", { code: state.result.code, card_code: card.code });
+  showToast("人格圖卡已下載；圖片不包含持股與報酬明細");
 }
 
 function renderStockResults() {
@@ -289,6 +322,68 @@ function computeResult() {
   setTimeout(() => { clearInterval(timer); state.result = computeResultData(); renderResult(); showScreen("result"); track("reconstruction_result_view", { code: state.result.code, confirmed_holdings: state.result.holdings.length, confidence: state.result.confidence }); }, 1750);
 }
 
+function drawAbilityRadar(abilities) {
+  const canvas = document.querySelector("#abilityRadar");
+  const context = canvas.getContext("2d");
+  const center = canvas.width / 2;
+  const radius = 132;
+  const labelRadius = 172;
+  const angles = abilities.map((_, index) => -Math.PI / 2 + index * (Math.PI * 2 / abilities.length));
+  const pointAt = (angle, distance) => ({ x: center + Math.cos(angle) * distance, y: center + Math.sin(angle) * distance });
+  const drawPolygon = (distances) => {
+    context.beginPath();
+    distances.forEach((distance, index) => {
+      const point = pointAt(angles[index], distance);
+      if (index === 0) context.moveTo(point.x, point.y);
+      else context.lineTo(point.x, point.y);
+    });
+    context.closePath();
+  };
+
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.lineWidth = 1;
+
+  for (let ring = 1; ring <= 4; ring += 1) {
+    drawPolygon(angles.map(() => radius * ring / 4));
+    context.strokeStyle = ring === 4 ? "rgba(143,167,186,.38)" : "rgba(143,167,186,.16)";
+    context.stroke();
+  }
+
+  angles.forEach((angle) => {
+    const edge = pointAt(angle, radius);
+    context.beginPath();
+    context.moveTo(center, center);
+    context.lineTo(edge.x, edge.y);
+    context.strokeStyle = "rgba(143,167,186,.2)";
+    context.stroke();
+  });
+
+  const values = abilities.map(([, value, max]) => radius * value / max);
+  drawPolygon(values);
+  context.fillStyle = "rgba(85,230,215,.2)";
+  context.fill();
+  context.lineWidth = 3;
+  context.strokeStyle = "#c9ff63";
+  context.stroke();
+
+  values.forEach((distance, index) => {
+    const point = pointAt(angles[index], distance);
+    context.beginPath();
+    context.arc(point.x, point.y, 5, 0, Math.PI * 2);
+    context.fillStyle = "#55e6d7";
+    context.fill();
+  });
+
+  context.fillStyle = "#f4f8fb";
+  context.font = "700 14px Inter, system-ui, sans-serif";
+  context.textBaseline = "middle";
+  abilities.forEach(([name, value, max], index) => {
+    const label = pointAt(angles[index], labelRadius);
+    context.textAlign = Math.abs(label.x - center) < 8 ? "center" : label.x > center ? "right" : "left";
+    context.fillText(`${name} ${Math.round(value / max * 100)}`, label.x, label.y);
+  });
+}
+
 function renderResult() {
   const result = state.result;
   document.querySelector("#personaCode").textContent = result.code;
@@ -306,16 +401,35 @@ function renderResult() {
   document.querySelector("#fingerprintVector").textContent = `[${result.vector.map((value) => value.toFixed(2)).join(", ")}]`;
   const abilities = [["報酬結果",result.scores.outcomeScore,40,"五檔等權重重建報酬"],["進場位置",result.scores.entryScore,25,"成交價在當月區間的位置"],["報酬捕捉",result.scores.captureScore,20,"離場價相對後續月末價格"],["資料完整",result.scores.dataScore,15,"精確價格與行情驗證可信度"]];
   document.querySelector("#abilityGrid").innerHTML = abilities.map(([name,value,max,copy]) => `<article class="ability"><header><span>${name}</span><b>${value} / ${max}</b></header><i><b style="width:${value/max*100}%"></b></i><p>${copy}</p></article>`).join("");
-  document.querySelector("#sharePersona").textContent = result.persona;
-  document.querySelector("#shareCode").textContent = result.code;
-  document.querySelector("#shareHeadline").textContent = result.headline;
+  drawAbilityRadar(abilities);
+  const card = resultCard(result);
+  const shareImage = document.querySelector("#shareCardImage");
+  shareImage.src = card.image;
+  shareImage.alt = card.alt;
+  document.querySelector("#shareCardLabel").textContent = `${card.code} ${card.name}`;
 }
 
 async function share() {
-  const text = `我的 2025 投資人格是「${state.result.persona} ${state.result.code}」！${state.result.headline} 不曬持股也能分享，你是哪一型？ #投資時光機 #Mindfolio`;
-  track("share_copy", { code: state.result.code });
-  try { await navigator.clipboard.writeText(text); showToast("匿名文案已複製，沒有包含持股與報酬明細"); }
-  catch { window.prompt("複製匿名分享文案：", text); }
+  if (!state.result) return;
+  const card = resultCard();
+  const text = shareText();
+
+  try {
+    const response = await fetch(card.image);
+    if (!response.ok) throw new Error("share card unavailable");
+    const file = new File([await response.blob()], `mindfolio-${card.code.toLowerCase()}.png`, { type: "image/png" });
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      await navigator.share({ title: `我的 2025 投資人格：${card.name}`, text, files: [file] });
+      track("share_card_native", { code: state.result.code, card_code: card.code });
+      return;
+    }
+  } catch (error) {
+    if (error?.name === "AbortError") return;
+  }
+
+  await copyText(text);
+  downloadResultCard();
+  track("share_card_fallback", { code: state.result.code, card_code: card.code });
 }
 
 document.querySelector("#dbCount").textContent = database.stockCount;
@@ -327,6 +441,13 @@ document.querySelector("#stockSearch").addEventListener("input", renderStockResu
 document.querySelector("#quickPickBtn").addEventListener("click", () => { state.selected = database.popular.slice(0, 5); renderStockResults(); renderSelected(); track("popular_five_selected", { stock_ids: [...state.selected] }); });
 document.querySelector("#configureBtn").addEventListener("click", beginConfiguration);
 document.querySelector("#shareBtn").addEventListener("click", share);
+document.querySelector("#downloadCardBtn").addEventListener("click", downloadResultCard);
+document.querySelector("#copyShareTextBtn").addEventListener("click", async () => {
+  if (!state.result) return;
+  await copyText(shareText());
+  track("share_copy", { code: state.result.code });
+  showToast("匿名分享文案已複製；不包含持股與報酬明細");
+});
 document.querySelector("#unlockBtn").addEventListener("click", () => { track("portfolio_radar_unlock_click", { confirmed_holdings: state.result.holdings.length }); showToast("Demo：下一步會徵求同意並儲存已確認持股，不會自動連結券商"); });
 
 renderStockResults();
