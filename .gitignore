@@ -6,6 +6,8 @@
 .env.*
 !.env.example
 node_modules/
+.pnpm-store/
+*.egg-info/
 dist/
 build/
 .next/
@@ -16,6 +18,13 @@ __pycache__/
 .venv/
 venv/
 *.log
+*.tsbuildinfo
+
+# TypeScript config build output; the source *.config.ts files are canonical.
+V2/apps/web/vite.config.js
+V2/apps/web/vite.config.d.ts
+V2/apps/web/vitest.config.js
+V2/apps/web/vitest.config.d.ts
 
 # Offline AI training outputs are reproducible and stay out of Git.
 apps/ai-training/artifacts/*
@@ -24,6 +33,9 @@ apps/ai-training/outputs/
 V1/apps/ai-training/artifacts/*
 !V1/apps/ai-training/artifacts/.gitkeep
 V1/apps/ai-training/outputs/
+V2/apps/ai-training/artifacts/*
+!V2/apps/ai-training/artifacts/.gitkeep
+V2/apps/ai-training/outputs/
 
 # Organizer-provided source package stays local unless redistribution is approved.
 data/*.pdf

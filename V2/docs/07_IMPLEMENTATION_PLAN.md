@@ -11,7 +11,7 @@
 - 使用 adjustment factor 重建可比較報酬。
 - 產生資料可信度、Fingerprint vector、人格與漏斗 CTA。
 
-## 目標目錄設計
+## 已初始化目錄
 
 ```text
 V2/
@@ -30,12 +30,27 @@ V2/
 │   └── ai-training/            # Python offline training commands
 ├── packages/
 │   └── mindfolio-core/         # API/Training 共用 features 與 domain calculation
-├── pyproject.toml              # Python environment 與共用 dependency
+├── python-requirements.txt     # 共用 Python virtual environment 安裝入口
+├── package.json               # pnpm workspace scripts
 ├── docs/
 └── demo/                       # 現有靜態 UX reference，非正式架構
 ```
 
-本輪只更新文件，尚未搬移或建立以上目錄。
+以上骨架已建立。React 可完成 production build，FastAPI health endpoint、共用 core contract 與 training artifact contract 已有測試。現階段只代表工程底座可執行，不代表下列正式 MVP API、金融規則或模型已完成。
+
+## Initialization checkpoint
+
+- [x] React + TypeScript + Vite workspace
+- [x] Router、Query provider、API health client
+- [x] FastAPI application factory、CORS、OpenAPI、health route
+- [x] API／Training 共用 `mindfolio-core`
+- [x] Offline training package 與無假數據 artifact contract
+- [x] Frontend build／test 與 Python test baseline
+- [ ] 股票與月份行情 repositories
+- [ ] reconstruction／holding API contracts
+- [ ] deterministic return／fingerprint services
+- [ ] 第一版 regime／anomaly model training
+- [ ] PostgreSQL 與 AWS runtime
 
 ## 正式 MVP Phase 1：FastAPI backend
 

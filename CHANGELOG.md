@@ -1,5 +1,15 @@
 # Changelog & Product Journey
 
+## 2026-07-14 — V2.4：React／FastAPI／AI Training 專案初始化
+
+- 建立 pnpm workspace 與 React + TypeScript + Vite frontend。
+- 加入 Router、React Query、typed health client、foundation route 與前端測試。
+- 建立 FastAPI application factory、CORS、OpenAPI 與 `/api/v2/health`。
+- 建立 API／Training 共用的 `mindfolio-core` domain、feature 與 inference package。
+- 建立 offline AI training command 與 artifact metadata contract；尚未訓練模型，不產生虛構 metrics。
+- 建立共用 Python virtual environment、測試與 production build baseline。
+- 保留 `demo/` 作為 UX reference；正式金融計算與資料信任邊界仍以 FastAPI 為準。
+
 ## 2026-07-14 — V2.3：補齊 React 架構與 AI Training 計畫
 
 - Frontend 正式指定為 React + TypeScript，採 route／feature-based structure。

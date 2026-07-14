@@ -16,6 +16,7 @@
 快速入口：
 
 - [V2 可操作 Demo](V2/demo/index.html)
+- [V2 工程初始化與啟動方式](V2/DEVELOPMENT.md)
 - [V2 文件中心](V2/docs/README.md)
 - [版本變更與心路歷程](CHANGELOG.md)
 

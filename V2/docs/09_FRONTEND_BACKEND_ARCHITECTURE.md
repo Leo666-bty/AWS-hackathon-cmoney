@@ -1,5 +1,9 @@
 # Frontend / FastAPI Backend Architecture
 
+## Current implementation status
+
+架構底座已初始化：React frontend、FastAPI application、共用 Python core 與 offline AI training package 均已建立。現在僅實作 `/api/v2/health` 與前端 foundation route；其餘本文件 API 是下一階段 contract，不應被視為已上線能力。
+
 ## Architecture decision
 
 V2 正式版本採前後端分離：

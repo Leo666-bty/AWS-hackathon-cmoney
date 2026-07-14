@@ -4,9 +4,9 @@
 
 V2 不再是固定五檔歷史選擇題。使用者可以從 CMoney 熱門推薦開始，也能搜尋主辦方 300 檔股票資料庫；每檔只需提供買進月份、價格區間或實際價格，以及仍持有或賣出月份。`Portfolio Reconstruction Engine` 會驗證價格合理性、處理公司行動、重建投報率並生成投資指紋。
 
-## 目標技術架構
+## 已初始化技術架構
 
-正式 V2 採前後端分離。前端使用 **React + TypeScript**；後端統一使用 **FastAPI + Python**，讓行情計算、資料驗證、Portfolio Fingerprint、AI training inference 與 AI narrative 共用同一個 Python runtime。
+正式 V2 採前後端分離。前端使用 **React + TypeScript**；後端統一使用 **FastAPI + Python**，讓行情計算、資料驗證、Portfolio Fingerprint、AI training inference 與 AI narrative 共用同一個 Python runtime。第一階段專案骨架已建立，商業功能將依實作計畫逐步搬入。
 
 ```text
 React + TypeScript Frontend
@@ -19,6 +19,16 @@ React + TypeScript Frontend
 ```
 
 目前 `demo/` 是靜態 UX reference，內嵌資料與前端計算只用來示範流程，不代表正式安全邊界。正式版的價格驗證、報酬、可信度、人格向量與 AI context 必須全部由 FastAPI 重算。
+
+## 目前完成範圍
+
+- `apps/web`：React、TypeScript、Vite、Router、React Query、API client 與 smoke test。
+- `apps/api`：FastAPI application factory、CORS、OpenAPI 與 `/api/v2/health`。
+- `packages/mindfolio-core`：API 與 AI Training 共用的 domain、features、inference package。
+- `apps/ai-training`：離線 training command 與 model artifact metadata contract；目前未訓練模型，也不產生假 metrics。
+- 根目錄 workspace、Python 共用 virtual environment 設定與前後端測試／建置指令。
+
+尚未完成股票搜尋、行情 repository、交易重建、人格評分、模型訓練、資料庫與 AWS 部署。
 
 ## 核心閉環
 
@@ -42,6 +52,7 @@ React + TypeScript Frontend
 - [資料庫快照產生器](tools/build_market_catalog.py)
 - [前後端分離架構](docs/09_FRONTEND_BACKEND_ARCHITECTURE.md)
 - [AI Training 計畫](docs/10_AI_TRAINING_PLAN.md)
+- [本機開發方式](DEVELOPMENT.md)
 
 ## Demo 能力
 

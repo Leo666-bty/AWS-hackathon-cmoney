@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mindfolio-ai-training"
+version = "0.1.0"
+description = "Offline market-regime and anomaly training for Mindfolio V2"
+requires-python = ">=3.11"
+dependencies = [
+  "joblib>=1.4,<2",
+  "mindfolio-core>=0.1.0",
+  "numpy>=2,<3",
+  "pandas>=2.2,<3",
+  "scikit-learn>=1.5,<2",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8.3,<9"]
+
+[project.scripts]
+mindfolio-training-status = "mindfolio_training.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
