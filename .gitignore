@@ -1,5 +1,6 @@
 .DS_Store
 .kiro/
+.idea/
 .env
 .env.*
 !.env.example

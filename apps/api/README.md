@@ -25,8 +25,10 @@ src/
 | POST | `/v1/events/batch` | 同步前端 event outbox |
 | GET | `/v1/users/{user_id}/events` | Demo 事件檢查 |
 | GET | `/v1/dashboard/metrics` | 最小漏斗指標 |
+| POST | `/v1/users/{user_id}/reset` | 重置該使用者 Demo 狀態（關係、回饋、已生成卡片） |
+| GET | `/health` | 服務存活檢查 |
 
-完整初版合約見 [`contracts/openapi.yaml`](contracts/openapi.yaml)。
+`cards/next` 無卡可出時回 `204 No Content`。完整初版合約見 [`contracts/openapi.yaml`](contracts/openapi.yaml)。
 
 ## AI 邊界
 

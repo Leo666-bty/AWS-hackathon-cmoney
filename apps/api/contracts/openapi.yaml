@@ -34,10 +34,12 @@ paths:
           schema: { type: string, example: "LEO" }
       responses:
         "200":
-          description: Next card or no-content state
+          description: Highest-priority action card
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ActionCard" }
+        "204":
+          description: No eligible card remains for this user
   /v1/users/{user_id}/cards/{card_id}/feedback:
     post:
       summary: Submit one-tap relationship feedback
@@ -139,6 +141,30 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/DashboardMetrics" }
+  /v1/users/{user_id}/reset:
+    post:
+      summary: Reset demo state for a user (clears relationships, feedback, and generated cards)
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema: { type: string, example: "LEO" }
+      responses:
+        "204":
+          description: Demo state cleared; user restored to initial state
+  /health:
+    get:
+      summary: Liveness check
+      responses:
+        "200":
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status: { type: string, enum: [ok] }
 components:
   schemas:
     StockContext:
@@ -157,9 +183,13 @@ components:
         community_bullish_count_7d: { type: integer, example: 216 }
         community_bearish_count_7d: { type: integer, example: 14 }
         community_bullish_ratio_7d:
-          type: number
+          type: [number, "null"]
           example: 0.939
-          description: Ratio among posts with an explicit bullish or bearish stance; not the user's emotion.
+          description: >-
+            Ratio among posts with an explicit bullish or bearish stance;
+            not the user's emotion. Null when no explicit-stance post exists
+            in the 7-day window (not computable — never coerced to 0, 1, or
+            a neutral value).
         demo_news:
           type: array
           description: Must be replaced by an authorized source before production.
