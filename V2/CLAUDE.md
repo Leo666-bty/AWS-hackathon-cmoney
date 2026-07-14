@@ -22,14 +22,24 @@ architecture: `08`/`09`.
 
 ## Current state
 
-The acquisition vertical slice is implemented end to end. `apps/web` contains
-the React landing, five-stock builder, per-stock reconstruction wizard, result,
-share-card and explicit-consent UI. `apps/api` exposes all eight `/api/v2`
-operations; `packages/mindfolio-core` owns deterministic validation,
-reconstruction, persona and scoring. Market data is the built file catalog and
-confirmed holdings persist in PostgreSQL. `docker-compose.yml` runs web, API
-and PostgreSQL together on one EC2. `apps/ai-training` remains an untrained
-offline scaffold, and the UI still uses demo identity `LEO`.
+The two-stage lifecycle — **Time Machine (acquisition) → Portfolio Radar
+(retention)** — is implemented end to end. `apps/web` contains the React
+landing, five-stock builder, per-stock reconstruction wizard, result,
+share-card and explicit-consent UI, plus `/activate` (invite-code activation)
+and `/app` (Portfolio Radar dashboard). `apps/api` exposes 12 `/api/v2`
+operations (6 acquisition + 6 retention in `routers/retention.py`);
+`packages/mindfolio-core` owns deterministic validation, reconstruction,
+persona and scoring. Market data is the built file catalog; confirmed holdings
+plus `reconstruction_reports`, `action_card_feedback` and `interaction_events`
+persist in PostgreSQL. `docker-compose.yml` runs web, API and PostgreSQL
+together on one EC2. `apps/ai-training` remains an untrained offline scaffold.
+Identity is now server-derived: an invite-code adapter issues a session token
+(demo `LEO` via `invite_identities="demo-leo:LEO"`); the retention surface never
+trusts a client-supplied `user_id`. Not yet done: real Bedrock is configured but
+unverified (`bedrock_enabled` default false → deterministic fallback); the
+action-card `mute` preference is stored but not yet acted on (Moment-Engine
+ranking deferred to Feature 006); `docs/api/004..007` per-feature SDD folders are
+not yet written. Python suite: 60 tests.
 
 ## Toolchain & commands (NOT uv)
 
@@ -71,13 +81,26 @@ The FastAPI OpenAPI schema is the frozen integration surface. The current
 frontend uses a hand-written TypeScript + Zod client; OpenAPI codegen and a
 generated-client contract test remain production hardening. Any endpoint/field
 change is still made in the schema and communicated first. Implemented v2
-endpoints (docs/09):
+endpoints (12 total, docs/09):
 
+Acquisition (6):
+- `GET /api/v2/health`
 - `GET /api/v2/stocks/popular` · `GET /api/v2/stocks/search`
 - `GET /api/v2/stocks/{id}/months/{yyyy_mm}/envelope`
 - `POST /api/v2/reconstructions/validate` · `POST /api/v2/reconstructions/complete`
-- `POST /api/v2/confirmed-holdings`
-- `GET /api/v2/users/{user_id}/confirmed-holdings` · `GET /api/v2/health`
+  (complete also returns a `report` handle: `{report_id, claim_token, expires_at}`)
+
+Retention (6, `routers/retention.py`, session-authenticated):
+- `POST /api/v2/auth/session` (invite code → session token; identity server-derived)
+- `POST /api/v2/reports/{report_id}/claim`
+- `POST /api/v2/reports/{report_id}/confirmed-holdings` (the only confirmed-holdings write path)
+- `GET /api/v2/me/dashboard`
+- `POST /api/v2/me/action-cards/{card_id}/feedback`
+- `POST /api/v2/events/batch`
+
+**Removed for security**: the old unauthenticated `POST /api/v2/confirmed-holdings`
+and `GET /api/v2/users/{user_id}/confirmed-holdings` (trusted a client `user_id`, a
+cross-member isolation hole) no longer exist — use the report-scoped path above.
 
 ## Engine boundaries (hard rules)
 
@@ -87,10 +110,15 @@ endpoints (docs/09):
   same result (deterministic regression coverage; broader property-based
   coverage remains a hardening item).
 - **Re-validate on complete**: `reconstructions/complete` re-validates all five
-  trades from raw input and never trusts a prior `validate` response;
-  `confirmed-holdings` statelessly re-runs those five trades and derives only
-  `holding_candidates`. Durable reconstruction/session binding is not yet
-  implemented and remains an identity-hardening gap.
+  trades from raw input and never trusts a prior `validate` response, and (when
+  the store is available) emits a `report` handle. Confirmed holdings are now
+  written only via the session-authenticated, report-scoped
+  `POST /reports/{report_id}/confirmed-holdings`, which statelessly re-runs the
+  claimed report's trades, derives `holding_candidates`, and records
+  `source_report_id`. Durable reconstruction/session binding is therefore now in
+  place (invite-code session + report claim + `source_report_id`); a real
+  end-user login/registration flow beyond the invite-code adapter remains an
+  identity-hardening item.
 - **AI only narrates verified results**: Bedrock receives a verified DTO
   (never raw prices, credentials, full event history, or PII), its output is
   Pydantic-validated, and on any failure a deterministic fixed-template

@@ -18,13 +18,18 @@ Landing
   → 每檔輸入買進月份與價格精度
   → 標記仍持有／已賣出
   → FastAPI 逐筆驗證
-  → FastAPI 重建 5 檔結果
+  → FastAPI 重建 5 檔結果（回傳 report handle）
   → 人格／報酬／指紋／AI 敘事
   → 匿名分享
-  → 明確同意後保存仍持有關係
+  --- 留存（Portfolio Radar）---
+  → /activate 邀請碼換 session token
+  → 認領報告（POST /reports/{id}/claim）
+  → 明確同意後 report-scoped 保存仍持有關係
+  → /app Portfolio Radar（dashboard／card／weekly review）
 ```
 
-測試 persona 固定使用 `LEO`；正式版必須由登入 session 取得 identity，不得信任 client 傳入任意 user ID。
+身份由邀請碼 adapter 發出的 server-derived session 推導（demo `demo-leo:LEO`
+映射到 `LEO`）；留存端點一律不信任 client 傳入的 user ID。
 
 ## 3. 前端範圍
 
@@ -33,7 +38,9 @@ Landing
 | `/` | 價值主張、零上傳／零聊天入口、API 狀態 | `GET /health` |
 | `/builder` | 熱門／搜尋、選滿五檔、顯示可用月份數 | `GET /stocks/popular`, `/stocks/search` |
 | `/reconstruct/:index` | 逐檔月份、區間／精確價格、持有關係 | `GET /envelope`, `POST /validate`, `POST /complete` |
-| `/result` | 只呈現後端 result、人格卡、同意保存 | `POST /confirmed-holdings` |
+| `/result` | 只呈現後端 result、人格卡、匿名分享 | `POST /complete`（含 report handle）|
+| `/activate` | 邀請碼啟用、換取 session token | `POST /auth/session` |
+| `/app` | Portfolio Radar：dashboard、認領、持股授權、卡片回饋 | `POST /reports/{id}/claim`, `POST /reports/{id}/confirmed-holdings`, `GET /me/dashboard`, `POST /me/action-cards/{id}/feedback` |
 
 前端可保存 wizard draft，不可計算正式報酬、調整因子、人格、分數或持股候選。
 
@@ -65,12 +72,28 @@ Base path：`/api/v2`。OpenAPI：`/api/v2/openapi.json`。
 - 公司行動月若不允許 band，前端切換 exact；後端仍是最終裁決者。
 - complete response 是 UI 唯一金融真相。
 
-### 持股同意
+### 持股同意（report-scoped，session 驗證）
 
-- 僅 `relation=holding` 的候選可寫入。
-- 後端重跑 reconstruction 後才 persistence。
-- MVP 只存 `user_id`, `stock_id`, `source`, `confirmed_at`。
-- 不存買價、賣價、報酬與人格明細。
+- 唯一寫入路徑為 `POST /reports/{report_id}/claim` 認領後的
+  `POST /reports/{report_id}/confirmed-holdings`。
+- 僅屬於該報告 `holding_candidates` 的候選可寫入（否則 422）。
+- 後端由已認領報告的原始 trades 重跑 reconstruction 後才 persistence。
+- 存 `user_id`、`stock_id`、`source`、`confirmed_at`，並記錄 `source_report_id`
+  與 `last_reviewed_at`；不存買價、賣價、報酬與人格明細。
+
+> 已移除（安全性）：舊的未驗證 `POST /confirmed-holdings` 與
+> `GET /users/{user_id}/confirmed-holdings`（信任 client `user_id` 的跨會員隔離
+> 漏洞）已刪除。
+
+### 留存端點（Portfolio Radar，6 支）
+
+- `POST /auth/session`：邀請碼 → `{access_token, member_id, display_name}`；無效碼 401。
+- `POST /reports/{report_id}/claim`：綁定報告到 session 會員；404／403／410／409／503。
+- `POST /reports/{report_id}/confirmed-holdings`：唯一確認持股寫入路徑（見上）。
+- `GET /me/dashboard`：`{member_id, display_name, report, portfolio, priority_card, weekly_review}`。
+- `POST /me/action-cards/{card_id}/feedback`：`{preference: review_evidence|routine|mute}`；
+  `mute` 目前僅被記錄，尚未改變下一張卡片排序（Feature 006）。
+- `POST /events/batch`：以 `event_id` idempotent 寫入互動事件。
 
 ## 5. 資料策略：2025 與即時行情
 
@@ -111,7 +134,7 @@ AI 不做：
 | Zod typed client | runtime 可攔 contract drift | 手寫 schema 有維護成本；CI 後續改 OpenAPI codegen |
 | JSON market snapshot | 快、可重現、無 DB 查詢成本 | 不適合即時更新；live feed 另建 adapter |
 | Sync FastAPI services | 邏輯簡單、deterministic 計算可預測 | Bedrock 高延遲時需 async／worker |
-| PostgreSQL 只存 confirmed holdings | 隱私與 schema 最小化 | 無法跨裝置續填；正式版增加 reconstruction session |
+| PostgreSQL 四表（holdings + reports + feedback + events）| 支援報告認領、卡片偏好與 event，隱私仍最小化 | 獲客 wizard draft 仍在瀏覽器；真正註冊登入待補 |
 
 ## 8. 驗收條件
 
@@ -121,16 +144,25 @@ AI 不做：
 - [x] complete 的人格、報酬、分數、指紋全部來自 FastAPI。
 - [x] Bedrock 關閉或失敗時仍有 deterministic narrative。
 - [x] 使用者未勾同意時不可保存 confirmed holdings。
-- [x] React production build 與 Python test suite 通過。
+- [x] 邀請碼可換取 session token；留存端點以 session 推導身份，不信任 client user ID。
+- [x] `complete` 回傳 report handle，登入後可認領並綁定會員身份。
+- [x] confirmed holdings 只能經 session-authenticated、report-scoped 路徑寫入（舊未驗證端點已移除）。
+- [x] `GET /me/dashboard` 回傳 report／portfolio／priority card／weekly review。
+- [x] `POST /events/batch` 以 `event_id` idempotent 寫入。
+- [x] React production build 與 Python test suite（60 tests）通過。
 - [x] 單一 EC2 用 Docker Compose 定義（web + api + PostgreSQL）與本機容器驗收。
-- [ ] 實際 EC2／IAM Role／HTTPS 驗收、正式身份驗證、rate limit 與 event analytics。
+- [ ] 實際 EC2／IAM Role／HTTPS 驗收、真正註冊登入、rate limit 與 event analytics。
+- [ ] 真實 Bedrock 上線驗證（目前走 fallback）、action card `mute` 影響排序（Feature 006）、`docs/api/004..007` SDD 資料夾補齊。
 
 ## 9. 模組路徑
 
-- React routes：`V2/apps/web/src/routes/`
+- React routes：`V2/apps/web/src/routes/`（含 `ActivateRoute.tsx`、`PortfolioRadarRoute.tsx`）
 - Wizard state：`V2/apps/web/src/features/reconstruction/ReconstructionContext.tsx`
+- Portfolio Radar modules：`V2/apps/web/src/features/portfolio-radar/`
 - Typed API client：`V2/apps/web/src/shared/api/client.ts`
-- FastAPI routers：`V2/apps/api/src/mindfolio_api/routers/`
+- FastAPI routers：`V2/apps/api/src/mindfolio_api/routers/`（含 `retention.py`）
+- Session/identity：`V2/apps/api/src/mindfolio_api/auth.py`
 - Deterministic service：`V2/apps/api/src/mindfolio_api/services/reconstruction.py`
+- Retention service：`V2/apps/api/src/mindfolio_api/services/retention.py`
 - Core calculation：`V2/packages/mindfolio-core/src/mindfolio_core/market/`
-- PostgreSQL schema：`V2/infra/schema/001_init.sql`
+- PostgreSQL schema：`V2/infra/schema/001_init.sql`（四表）

@@ -34,16 +34,27 @@
    Fingerprint Vector；目前結果頁沒有獨立 pipeline 圖。
 5. 不同股票、月份與價格會改變人格與向量。
 
-## 130–150 秒：成長閉環
+## 130–150 秒：成長閉環（Time Machine → Portfolio Radar）
 
-複製匿名分享文案，指出不包含持股與報酬明細。勾選 consent 後點
-「確認並建立庫存」，展示後端只接受重新驗證後的 `holding_candidates`；Compose
-部署會寫入 PostgreSQL，本機未設定 `DATABASE_URL` 時則是重啟即清空的 memory store：
+複製匿名分享文案，指出不包含持股與報酬明細。接著完整走出兩階段閉環：
 
-> 「人格負責讓陌生人進來；重建引擎負責取得高品質資料；今天先完成明確持股，下一步才由持股雷達讓他持續回來。」
+1. `complete` 已回傳 report handle（`report_id` + `claim_token`）。到 `/activate`
+   輸入邀請碼（demo `demo-leo:LEO`）換取 session token——身份由伺服器端 session
+   推導，前端不再夾帶 `user_id`。
+2. 以該 session 認領剛才的報告（`POST /reports/{id}/claim`），把獲客結果綁定到會員 `LEO`。
+3. 勾選 consent 後確認持股，走 report-scoped 的
+   `POST /reports/{id}/confirmed-holdings`：後端只寫入重新驗證後的
+   `holding_candidates`，並記錄 `source_report_id`。
+4. 進入 `/app` 的 Portfolio Radar：展示 dashboard 的人格/fingerprint、持股、
+   priority action card 與 weekly review。
 
-現行按鈕使用固定 Demo identity `LEO`，沒有登入、報告認領或 Portfolio Radar
-頁面；這三項只能作為下一階段產品方向說明。
+> 「人格負責讓陌生人進來；重建引擎負責取得高品質資料；今天完成明確持股後，持股雷達就讓他持續回來——兩階段今天都已經跑得起來。」
+
+Compose 部署會把持股與 reports/feedback/events 寫入 PostgreSQL；本機未設定
+`DATABASE_URL` 時為重啟即清空的 memory store，此時 `complete` 的 report handle 為
+`null`，可改以口頭帶過認領步驟。可如實補充：narrative 目前走 deterministic
+fallback（`bedrock_enabled` 預設 false），action card 的 `mute` 偏好已被記錄但尚未
+改變下一張卡片的排序（未來 Feature 006）。
 
 ## 禁止說法
 
@@ -58,7 +69,9 @@
 正式 Live Demo 優先使用 `docker compose up -d --build`，讓 nginx、FastAPI 與
 PostgreSQL 都符合部署拓撲。本機 UI 排練也可先以 `make dev-api` 啟動 FastAPI，
 再以 `make dev-web` 啟動 React，但預設 confirmed holdings 只存在 memory store。
-兩種方式的熱門／搜尋、月份 envelope、validation、complete、AI narrative 與
-confirmed holdings 都走 `/api/v2`。`V2/demo/` 只能作為 presentation-only 的靜態
+兩種方式的熱門／搜尋、月份 envelope、validation、complete、AI narrative，以及
+留存側的 auth/session、report claim、report-scoped confirmed holdings、
+me/dashboard、card feedback 與 events batch 都走 `/api/v2`。`V2/demo/` 只能作為
+presentation-only 的靜態
 視覺 reference，不是 runtime 降級路徑；若現場展示，必須明說其瀏覽器計算不是
 正式金融結果。

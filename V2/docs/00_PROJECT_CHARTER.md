@@ -18,7 +18,7 @@ FAQ／ChatGPT 型應用還有另一個根本限制：使用者必須先想到問
 - **AI 不是金融真相來源**：報酬、價格合理性、公司行動、可信度與人格向量都由可重算的 Python service 產生。
 - **人格是傳播層**：Bedrock／LLM 將 verified DTO 寫成易懂、可分享的敘事，失敗時使用固定模板。
 - **Reconstruction Engine 是護城河**：把「大概三月買、差不多這個價」轉成行情驗證、公司行動還原、附可信度的結構化重建事件；持股關係仍須由使用者明確確認。
-- **Portfolio Radar 是長期價值**：V2 Time Machine 取得陌生用戶與第一筆資料；註冊後由 Portfolio Radar 延續 V1 的 Market Moment／Action Card 能力，形成回訪理由。
+- **Portfolio Radar 是長期價值（已實作 P0）**：V2 Time Machine 取得陌生用戶與第一筆資料；邀請碼啟用並認領報告後，Portfolio Radar（`/app`）延續 V1 的 Market Moment／Action Card 能力，形成回訪理由。兩階段（Time Machine → Portfolio Radar）現皆已跑得起來。
 
 ## 解法
 
@@ -67,7 +67,7 @@ FAQ／ChatGPT 型應用還有另一個根本限制：使用者必須先想到問
 - Backend 使用 FastAPI + Python，統一承擔驗證、報酬、Fingerprint、人格與 AI orchestration。
 - deterministic finance calculation 與 AI 共用 Python environment，但維持不同 service boundary。
 - Offline AI training 與 FastAPI 共用 feature definitions 與 model contract，不在 request path 訓練。
-- React × FastAPI vertical slice 已完成：8 支 API、300 檔 catalog、逐筆驗證、五檔 complete、AI fallback 與 confirmed holdings。V2 Python suite 58 tests 與 React build 通過；`V2/demo/` 保留為靜態 UX reference。
+- React × FastAPI 兩階段 vertical slice 已完成：12 支 API（獲客 6 + 留存 6）、300 檔 catalog、逐筆驗證、五檔 complete、AI fallback、report-scoped confirmed holdings、邀請碼 session 與 Portfolio Radar dashboard。V2 Python suite 60 tests 與 React build 通過；`V2/demo/` 保留為靜態 UX reference。
 
 ## 非目標
 

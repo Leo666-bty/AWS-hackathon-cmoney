@@ -64,7 +64,9 @@ comparable_user_price = raw_user_price × factor
 
 只有使用者明確選擇「仍持有」並同意保存時，才建立 confirmed holding。這避免把測驗答案污染正式 Portfolio。
 
-## Implemented API surface
+## Implemented API surface（12 端點）
+
+獲客（Time Machine，6）:
 
 ```text
 GET  /api/v2/health
@@ -72,10 +74,23 @@ GET  /api/v2/stocks/search?q=台積
 GET  /api/v2/stocks/popular?limit=12
 GET  /api/v2/stocks/2330/months/2025-04/envelope
 POST /api/v2/reconstructions/validate
-POST /api/v2/reconstructions/complete
-POST /api/v2/confirmed-holdings
-GET  /api/v2/users/{user_id}/confirmed-holdings
+POST /api/v2/reconstructions/complete      # 另回傳 report handle {report_id, claim_token}
 ```
+
+留存（Portfolio Radar，6；session 驗證）:
+
+```text
+POST /api/v2/auth/session                          # 邀請碼 → session token
+POST /api/v2/reports/{report_id}/claim
+POST /api/v2/reports/{report_id}/confirmed-holdings # 唯一確認持股寫入路徑
+GET  /api/v2/me/dashboard
+POST /api/v2/me/action-cards/{card_id}/feedback
+POST /api/v2/events/batch
+```
+
+> 已移除（安全性）：舊的未驗證 `POST /api/v2/confirmed-holdings` 與
+> `GET /api/v2/users/{user_id}/confirmed-holdings`（信任 client `user_id` 的跨會員
+> 隔離漏洞）已刪除，改由上方 report-scoped 路徑寫入。
 
 報酬、驗證與可信度必須由後端重算；LLM 只負責根據已驗證 vector 產生受 schema 限制的自然語言，不直接接收原始未驗證價格。
 

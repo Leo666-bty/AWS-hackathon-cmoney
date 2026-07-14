@@ -302,6 +302,11 @@ confirmed ↔ watch_only → removed
 
 **假設**會員將 Action Card 設為 `mute`，**當**系統選擇下一張卡片，**則**打擾成本必須反映該偏好，但已認領的 2025 年報告與已確認關係歷史不得變更。
 
+> **現況（部分達成）**：`mute`／`routine`／`review_evidence` 偏好已被持久化到
+> `action_card_feedback`，且歷史不可變的部分已成立。但偏好**尚未改變下一張卡片的
+> 排序**——Moment-Engine 的 ranking（打擾成本實際影響選卡）延後到未來 Feature 006。
+> 目前應把 `mute` 描述為「已記錄、尚未作用」。
+
 ### AS-07 — 身份隔離
 
 **假設**報告 A 屬於會員 A，**當**會員 B 要求存取或認領該報告，**則** API 必須拒絕操作，且不得洩漏會員 A 的身份或報告內容。
@@ -312,14 +317,22 @@ confirmed ↔ watch_only → removed
 
 ## 12. 後續 SDD 交付切片
 
-建議的 Feature 順序延續既有 V2 API SDD 編號：
+> **狀態更新（2026-07-15）**：P0 留存閉環（會員啟用、報告認領、report-scoped
+> 持股授權、`/app` Portfolio Radar aggregate、卡片偏好與冪等事件）**已直接實作
+> 出貨**——程式碼在 `apps/api/src/mindfolio_api/routers/retention.py` 與
+> `apps/web/src/routes/{ActivateRoute,PortfolioRadarRoute}.tsx`。因此下表所列
+> 004–007 的**功能已上線**，但對應的 per-feature SDD 資料夾
+> (`docs/api/004..007`) **尚未建立**——這是一筆未結清的 paper-trail 追溯缺口，需
+> 回填 spec/plan/tasks，而非重新開發。本節原先「必須先完成 004 SDD 才能動工」的
+> 前置規範，對已出貨的 P0 範圍已不再適用（見 §16 決策紀錄與 §8「P0 OpenAPI 已完成
+> 實作」）。
 
-| Feature | 建議目錄 | 範圍 | 依賴 |
+| Feature | 建議目錄 | 範圍 | 狀態 |
 |---|---|---|---|
-| 004 | `docs/api/004-member-activation` | 可保存報告、認領、Identity Adapter 與持股授權銜接 | 既有 002／003 |
-| 005 | `docs/api/005-portfolio-radar-home` | `/app` Aggregate、已認領指紋與已確認 Portfolio | 004 |
-| 006 | `docs/api/006-market-moments-action-cards` | V1 Moment Engine 概念、排序、Bedrock 敘事與降級 | 005＋AI Artifact |
-| 007 | `docs/api/007-events-preferences` | 冪等事件、關係回饋、提醒偏好與 Metrics | 004–006 |
+| 004 | `docs/api/004-member-activation` | 可保存報告、認領、Identity Adapter 與持股授權銜接 | 功能已上線；SDD 資料夾待回填 |
+| 005 | `docs/api/005-portfolio-radar-home` | `/app` Aggregate、已認領指紋與已確認 Portfolio | 功能已上線；SDD 資料夾待回填 |
+| 006 | `docs/api/006-market-moments-action-cards` | V1 Moment Engine 概念、排序、Bedrock 敘事與降級 | 部分上線（單張優先卡＋fallback 敘事已有；`mute` 影響排序的 Moment-Engine ranking 未做）；SDD 資料夾待回填 |
+| 007 | `docs/api/007-events-preferences` | 冪等事件、關係回饋、提醒偏好與 Metrics | 功能已上線；SDD 資料夾待回填 |
 
 每個 SDD Feature 必須包含：
 
@@ -332,7 +345,11 @@ confirmed ↔ watch_only → removed
 7. 需求至測試的 Traceability；
 8. 明確的 Rollback 與 Demo 降級行為。
 
-不得只依本整合文件直接開始後續實作。Feature 004 是第一個 Alignment Gate，因為身份、報告所有權與授權會影響所有後續留存工作。
+原本的規範是「不得只依本整合文件直接開始後續實作，Feature 004 為第一個
+Alignment Gate」。實務上 P0 已在此 gate 未逐項落檔的情況下出貨；因此該規範現在
+改為**回填要求**：既有 P0 程式碼必須補上 004–007 的 spec/plan/tasks 以恢復
+Traceability，而 P1／未完成項目（如 Moment-Engine ranking）仍應先過對應 Feature
+SDD 再擴充。
 
 ## 13. 各交付階段範圍
 
@@ -408,12 +425,18 @@ V1 可作為下列需求與互動的參考：
 
 ## 17. 需求就緒定義
 
-當符合下列條件時，本整合需求即可進入 Feature-Level SDD：
+> **狀態更新（2026-07-15）**：下列前四項就緒條件在 P0 開發前均已滿足，P0 也已
+> 據此出貨。唯一未落檔的是第五項——Feature 004 的獨立 Spec 尚未寫出（功能已上線，
+> SDD 資料夾待回填，見 §12）。因此本節不再是「開工前的 gate」，而是記錄 P0 已就緒
+> 並出貨、且標示出剩餘的 004–007 SDD 回填工作。
 
-- Product Owner 確認 Time Machine → Portfolio Radar 銜接方式；
-- P0 與 P1 範圍獲得確認；
-- Identity 與 Report Claim 策略已選定；
-- 目前資料來源與 Demo Fixture 政策已選定；
-- Feature 004 已有獨立 Spec，且不存在未解決的所有權或授權歧義。
+當初判定本整合需求可進入 Feature-Level SDD 的條件（現況）：
 
-在上述條件完成前，目前 V2 獲客行為仍是實作真實來源，V1 維持唯讀參考。
+- Product Owner 確認 Time Machine → Portfolio Radar 銜接方式；（已確認）
+- P0 與 P1 範圍獲得確認；（已確認）
+- Identity 與 Report Claim 策略已選定；（已選定：邀請碼 Identity Adapter + 短效 Session Token + 報告認領）
+- 目前資料來源與 Demo Fixture 政策已選定；（已選定）
+- Feature 004 已有獨立 Spec，且不存在未解決的所有權或授權歧義。（**未落檔**：P0 直接出貨，004–007 SDD 資料夾待回填）
+
+P0 獲客與留存皆已是實作真實來源；V1 維持唯讀參考。剩餘工作為回填 004–007 SDD
+以恢復 Traceability，以及推進 P1／未完成項目（如 Moment-Engine ranking）。

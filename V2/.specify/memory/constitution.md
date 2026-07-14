@@ -1,19 +1,32 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 → 1.0.1 (implementation-status alignment; no principle change)
+- Version change: 1.0.1 → 1.0.2 (retention scope alignment; no principle change)
 - Product pivot: V1 "Reverse Portfolio Onboarding" → V2 "2025 投資時光機 ×
   投資人格實驗室" (Portfolio Reconstruction Engine). Principles re-authored for
   the reconstruction/persona domain; V1's engineering discipline carries over.
+- 1.0.2 scope note: the product is now a two-stage lifecycle — Time Machine
+  (acquisition) → Portfolio Radar (retention). Retention P0 shipped: an
+  invite-code identity adapter issues server-derived sessions; `complete` emits
+  a report handle claimed via `POST /reports/{id}/claim`; confirmed holdings are
+  written only through the session-authenticated report-scoped path; and three
+  new tables (`reconstruction_reports`, `action_card_feedback`,
+  `interaction_events`) plus `confirmed_holdings.source_report_id` /
+  `last_reviewed_at` persist retention state. The old unauthenticated
+  `POST /confirmed-holdings` and `GET /users/{user_id}/confirmed-holdings` routes
+  were removed (client-`user_id` cross-member isolation hole).
 - Principles (6): I Contract-First · II Server-Authoritative Deterministic
   Engine · III AI Narrative Guardrails · IV Test-First · V Confirmed-Holding
   Gate & Data Honesty · VI Demo-Complete Degradation
 - Templates: plan/spec/tasks templates compatible as-is (generic gates)
 - Resolved follow-up: persona thresholds, band representative prices,
   normalization and decision-score formulas are pinned in docs/02 and feature
-  002, then implemented in `packages/mindfolio-core`.
+  002, then implemented in `packages/mindfolio-core`. Durable reconstruction/
+  session binding is now in place via the invite-session + report-claim flow.
 - Recorded compliance gaps: the current frontend client is hand-written
   TypeScript + Zod rather than generated from OpenAPI; broader property-based
-  coverage and durable reconstruction/session binding remain follow-ups.
+  coverage remains a follow-up; a real end-user login/registration flow beyond
+  the invite-code adapter is still pending; retention P0 shipped without its
+  per-feature SDD folders (`docs/api/004..007`), an outstanding paper-trail gap.
 -->
 
 # Mindfolio V2 Constitution
@@ -120,8 +133,11 @@ reconstruction result itself.
   (per-stock, per-month raw low/high, month-end raw & adjusted close, adjustment
   factor, corporate-action flag). The backend reads it via
   `MINDFOLIO_MARKET_DATA_PATH` — market data stays file-based (read-only).
-  User state (confirmed holdings) is persisted in PostgreSQL self-hosted on the
-  same EC2 instance as the API (not RDS) via `DATABASE_URL`; a DB outage yields
+  User and retention state is persisted in PostgreSQL self-hosted on the
+  same EC2 instance as the API (not RDS) via `DATABASE_URL` — a four-table schema
+  (`infra/schema/001_init.sql`): `confirmed_holdings` (now with
+  `source_report_id` / `last_reviewed_at`), `reconstruction_reports`,
+  `action_card_feedback`, `interaction_events`. A DB outage yields
   HTTP 503 at request time and never crashes startup or blocks the reconstruction
   loop. Raw organizer CSVs/PDFs live in `V2/data/`
   (the active version owns its data) and stay gitignored — never committed; the
@@ -136,12 +152,24 @@ reconstruction result itself.
   `V2/docs/02_QUIZ_PERSONALITY_AND_SCORING.md` and feature 002. Any future
   formula change is an API/domain change that must update the spec, tests and
   implementation together; unpinned constants remain a defect.
+- **Retention scope (P0 shipped)**: the acquisition→retention binding is now
+  implemented. An invite-code identity adapter (`invite_identities`, demo
+  `demo-leo:LEO`) issues a server-derived session token; `complete` emits a
+  report handle; `POST /reports/{id}/claim` binds that report to the session
+  member; and confirmed holdings are written only through the
+  session-authenticated `POST /reports/{id}/confirmed-holdings` (recording
+  `source_report_id`). Retention config also adds `session_secret`,
+  `session_ttl_hours`, `report_ttl_hours` and a production guard that refuses the
+  default session secret. The action-card `mute` preference is stored but does
+  not yet change card ordering (Moment-Engine ranking deferred to Feature 006).
 - **Current compliance gaps**: `apps/web` currently uses a hand-written Zod
   client; OpenAPI codegen/generated-client contract coverage is required before
   production. The engine has deterministic regression coverage but broader
-  property-based coverage remains; confirmed holdings statelessly re-run the
-  five trades but are not yet bound to a durable reconstruction/session. These
-  are tracked gaps, not permission to weaken Principles I, II, IV or V.
+  property-based coverage remains. Durable reconstruction/session binding is now
+  in place, but a real end-user login/registration flow beyond the invite-code
+  adapter is still pending. Retention P0 shipped without its per-feature SDD
+  folders (`docs/api/004..007`), an outstanding paper-trail gap. These are
+  tracked gaps, not permission to weaken Principles I, II, IV or V.
 - Training exception (offline only): `V2/apps/ai-training` may train
   UNSUPERVISED market-regime clustering and an anomaly detector over the 2025
   stock-month features. It MUST NOT predict holdings, price direction, or
@@ -149,9 +177,10 @@ reconstruction result itself.
   exist. The online API loads approved artifacts for inference only, never
   trains during a request. Model artifacts record feature version, data range,
   metrics, and `generated_at`.
-- Out of scope for the 3-day hackathon (docs/07 cut lines): real login, real
-  push notifications, image sharing, leaderboards, free-text chat, broker
-  integration, multi-batch/partial trades. Never cut: front/back separation,
+- Out of scope for the 3-day hackathon (docs/07 cut lines): real
+  login/registration (retention uses an invite-code adapter, not a full auth
+  system), real push notifications, image sharing, leaderboards, free-text chat,
+  broker integration, multi-batch/partial trades. Never cut: front/back separation,
   FastAPI, 300-stock search, price validation, month reconstruction,
   corporate-action adjustment, the confirmed-holding boundary, the technical
   result page.
@@ -186,4 +215,4 @@ verify Principles I–VI; violations require a justified entry in the plan's
 Complexity Tracking table. Runtime agent guidance (a V2 CLAUDE.md, when added)
 must stay consistent with this document.
 
-**Version**: 1.0.1 | **Ratified**: 2026-07-14 | **Last Amended**: 2026-07-15
+**Version**: 1.0.2 | **Ratified**: 2026-07-14 | **Last Amended**: 2026-07-15

@@ -42,13 +42,22 @@
 也不自行計算驗證結果。靜態 `demo/market-data.js` 只作為 presentation-only 的
 視覺 reference，不是正式 runtime fallback。
 
-目前 PostgreSQL 只有 `confirmed_holdings`：`user_id`、`stock_id`、固定
-`source=user_confirmed` 與 `confirmed_at`。市場主檔與月行情不進 PostgreSQL，
-reconstruction input／result、匿名 session 與 event 也尚未持久化。
+目前 PostgreSQL 為四表 schema（`infra/schema/001_init.sql`），市場主檔與月行情
+不進 PostgreSQL：
 
-未來導入登入與報告認領時，anonymous reconstruction、member profile 和
-confirmed holding 必須使用清楚分離的 identifier／table；不能把搜尋、測驗選股或
-未同意的重建事件自動轉成正式 Portfolio。
+- `confirmed_holdings`：`user_id`、`stock_id`、固定 `source=user_confirmed`、
+  `confirmed_at`，並新增 `source_report_id`（追溯來源報告）與 `last_reviewed_at`。
+- `reconstruction_reports`：`complete` 後落地的重建報告（trades、result、
+  narrative、`claim_token_hash`、`claimed_by`、`expires_at`），供登入後認領。
+- `action_card_feedback`：會員對 action card 的偏好（`review_evidence` /
+  `routine` / `mute`）。
+- `interaction_events`：idempotent 寫入的互動事件（以 `event_id` 去重）。
+
+登入與報告認領已實作：邀請碼 adapter 發出 server-derived session，`complete` 的
+report 由 `POST /reports/{id}/claim` 綁定到會員身份。anonymous reconstruction、
+member 身份與 confirmed holding 使用分離的 identifier／table；搜尋、測驗選股或
+未同意的重建事件不會自動轉成正式 Portfolio——confirmed holding 只能透過
+session-authenticated、report-scoped 的確認路徑寫入。
 
 ## 前後端信任邊界
 

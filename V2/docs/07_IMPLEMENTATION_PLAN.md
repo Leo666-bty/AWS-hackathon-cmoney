@@ -36,11 +36,16 @@ V2/
 └── demo/                       # 現有靜態 UX reference，非正式架構
 ```
 
-以上骨架已建立。**正式 MVP vertical slice 已完成**：8 支 API、deterministic
-重建引擎、AI 敘事 fallback、Postgres confirmed holdings，以及 React 四 route
-串接。Docker Compose 已包含 nginx web、API 與 PostgreSQL，並完成本機容器驗收。
-**尚未完成**：實際 EC2 上線、HTTPS／網域、真實 Bedrock 權限驗證、離線模型
-訓練（`apps/ai-training` 仍是 scaffold）、真身份與即時行情。
+以上骨架已建立。**兩階段 MVP vertical slice 已完成**：12 支 API（獲客 6 + 留存
+6）、deterministic 重建引擎、AI 敘事 fallback、Postgres 四表持久層（confirmed
+holdings + reconstruction_reports + action_card_feedback + interaction_events）、
+邀請碼 session 與 report-scoped confirmed holdings，以及 React 六 route 串接
+（含 `/activate`、`/app` Portfolio Radar）。Docker Compose 已包含 nginx web、API
+與 PostgreSQL，並完成本機容器驗收。**尚未完成**：實際 EC2 上線、HTTPS／網域、
+真實 Bedrock 權限驗證（`bedrock_enabled` 預設 false，目前走 fallback）、離線模型
+訓練（`apps/ai-training` 仍是 scaffold）、真正的註冊登入（目前為邀請碼 adapter）、
+action card `mute` 尚未影響排序（Feature 006）、以及 `docs/api/004..007` per-feature
+SDD 資料夾尚未補齊（paper-trail 缺口）。
 
 ## Initialization checkpoint
 
@@ -63,8 +68,12 @@ V2/
 - 將 `market-data.js` 改成後端讀取版本化 `market-catalog.json`；黑客松不把只讀行情搬入 PostgreSQL。
 - 建立 `/stocks/popular`、`/stocks/search`、`/stocks/{id}/months/{ym}/envelope`、`/reconstructions/validate`、`/reconstructions/complete` API。
 - 由後端重算報酬與可信度，前端結果不可作為可信來源。
-- 目前不保存 anonymous session／member profile；正式身份階段必須使用不同識別
-  與資料表，不能沿用 client 傳入的 Demo `user_id` 作授權邊界。
+- 留存側已加入 6 端點（`routers/retention.py`）：`auth/session`、
+  `reports/{id}/claim`、`reports/{id}/confirmed-holdings`、`me/dashboard`、
+  `me/action-cards/{id}/feedback`、`events/batch`。身份由邀請碼 adapter 發出的
+  server-derived session 推導，不再沿用 client 傳入的 `user_id` 作授權邊界；
+  anonymous session 與 member 使用不同識別與資料表。舊的未驗證
+  `POST /confirmed-holdings` 與 `GET /users/{user_id}/confirmed-holdings` 已移除。
 - 將 deterministic calculation、AI narrative 與 API 放在同一個 Python environment，但保持不同 module。
 
 ## 已完成：React Frontend Phase
@@ -94,14 +103,25 @@ V2/
 - 支援分批買進、分批賣出與部位權重。
 - 提供刪除、撤回與資料匯出。
 
-## Phase 3：CMoney 個人化
+## Phase 3：CMoney 個人化（留存 P0 已完成）
 
-- 依 `13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md` 將 Time Machine 獲客銜接 Portfolio Radar 留存。
-- 先完成匿名報告認領、身份邊界與 confirmed holding consent handoff。
-- 在 V2 重新實作需要的 V1 Moment Engine／Action Card 能力，不恢復第二套 V1 runtime。
-- 加入法人、估值、社群與基本面訊號，依持股與使用者偏好產生每週 Portfolio Radar。
+已完成（依 `13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md`）：
+
+- Time Machine 獲客銜接 Portfolio Radar 留存的 P0 閉環已上線。
+- 匿名報告認領、server-derived 身份邊界與 report-scoped confirmed holding
+  consent handoff 皆已實作（invite session → report claim → confirmed-holdings）。
+- 在 V2 以 `me/dashboard` + action card 重新實作所需的 Moment／Action Card 能力，
+  不恢復第二套 V1 runtime。
+
+尚未完成 / roadmap：
+
+- 加入法人、估值、社群與基本面訊號，依持股與使用者偏好產生每週 Portfolio Radar
+  （目前 weekly review 為 snapshot/fixture，action card `mute` 尚未影響排序——
+  Moment-Engine ranking 為 Feature 006）。
 - A/B Test「人格分享」與「挑戰大盤」獲客訊息。
-- 後續 SDD 順序為 004 member activation、005 Portfolio Radar home、006 market moments、007 events/preferences。
+- **Paper-trail 缺口**：留存程式碼直接出貨，`docs/13` §12 承諾的 per-feature SDD
+  資料夾 `docs/api/004 member activation`、`005 Portfolio Radar home`、
+  `006 market moments`、`007 events/preferences` 尚未建立，仍待補回。
 
 ## 三天黑客松切割線
 

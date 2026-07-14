@@ -55,20 +55,25 @@ Landing
 
 Result 必須完全使用 FastAPI `reconstructions/complete` response；前端不可自行重算數字或在 API 失敗時產生未驗證人格。
 
-現行 MVP 尚無登入、報告認領或 Portfolio Radar route；這些屬下一階段
-Progressive Profiling 規格，不可在 Demo 中描述為已完成。
+邀請碼啟用（`/activate`）、報告認領與 Portfolio Radar（`/app`）route 現已實作，
+構成留存階段；可在 Demo 中如實展示。仍屬下一階段的是真正的登入／註冊系統
+（目前以邀請碼 adapter 代替）。
 
-## Progressive Profiling（產品路線圖）
+## Progressive Profiling（前三階段已實作）
 
-| 階段 | 使用者提供 | 系統回饋 |
-|---|---|---|
-| 匿名選股 | 五檔股票 | 可玩的個人題目 |
-| 月份／價格 | 模糊或精確交易記憶 | 報酬重建、人格、可信度 |
-| 仍持有確認 | 股票關係 | Portfolio 與個人雷達 |
-| 註冊同意 | 身份與保存授權 | 跨裝置報告、持續追蹤 |
+| 階段 | 使用者提供 | 系統回饋 | 狀態 |
+|---|---|---|---|
+| 匿名選股 | 五檔股票 | 可玩的個人題目 | 已實作 |
+| 月份／價格 | 模糊或精確交易記憶 | 報酬重建、人格、可信度 | 已實作 |
+| 仍持有確認 | 股票關係 | Portfolio 與個人雷達（`/app`）| 已實作 |
+| 邀請碼啟用＋報告認領 | 邀請碼、保存授權 | session 綁定報告、Portfolio Radar 追蹤 | 已實作（邀請碼 adapter）|
+| 真正註冊登入 | 身份與長期授權 | 跨裝置報告、持續追蹤 | roadmap |
 
 ## 隱私
 
-分享卡預設不包含股票、月份、價格、報酬明細與 confirmed holding。現行 wizard
-只存在 React 記憶體，重新整理即清空；尚未實作 localStorage、匿名 event 或報告
-持久化。正式上線需加入身份、保存期限、同意、刪除與撤回機制。
+分享卡預設不包含股票、月份、價格、報酬明細與 confirmed holding。獲客 wizard
+本身仍只存在 React 記憶體，重新整理即清空；但 `complete` 後的重建報告會（在持久層
+可用時）落地為 `reconstruction_reports`，登入認領後綁定會員身份，互動事件寫入
+`interaction_events`、卡片偏好寫入 `action_card_feedback`——報告與 event 已可持久化。
+真正上線仍需補齊完整身份系統、保存期限、同意、刪除與撤回機制（目前 report 以
+`report_ttl_hours` 設定到期）。
