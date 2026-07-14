@@ -116,8 +116,11 @@ reconstruction result itself.
   by `V2/tools/build_market_catalog.py` into a structured catalog file
   (per-stock, per-month raw low/high, month-end raw & adjusted close, adjustment
   factor, corporate-action flag). The backend reads it via
-  `MINDFOLIO_MARKET_DATA_PATH`; PostgreSQL is deferred (MVP uses the file
-  catalog, "read-only fixture"). Raw organizer CSVs/PDFs live in `V2/data/`
+  `MINDFOLIO_MARKET_DATA_PATH` — market data stays file-based (read-only).
+  User state (confirmed holdings) is persisted in PostgreSQL self-hosted on the
+  same EC2 instance as the API (not RDS) via `DATABASE_URL`; a DB outage yields
+  HTTP 503 at request time and never crashes startup or blocks the reconstruction
+  loop. Raw organizer CSVs/PDFs live in `V2/data/`
   (the active version owns its data) and stay gitignored — never committed; the
   built `V2/data/market-catalog.json` is the shared fixture.
 - Corporate action: `factor = adjusted_close / raw_close`;

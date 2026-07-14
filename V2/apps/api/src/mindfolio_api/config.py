@@ -22,6 +22,12 @@ class Settings(BaseSettings):
     # MINDFOLIO_AWS_REGION; falls back to the Tokyo region used by the project.
     aws_region: str = Field(default_factory=lambda: os.getenv("AWS_REGION", "ap-northeast-1"))
 
+    # --- Persistence (feature 003) ---
+    # PostgreSQL self-hosted on the same EC2 instance (not RDS). Empty in local
+    # dev/tests → an in-memory holdings store is used (non-persistent). Read from
+    # the conventional DATABASE_URL env var.
+    database_url: str = Field(default_factory=lambda: os.getenv("DATABASE_URL", ""))
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]

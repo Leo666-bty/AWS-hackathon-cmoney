@@ -53,6 +53,15 @@ class MonthEnvelope(BaseModel):
     allowed_price_modes: list[str]
 
 
+class ConfirmedHolding(BaseModel):
+    """A user-confirmed holding (only a consented `holding` trade lands here)."""
+
+    user_id: str
+    stock_id: str
+    source: str = "user_confirmed"
+    confirmed_at: datetime
+
+
 class PriceValidation(BaseModel):
     """Displayable result of validating one user-entered price against a month."""
 

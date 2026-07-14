@@ -9,9 +9,15 @@ from __future__ import annotations
 
 from typing import Any
 
+from mindfolio_api.repositories.holdings import HoldingsRepository
 from mindfolio_api.repositories.market_data import MarketCatalog
 from mindfolio_api.schemas.reconstruction import TradeConfig
-from mindfolio_core.domain.models import PriceRegime, PriceValidation, ReconstructionResult
+from mindfolio_core.domain.models import (
+    ConfirmedHolding,
+    PriceRegime,
+    PriceValidation,
+    ReconstructionResult,
+)
 from mindfolio_core.market.reconstruction import MonthData, TradeInput, reconstruct_portfolio
 from mindfolio_core.market.validation import validate_exact_price
 
@@ -143,3 +149,21 @@ def complete_reconstruction(
 
     inputs = [_build_trade_input(stock, config) for stock, config in zip(stocks, configs)]
     return reconstruct_portfolio(inputs)
+
+
+def confirm_holdings(
+    catalog: MarketCatalog,
+    repo: HoldingsRepository,
+    user_id: str,
+    configs: list[TradeConfig],
+) -> list[ConfirmedHolding]:
+    """Re-run the reconstruction to derive holding candidates, then persist them.
+
+    Only stocks the reconstruction marks as `holding` are written (Constitution
+    V) — the client cannot smuggle in a watch/sold stock as a confirmed holding.
+    Raises the same 404/422 as `complete`, plus HoldingsUnavailable (→ 503).
+    """
+    result = complete_reconstruction(catalog, configs)
+    if result.holding_candidates:
+        return repo.add_holdings(user_id, result.holding_candidates)
+    return repo.list_holdings(user_id)
