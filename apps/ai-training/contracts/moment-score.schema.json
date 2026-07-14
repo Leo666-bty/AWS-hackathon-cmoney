@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mindfolio.local/schemas/moment-score.schema.json",
+  "title": "MomentSignal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["stock_id", "as_of", "moment_type", "anomaly_score", "severity", "evidence", "model_version"],
+  "properties": {
+    "stock_id": { "type": "string", "pattern": "^[0-9A-Za-z.-]+$" },
+    "as_of": { "type": "string", "format": "date" },
+    "moment_type": {
+      "type": "string",
+      "enum": [
+        "institution_community_divergence",
+        "discussion_heat_spike",
+        "institution_flow_anomaly",
+        "price_momentum_anomaly",
+        "mixed_anomaly"
+      ]
+    },
+    "anomaly_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "severity": { "type": "string", "enum": ["info", "attention", "significant"] },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": { "type": ["number", "integer", "string", "null"] }
+    },
+    "model_version": { "type": "string" }
+  }
+}

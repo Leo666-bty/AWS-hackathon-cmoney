@@ -15,6 +15,11 @@ __pycache__/
 venv/
 *.log
 
+# Offline AI training outputs are reproducible and stay out of Git.
+apps/ai-training/artifacts/*
+!apps/ai-training/artifacts/.gitkeep
+apps/ai-training/outputs/
+
 # Organizer-provided source package stays local unless redistribution is approved.
 data/*.pdf
 data/Delivery_Hackathon_DataPackage_20260624/*.csv

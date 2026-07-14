@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mindfolio-ai-training"
+version = "0.1.0"
+description = "Offline market moment detection for the Mindfolio AI hackathon MVP"
+requires-python = ">=3.9"
+dependencies = [
+  "joblib>=1.4,<2",
+  "numpy>=1.26,<3",
+  "pandas>=2.2,<3",
+  "scikit-learn>=1.5,<2",
+]
+
+[project.scripts]
+mindfolio-build-features = "mindfolio_training.build_features:main"
+mindfolio-train = "mindfolio_training.train_moment_detector:main"
+mindfolio-score = "mindfolio_training.score_moments:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
