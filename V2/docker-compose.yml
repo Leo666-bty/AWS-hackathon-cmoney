@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mindfolio
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in V2/.env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/schema/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d mindfolio"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://app:${DB_PASSWORD}@postgres:5432/mindfolio
+      MINDFOLIO_ENV: production
+      MINDFOLIO_CORS_ORIGINS: ${MINDFOLIO_CORS_ORIGINS:-http://localhost}
+      MINDFOLIO_MARKET_DATA_PATH: /app/data/market-catalog.json
+      MINDFOLIO_BEDROCK_ENABLED: ${MINDFOLIO_BEDROCK_ENABLED:-false}
+      MINDFOLIO_BEDROCK_MODEL_ID: ${MINDFOLIO_BEDROCK_MODEL_ID:-}
+      AWS_REGION: ${AWS_REGION:-ap-northeast-1}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v2/health', timeout=3)"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    ports:
+      # Optional for direct Swagger/API access. Remove this mapping if nginx
+      # should be the only public entry point on the EC2 instance.
+      - "${API_PORT:-8000}:8000"
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-80}:80"
+
+volumes:
+  pgdata:
