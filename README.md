@@ -27,12 +27,29 @@ apps/
 infra/
 └── schema/              # PostgreSQL schema
 docs/
-├── 00...11              # 提案、產品、技術、Demo 與共用 Spec
+├── 00...11              # 提案、產品、技術、Demo 與共用 Spec（給人讀的專案碎片）
+├── api/                 # 後端各功能的 SDD 規格（001 核心迴圈、002 事件/儀表板）
 ├── ppt/                 # HTML 簡報初版
 └── brainstromingm/      # 未採用的備案，不混入主線
 data/                    # 主辦方簡報、workshop 與 CSV package
 assets/                  # Demo／Pitch 素材
+.specify/                # Spec Kit 工具設定：憲法、範本、腳本（工具維護，勿手改）
+.claude/skills/          # /speckit-* 指令本體
 ```
+
+## 文件結構與 Spec-Driven Development
+
+後端採用 Spec-Driven Development（GitHub Spec Kit）。三個資料夾分工，一句話記住：**規格改 `docs/`，工具設定別碰 `.specify/`。**
+
+| 位置 | 是什麼 | 誰用 |
+|---|---|---|
+| `docs/` | 給人讀的文件。`docs/00~11` 是專案共識碎片；`docs/api/<NNN-feature>/` 是各功能的規格（`spec` 需求 → `plan` 技術計畫 → `tasks` 任務拆解） | 人打開讀、討論、提需求 |
+| `.specify/` | Spec Kit 工具的設定與範本（規則、腳本）。裡面唯一值得人讀的是 `.specify/memory/constitution.md`——專案的工程鐵律 | 工具維護，勿手動改 |
+| `.claude/skills/` | 在 Claude Code 裡打的 `/speckit-*` 指令 | 工具用 |
+
+打個比方：`.specify/` 是模具與規則手冊，`docs/api/` 是壓出來的成品。功能規格看 `docs/api/`；`docs/00~11` 若與規格衝突，以 `docs/11_COMPLETE_MVP_SPEC.md` 為準。
+
+SDD 流程：`/speckit-specify`（寫規格）→ `/speckit-clarify`（問清楚）→ `/speckit-plan`（技術計畫）→ `/speckit-tasks`（拆任務）→ `/speckit-implement`（實作）。
 
 ## 快速查看
 
