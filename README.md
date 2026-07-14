@@ -2,7 +2,7 @@
 
 > 先給洞察，再用一次點擊建立真實庫存情境。
 
-CMoney 籌碼 K 線黑客松原型。Mindfolio AI 不建立另一個 ChatGPT 頁面，也不要求使用者上傳券商截圖或填寫完整資產；它把 AI 嵌入原本的看盤流程，在市場事件值得注意時先顯示有證據的洞察，再用「是我的持股／只是觀察／不相關」取得最低敏感度的一鍵回饋。
+CMoney 籌碼 K 線黑客松三天 MVP。Mindfolio AI 不建立另一個 ChatGPT 頁面，也不要求使用者上傳券商截圖或填寫完整資產；它把 AI 嵌入原本的看盤流程，在市場事件值得注意時先顯示有證據的洞察，再用「是我的持股／只是觀察／不相關」取得最低敏感度的一鍵回饋。
 
 ## 核心創新
 
@@ -21,8 +21,9 @@ CMoney 籌碼 K 線黑客松原型。Mindfolio AI 不建立另一個 ChatGPT 頁
 
 ```text
 apps/
-├── web/                 # React 目標結構與可操作靜態 prototype
-└── api/                 # FastAPI 目標結構與 OpenAPI contract
+├── web/                 # React 目標結構與可操作 MVP reference
+├── api/                 # FastAPI 實作邊界與 OpenAPI contract
+└── ai-training/         # Python 離線 Market Moment Detector
 infra/
 └── schema/              # PostgreSQL schema
 docs/
@@ -35,10 +36,11 @@ assets/                  # Demo／Pitch 素材
 
 ## 快速查看
 
-- Web Prototype：[`apps/web/prototype/index.html`](apps/web/prototype/index.html)
+- Interactive MVP Reference：[`apps/web/prototype/index.html`](apps/web/prototype/index.html)
 - HTML Slides：[`docs/ppt/index.html`](docs/ppt/index.html)
 - 團隊共用 Spec：[`docs/11_COMPLETE_MVP_SPEC.md`](docs/11_COMPLETE_MVP_SPEC.md)
 - API Contract：[`apps/api/contracts/openapi.yaml`](apps/api/contracts/openapi.yaml)
+- AI Training：[`apps/ai-training/README.md`](apps/ai-training/README.md)
 - Database Schema：[`infra/schema/001_init.sql`](infra/schema/001_init.sql)
 
 ## 資料與聲明
@@ -47,3 +49,5 @@ assets/                  # Demo／Pitch 素材
 - 官方 package 提供的是個股市場、法人、基本面與社群每日彙總，不含個人持股、不含 user event log、不含貼文原文。
 - 「明確多空貼文 93.9% 偏多」只代表可判定方向的貼文比例，不代表個人情緒。
 - AI 僅提供資料整理與情境說明，不構成投資建議。
+- 新聞頁目前是明確標示的 Demo Feed；正式部署必須改接有授權來源。
+- 使用者互動先寫入瀏覽器 outbox；接上 `/api/v1/events/batch` 後才標示為已同步。

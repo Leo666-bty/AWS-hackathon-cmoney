@@ -1,30 +1,26 @@
 # Web App
 
-Mindfolio AI 的使用者介面，定位為嵌入「籌碼 K 線」既有使用流程的情境式 AI，而不是獨立聊天頁。
+Mindfolio AI 的 React 目標應用與可操作 MVP reference，嵌入籌碼 K 線既有研究流程，不是獨立聊天頁。
 
-## 三天版本責任
+## MVP Pages
 
-- 顯示 2382 廣達個股與籌碼情境
-- 在洞察之後提供一次點擊的關係確認
-- 支援「是我的持股／只是觀察／不相關」
-- 顯示 LEO 已確認的 Portfolio 與回饋紀錄
-- 不提供聊天框、圖片上傳、完整建庫表單
-
-## Prototype
-
-目前可直接開啟 [`prototype/index.html`](prototype/index.html) 查看靜態互動原型。正式實作建議使用 React + Vite，沿用相同的 API contract。
-
-## 頁面
-
-| 頁面 | Demo 目的 |
+| Page | Responsibility |
 |---|---|
-| 籌碼 K 線個股頁 | AI 先呈現法人與社群背離洞察 |
-| 我的庫存 | 顯示使用者已確認持有的股票 |
-| 今日洞察 | 呈現已確認持股的優先事件 |
+| 自選股 | 正常研究入口與 `stock_open` |
+| 個股 | 即時、盤後、社群、新聞與 AI 情境卡 |
+| 我的庫存 | 已確認關係、Concern Signal、移除持股 |
+| 營運 Dashboard | 四個最小指標、最近事件與同步狀態 |
 
-## 邊界
+## Interaction Rules
 
-- 候選關係不是已確認持股。
-- 官方資料日期固定為 `2025-12-31`。
-- 社群資料是股票每日彙總，不能描述成 LEO 的情緒。
-- 所有數據洞察都必須保留來源與「不構成投資建議」聲明。
+- 一鍵回饋：是我的持股／只是觀察／不相關。
+- AI 追問使用預設問題，不提供空白 ChatGPT 輸入框。
+- Concern 只收 `worried/routine/mute`，不生成焦慮分數。
+- localStorage 分開保存 demo state、event history 與 pending outbox。
+- API 成功前事件只顯示 `queued`，不可假裝已同步。
+
+## Run Reference
+
+直接開啟 [`prototype/index.html`](prototype/index.html)。正式三天 MVP 應以 React 串接 OpenAPI；此 reference 同時作為 UI contract 與斷網備援。
+
+新聞目前是清楚標示的 Demo Feed，正式產品必須改接有授權來源。

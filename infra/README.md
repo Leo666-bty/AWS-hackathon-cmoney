@@ -1,6 +1,6 @@
 # Infrastructure
 
-三天版本採最小部署：Web、API、PostgreSQL 三個責任邊界。`schema/` 保存資料結構，不在黑客松內建立複雜 IaC、訊息佇列或向量資料庫。
+三天版本採最小部署：Web、API、PostgreSQL 三個責任邊界。`schema/` 保存 Portfolio、Concern、Action Card、新聞 Demo 資料與互動事件，不在黑客松內建立複雜 IaC、訊息佇列或向量資料庫。
 
 ```text
 Web (React)

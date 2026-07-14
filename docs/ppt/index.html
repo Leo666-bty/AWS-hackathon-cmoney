@@ -58,7 +58,7 @@
           <div><b>01</b><strong>查看 2382</strong><p>不進聊天頁</p></div>
           <div><b>02</b><strong>先看到背離</strong><p>法人 × 社群</p></div>
           <div><b>03</b><strong>點一次</strong><p>持股／觀察／不相關</p></div>
-          <div><b>04</b><strong>Portfolio 更新</strong><p>下一次更相關</p></div>
+          <div><b>04</b><strong>Portfolio 更新</strong><p>Concern 回饋更精準</p></div>
         </div>
         <p class="takeaway">沒有上傳、沒有輸入框，也沒有被迫完成一份 Portfolio 表單。</p>
       </section>
@@ -89,7 +89,7 @@
 
       <section class="slide" data-slide="8">
         <p class="eyebrow">AI done differently</p>
-        <h2>AI 生成的是下一個可操作介面，不是一段聊天長文</h2>
+        <h2>AI 生成可操作介面與建議追問，不再等空白 Prompt</h2>
         <div class="split code-layout">
           <pre>{
   "type": "signal_divergence",
@@ -104,7 +104,7 @@
     "不相關"
   ]
 }</pre>
-          <div class="statement"><strong>Generative Action Card</strong><p>Bedrock 負責解釋與卡片結構；Python 負責算數、證據與排序。</p><p>模型失敗時，固定模板仍可完成整個流程。</p></div>
+          <div class="statement"><strong>Generative Action Card</strong><p>Bedrock 負責解釋、卡片與 contextual follow-up；Python 負責算數、證據與排序。</p><p>模型失敗時，固定模板仍可完成整個流程。</p></div>
         </div>
       </section>
 
@@ -121,19 +121,19 @@
       <section class="slide" data-slide="10">
         <p class="eyebrow">Business outcome</p>
         <h2>我們優化的是首檔持股確認，不是聊天次數</h2>
-        <div class="metric-chain"><span>洞察曝光</span><i>→</i><span>一鍵回饋</span><i>→</i><span class="north">首檔持股確認人數</span><i>→</i><span>D7 回訪</span><i>→</i><span>30 日更新</span></div>
-        <p class="takeaway">每一筆確認都讓籌碼 K 線能提供更相關的內容，也建立可持續的第一方 Portfolio Context。</p>
+        <div class="metric-chain"><span>個股開啟</span><i>→</i><span>證據查看</span><i>→</i><span class="north">首檔持股確認</span><i>→</i><span>Concern 回饋</span><i>→</i><span>Portfolio 查看</span></div>
+        <p class="takeaway">每一步都形成可同步事件；Dashboard 驗證漏斗，而不是只展示漂亮畫面。</p>
       </section>
 
       <section class="slide" data-slide="11">
         <p class="eyebrow">Three-day build</p>
         <h2>兩人三天，只做一條可信的完整閉環</h2>
         <div class="days">
-          <div><b>Day 1</b><strong>流程先跑通</strong><p>Web、API contract、2382 evidence、Portfolio update</p></div>
-          <div><b>Day 2</b><strong>接資料與 Bedrock</strong><p>Context Builder、Moment ranking、Action Card schema</p></div>
+          <div><b>Day 1</b><strong>閉環先跑通</strong><p>React、FastAPI、PostgreSQL、event outbox</p></div>
+          <div><b>Day 2</b><strong>AI 與量測</strong><p>Moment Detector、Bedrock、Concern、Dashboard</p></div>
           <div><b>Day 3</b><strong>凍結與交付</strong><p>部署、Demo、簡報、影片與 fallback</p></div>
         </div>
-        <p class="takeaway">不做模型訓練、RAG、聊天 Agent 或完整推播服務。</p>
+        <p class="takeaway">只訓練市場時刻偵測；不做持股／焦慮預測、RAG、聊天 Agent 或完整推播。</p>
       </section>
 
       <section class="slide closing dark" data-slide="12">

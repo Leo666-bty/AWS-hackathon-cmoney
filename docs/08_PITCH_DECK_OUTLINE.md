@@ -8,13 +8,13 @@
 | 2 | ChatGPT 版本低使用率揭露了互動摩擦 |
 | 3 | 真正阻力是「價值出現前先要求付出」 |
 | 4 | Reverse Portfolio Onboarding 反轉資料交換順序 |
-| 5 | LEO 不聊天、不上傳，只點一次 |
+| 5 | LEO 在自選股與個股頁完成研究、確認與 Concern 回饋 |
 | 6 | 廣達案例：社群樂觀、法人仍調節 |
 | 7 | Shadow relationship → Moment → Action Card → Confirmed Portfolio |
-| 8 | AI 產生可操作卡片，而不是聊天長文 |
+| 8 | AI 產生可操作卡片與建議追問，而不是空白聊天頁 |
 | 9 | 官方資料、使用者確認與限制清楚分層 |
-| 10 | 北極星是首檔持股確認人數，不是聊天次數 |
-| 11 | 兩人三天只做一條完整閉環 |
+| 10 | 北極星是首檔持股確認，事件 Dashboard 證明漏斗可量測 |
+| 11 | 兩人三天完成 React、FastAPI、PostgreSQL 的小型 MVP |
 | 12 | Mindfolio 讓籌碼 K 線從查資料變成理解我 |
 
 HTML Init：[`ppt/index.html`](ppt/index.html)。

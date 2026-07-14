@@ -1,14 +1,14 @@
 openapi: 3.1.0
 info:
-  title: Mindfolio AI API
-  version: 0.1.0
-  description: Reverse Portfolio Onboarding prototype contract.
+  title: Mindfolio AI MVP API
+  version: 0.2.0
+  description: Three-day MVP contract for embedded portfolio onboarding, interaction collection, concern feedback, and internal metrics.
 servers:
   - url: /api
 paths:
   /v1/stocks/{stock_id}/context:
     get:
-      summary: Get evidence-grounded stock context
+      summary: Get evidence-grounded stock, institutional, community, and demo-news context
       parameters:
         - in: path
           name: stock_id
@@ -56,21 +56,31 @@ paths:
           application/json:
             schema:
               type: object
-              required: [action]
+              required: [action, occurred_at]
               properties:
-                action:
-                  type: string
-                  enum: [confirmed_holding, watch_only, irrelevant]
+                action: { type: string, enum: [confirmed_holding, watch_only, irrelevant] }
+                occurred_at: { type: string, format: date-time }
       responses:
         "200":
-          description: Updated relationship and follow-up card
+          description: Updated relationship
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  relationship: { $ref: "#/components/schemas/PortfolioRelationship" }
-                  follow_up_card: { $ref: "#/components/schemas/ActionCard" }
+              schema: { $ref: "#/components/schemas/PortfolioRelationship" }
+  /v1/users/{user_id}/concern-feedback:
+    post:
+      summary: Record an explicit low-friction concern or reminder preference
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ConcernFeedback" }
+      responses:
+        "202": { description: Feedback accepted }
   /v1/users/{user_id}/portfolio:
     get:
       summary: Get user-confirmed portfolio relationships
@@ -87,6 +97,48 @@ paths:
               schema:
                 type: array
                 items: { $ref: "#/components/schemas/PortfolioRelationship" }
+  /v1/events/batch:
+    post:
+      summary: Persist idempotent front-end interaction events from the local outbox
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EventBatchRequest" }
+      responses:
+        "202":
+          description: Accepted event IDs
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EventBatchResponse" }
+  /v1/users/{user_id}/events:
+    get:
+      summary: Read recent interaction events for demo inspection
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 100, default: 50 }
+      responses:
+        "200":
+          description: Recent events
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/InteractionEvent" }
+  /v1/dashboard/metrics:
+    get:
+      summary: Get the minimum operational funnel metrics
+      responses:
+        "200":
+          description: MVP metrics
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DashboardMetrics" }
 components:
   schemas:
     StockContext:
@@ -97,11 +149,31 @@ components:
         stock_name: { type: string, example: "廣達" }
         as_of: { type: string, format: date, example: "2025-12-31" }
         close: { type: number, example: 272 }
+        annual_return: { type: number, example: -0.007 }
+        institutional_net_1d: { type: integer, example: 3957 }
         institutional_net_20d: { type: integer, example: -60265 }
+        institutional_holding_ratio: { type: number, example: 0.3291 }
+        dividend_yield: { type: number, example: 0.0478 }
+        community_bullish_count_7d: { type: integer, example: 216 }
+        community_bearish_count_7d: { type: integer, example: 14 }
         community_bullish_ratio_7d:
           type: number
           example: 0.939
-          description: Ratio among posts with an explicit bullish or bearish stance.
+          description: Ratio among posts with an explicit bullish or bearish stance; not the user's emotion.
+        demo_news:
+          type: array
+          description: Must be replaced by an authorized source before production.
+          items: { $ref: "#/components/schemas/NewsItem" }
+    NewsItem:
+      type: object
+      required: [news_id, title, published_at, source_name, is_demo]
+      properties:
+        news_id: { type: string }
+        title: { type: string }
+        summary: { type: string }
+        published_at: { type: string, format: date-time }
+        source_name: { type: string }
+        is_demo: { type: boolean }
     ActionCard:
       type: object
       required: [card_id, card_type, stock_id, title, evidence, actions]
@@ -111,9 +183,7 @@ components:
         stock_id: { type: string }
         title: { type: string }
         summary: { type: string }
-        evidence:
-          type: array
-          items: { type: string }
+        evidence: { type: array, items: { type: string } }
         actions:
           type: array
           items:
@@ -129,5 +199,54 @@ components:
         stock_id: { type: string, example: "2382" }
         relationship: { type: string, enum: [holding, watch_only, irrelevant] }
         importance: { type: string, enum: [core, normal, small, unknown] }
+        average_cost: { type: [number, "null"], description: Optional and not collected in the first interaction. }
+        shares: { type: [number, "null"], description: Optional and not collected in the first interaction. }
         source: { type: string, enum: [user_confirmed] }
         confirmed_at: { type: string, format: date-time }
+    ConcernFeedback:
+      type: object
+      required: [stock_id, card_id, concern, occurred_at]
+      properties:
+        stock_id: { type: string }
+        card_id: { type: string }
+        concern: { type: string, enum: [worried, routine, mute] }
+        occurred_at: { type: string, format: date-time }
+    InteractionEvent:
+      type: object
+      required: [event_id, session_id, event_type, user_id, surface, occurred_at]
+      properties:
+        event_id: { type: string, format: uuid }
+        session_id: { type: string }
+        event_type:
+          type: string
+          enum: [watchlist_view, stock_open, stock_tab_view, card_impression, card_evidence_open, relationship_feedback, concern_feedback, ai_followup_open, portfolio_view, holding_removed, news_open, dashboard_view]
+        user_id: { type: string }
+        stock_id: { type: [string, "null"] }
+        card_id: { type: [string, "null"] }
+        surface: { type: string }
+        action: { type: [string, "null"] }
+        source_date: { type: [string, "null"], format: date }
+        occurred_at: { type: string, format: date-time }
+        metadata: { type: object, additionalProperties: true }
+    EventBatchRequest:
+      type: object
+      required: [events]
+      properties:
+        events:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items: { $ref: "#/components/schemas/InteractionEvent" }
+    EventBatchResponse:
+      type: object
+      required: [accepted_event_ids]
+      properties:
+        accepted_event_ids: { type: array, items: { type: string } }
+    DashboardMetrics:
+      type: object
+      required: [event_count, card_impressions, relationship_feedback_count, confirmed_holdings]
+      properties:
+        event_count: { type: integer }
+        card_impressions: { type: integer }
+        relationship_feedback_count: { type: integer }
+        confirmed_holdings: { type: integer }

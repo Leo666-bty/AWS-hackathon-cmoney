@@ -3,88 +3,155 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Mindfolio AI — Reverse Portfolio Onboarding</title>
+    <title>Mindfolio AI — Three-Day MVP</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="#" data-page="stock"><span>籌</span><strong>籌碼 K 線</strong><small>＋ Mindfolio AI</small></a>
+      <button class="brand" data-page-link="watchlist" aria-label="回到自選股">
+        <span>籌</span><strong>籌碼 K 線</strong><small>Mindfolio AI MVP</small>
+      </button>
       <nav aria-label="主要導覽">
-        <button class="nav active" data-page="stock">個股</button>
-        <button class="nav" data-page="portfolio">我的庫存 <b id="portfolioCount">0</b></button>
+        <button class="nav active" data-page-link="watchlist">自選股</button>
+        <button class="nav" data-page-link="stock">個股</button>
+        <button class="nav" data-page-link="portfolio">我的庫存 <b id="portfolioCount">0</b></button>
+        <button class="nav internal" data-page-link="dashboard">營運 Dashboard</button>
       </nav>
-      <button class="profile" data-page="portfolio"><i>L</i><span>LEO</span></button>
+      <button class="profile" data-page-link="portfolio"><i>L</i><span>LEO</span></button>
     </header>
 
     <main>
-      <section class="page active" id="stockPage">
-        <div class="stock-header">
-          <div><p class="kicker">電腦及週邊設備</p><h1>2382 廣達</h1><p>資料基準日：2025-12-31</p></div>
-          <div class="quote"><small>收盤價</small><strong>272</strong><span>全年報酬 −0.7%</span></div>
-        </div>
+      <section class="page active" id="watchlistPage" data-page="watchlist">
+        <header class="page-header">
+          <div><p class="kicker">LEO 的籌碼 K 線</p><h1>自選股</h1><p>照常研究股票，不需要先打開 AI 或建立完整庫存。</p></div>
+          <div class="market-status"><small>資料基準日</small><strong>2025-12-31</strong><span>盤後資料已更新</span></div>
+        </header>
 
-        <div class="grid">
+        <div class="watchlist-tabs"><button class="selected">即時</button><button>盤後</button><button>討論</button></div>
+        <section class="watchlist-table" aria-label="自選股清單">
+          <div class="stock-row head"><span>商品</span><span>收盤</span><span>全年報酬</span><span>近 20 日法人</span><span></span></div>
+          <button class="stock-row" id="openQuantaBtn">
+            <span><b>2382 廣達</b><small>電腦及週邊設備</small></span><strong>272</strong><em class="down">−0.7%</em><em class="down">−60,265 張</em><i>查看 →</i>
+          </button>
+          <div class="stock-row"><span><b>2330 台積電</b><small>半導體</small></span><strong>1,550</strong><em class="up">＋46.5%</em><em class="up">＋28,361 張</em><i>—</i></div>
+          <div class="stock-row"><span><b>2454 聯發科</b><small>半導體</small></span><strong>1,430</strong><em class="up">＋5.2%</em><em class="up">＋5,720 張</em><i>—</i></div>
+        </section>
+        <aside class="entry-note"><b>Demo 起點</b><p>點擊「2382 廣達」，開始一段會留下真實事件資料的 MVP 流程。</p></aside>
+      </section>
+
+      <section class="page" id="stockPage" data-page="stock">
+        <header class="page-header stock-header">
+          <button class="back" data-page-link="watchlist">← 自選股</button>
+          <div><p class="kicker">電腦及週邊設備</p><h1>2382 廣達</h1><p>資料基準日：2025-12-31</p></div>
+          <div class="quote"><small>收盤價</small><strong>272</strong><span class="down">全年報酬 −0.7%</span></div>
+        </header>
+
+        <div class="stock-layout">
           <section class="market-panel">
-            <div class="tabs"><button class="selected">籌碼</button><button>法人</button><button>社群</button><button>基本面</button></div>
-            <article class="chart-card">
-              <header><div><p class="kicker">近 20 日</p><h2>法人籌碼趨勢</h2></div><strong class="down">−60,265 張</strong></header>
-              <div class="chart" aria-label="法人籌碼示意圖"><span></span></div>
-              <div class="facts"><p><small>單日法人</small><b class="up">＋3,957 張</b></p><p><small>全年報酬</small><b>−0.7%</b></p><p><small>殖利率</small><b>4.78%</b></p></div>
+            <div class="stock-tabs" role="tablist" aria-label="廣達資訊分類">
+              <button class="stock-tab" data-stock-tab="realtime">即時</button>
+              <button class="stock-tab selected" data-stock-tab="aftermarket">盤後</button>
+              <button class="stock-tab" data-stock-tab="community">社群</button>
+              <button class="stock-tab" data-stock-tab="news">新聞</button>
+            </div>
+
+            <article class="tab-panel" data-tab-panel="realtime">
+              <header><div><p class="kicker">今日行情</p><h2>廣達即時走勢</h2></div><strong>272</strong></header>
+              <div class="price-chart"><span></span></div>
+              <div class="facts"><p><small>開盤</small><b>270</b></p><p><small>最高</small><b>274</b></p><p><small>最低</small><b>268</b></p></div>
             </article>
-            <article class="community-card">
-              <div><p class="kicker">爆料同學會・近 7 日</p><h2>明確多空貼文中 93.9% 偏多</h2><p>此數值是個股社群彙總，不代表 LEO 的情緒。</p></div>
-              <div class="sentiment"><span style="--ratio:93.9%"></span><small>多 93.9%</small><small>空 6.1%</small></div>
+
+            <article class="tab-panel active" data-tab-panel="aftermarket">
+              <header><div><p class="kicker">盤後籌碼・近 20 日</p><h2>法人中期仍在調節</h2></div><strong class="down">−60,265 張</strong></header>
+              <div class="chip-chart" aria-label="法人籌碼趨勢示意圖"><span></span></div>
+              <div class="facts"><p><small>單日法人</small><b class="up">＋3,957 張</b></p><p><small>法人持股率</small><b>32.91%</b></p><p><small>殖利率</small><b>4.78%</b></p></div>
+              <button class="evidence-button" data-evidence="institution">我看完法人證據</button>
+            </article>
+
+            <article class="tab-panel" data-tab-panel="community">
+              <header><div><p class="kicker">爆料同學會・近 7 日</p><h2>明確多空貼文高度偏多</h2></div><strong class="up">93.9%</strong></header>
+              <div class="sentiment-bar"><span style="--ratio:93.9%"></span><small>看多 216 則</small><small>看空 14 則</small></div>
+              <div class="community-stats"><p><b>428</b><span>發文則數</span></p><p><b>6,312</b><span>回文則數</span></p><p><b>230</b><span>明確多空貼文</span></p></div>
+              <p class="disclaimer">全站個股社群彙總，不代表 LEO 的個人情緒。</p>
+              <button class="evidence-button" data-evidence="community">我看完社群證據</button>
+            </article>
+
+            <article class="tab-panel" data-tab-panel="news">
+              <header><div><p class="kicker">MVP Demo Feed</p><h2>廣達相關新聞</h2></div><span class="demo-source">非官方資料包</span></header>
+              <button class="news-item" data-news-id="news-001"><span>12/31 盤後</span><b>廣達 AI 伺服器展望與市場關注焦點</b><small>示範新聞摘要・用於驗證 news_open 與 AI Context</small></button>
+              <button class="news-item" data-news-id="news-002"><span>12/30</span><b>法人籌碼短線回補，中期動向仍待觀察</b><small>示範新聞摘要・不構成投資建議</small></button>
+              <p class="disclaimer">正式 MVP 上線前必須改接有授權的 CMoney 新聞來源。</p>
             </article>
           </section>
 
-          <aside>
+          <aside class="insight-column">
             <article class="ai-card" id="aiCard">
-              <div class="ai-head"><span>AI</span><div><b>今天值得注意</b><small>證據先行，不用聊天</small></div></div>
+              <div class="ai-head"><span>AI</span><div><b>Mindfolio 情境卡</b><small>不用輸入 Prompt</small></div></div>
               <div id="discoveryState">
                 <p class="badge">法人 × 社群背離</p>
                 <h2>市場很樂觀，法人卻仍在調節</h2>
-                <p>廣達近 20 日法人賣超 60,265 張，但明確多空貼文中 93.9% 偏多。兩種訊號方向不一致。</p>
-                <div class="evidence"><span>官方資料</span><span>截至 2025-12-31</span></div>
-                <hr />
-                <h3>廣達與你目前的關係是？</h3>
-                <p class="privacy">不用提供成本、股數或券商資料。</p>
-                <div class="actions">
-                  <button class="primary" id="holdingBtn">是我的持股</button>
-                  <button id="watchBtn">只是觀察</button>
-                  <button class="quiet" id="irrelevantBtn">不相關</button>
+                <p>近 20 日法人賣超 60,265 張，但明確多空貼文中 93.9% 偏多。兩種訊號方向不一致。</p>
+                <div class="evidence-tags"><span>官方資料</span><span>2025-12-31</span></div>
+                <button class="link-button" id="expandEvidenceBtn">查看完整證據</button>
+                <div class="relationship-block hidden" id="relationshipBlock">
+                  <h3>廣達與你目前的關係是？</h3>
+                  <p>不用提供成本、股數或券商。</p>
+                  <div class="actions"><button class="primary" id="holdingBtn">是我的持股</button><button id="watchBtn">只是觀察</button><button class="quiet" id="irrelevantBtn">不相關</button></div>
                 </div>
               </div>
+
               <div class="hidden" id="resultState">
                 <p class="badge success" id="resultBadge">已確認持股</p>
                 <h2 id="resultTitle">廣達已加入你的庫存情境</h2>
-                <p id="resultCopy">之後廣達的重大籌碼變化會優先出現在你的今日洞察。</p>
-                <button class="primary full" data-page="portfolio">查看我的庫存</button>
+                <p id="resultCopy">之後重大籌碼變化會優先出現在你的今日洞察。</p>
+                <div class="followups" id="followupButtons">
+                  <button data-followup="divergence">為什麼會背離？</button>
+                  <button data-followup="portfolio">和我的持股有什麼關係？</button>
+                  <button data-followup="evidence">整理完整證據</button>
+                </div>
+                <div class="followup-answer hidden" id="followupAnswer"></div>
+                <div class="concern-box" id="concernBox">
+                  <strong>這則變化現在對你有影響嗎？</strong>
+                  <div><button data-concern="worried">有點擔心</button><button data-concern="routine">例行查看</button><button data-concern="mute">不用提醒</button></div>
+                </div>
+                <button class="primary full" data-page-link="portfolio">查看我的庫存</button>
               </div>
             </article>
-            <article class="principle"><b>Reverse Portfolio Onboarding</b><p>先讓使用者看到與當下股票相關的價值，再用一次點擊確認關係。</p></article>
+            <article class="privacy-note"><b>目前只確認關係</b><p>沒有收集股數、成本、券商與總資產。</p></article>
           </aside>
         </div>
       </section>
 
-      <section class="page" id="portfolioPage">
-        <div class="portfolio-header"><div><p class="kicker">LEO</p><h1>我的庫存情境</h1><p>只保存你親自確認的關係，不推測股數、成本或總資產。</p></div><button class="reset" id="resetBtn">重設 Demo</button></div>
+      <section class="page" id="portfolioPage" data-page="portfolio">
+        <header class="page-header"><div><p class="kicker">LEO</p><h1>我的投資首頁</h1><p>已確認庫存、今日事件與關注回饋。</p></div><button class="reset" id="resetBtn">重設 Demo</button></header>
         <div class="portfolio-grid">
-          <article class="empty-state" id="emptyPortfolio">
-            <span>0</span><h2>目前還沒有已確認持股</h2><p>回到個股頁查看洞察，再用一次點擊確認。</p><button class="primary" data-page="stock">回到廣達</button>
-          </article>
+          <article class="empty-state" id="emptyPortfolio"><span>0</span><h2>目前還沒有已確認持股</h2><p>從廣達個股頁查看證據並一鍵確認。</p><button class="primary" data-page-link="watchlist">回到自選股</button></article>
           <article class="holding hidden" id="holdingCard">
-            <header><div><small>已確認持股</small><h2>2382 廣達</h2></div><span>使用者確認</span></header>
+            <header><div><small>已確認持股</small><h2>2382 廣達</h2></div><span>LEO 確認</span></header>
             <div class="priority"><small>今日優先事件</small><strong>法人與社群方向不一致</strong><p>近 20 日法人 −60,265 張／明確多空貼文 93.9% 偏多</p></div>
+            <div class="concern-result" id="concernResult">尚未回覆目前感受</div>
             <footer><span>未收集：成本、股數、券商</span><button id="removeBtn">我已賣出</button></footer>
           </article>
-          <aside class="trust-card">
-            <p class="kicker">AI 現在知道什麼</p>
-            <ul><li class="known">廣達是否為持股</li><li>股數</li><li>成本</li><li>券商帳戶</li><li>總資產</li></ul>
-            <p>三天版本只驗證最低敏感度的「是否持有」。</p>
-          </aside>
+          <aside class="trust-card"><p class="kicker">AI 現在知道什麼</p><ul><li class="known">廣達是否為持股</li><li id="concernKnowledge">目前是否需要提醒</li><li>股數</li><li>成本</li><li>券商帳戶</li></ul><p>只有 LEO 的明確點擊會成為個人資料。</p></aside>
         </div>
       </section>
+
+      <section class="page" id="dashboardPage" data-page="dashboard">
+        <header class="page-header"><div><p class="kicker">Internal MVP</p><h1>互動成效 Dashboard</h1><p>證明前台操作已形成可衡量事件；正式產品需加入權限控管。</p></div><span class="sync-status" id="syncStatus">Local outbox</span></header>
+        <section class="metrics">
+          <article><small>事件數</small><strong id="metricEvents">0</strong><span>本機 Demo session</span></article>
+          <article><small>卡片曝光</small><strong id="metricImpressions">0</strong><span>card_impression</span></article>
+          <article><small>關係回饋</small><strong id="metricFeedback">0</strong><span>relationship_feedback</span></article>
+          <article><small>已確認持股</small><strong id="metricHoldings">0</strong><span>North Star proxy</span></article>
+        </section>
+        <section class="event-panel">
+          <div class="section-heading"><div><p class="kicker">Realtime event inspector</p><h2>最近互動事件</h2></div><button id="retrySyncBtn">重試同步</button></div>
+          <div class="event-table" id="eventTable"><p class="empty-events">尚未產生事件。</p></div>
+        </section>
+      </section>
     </main>
+
+    <div class="toast hidden" id="toast" role="status"></div>
     <script src="./script.js"></script>
   </body>
 </html>

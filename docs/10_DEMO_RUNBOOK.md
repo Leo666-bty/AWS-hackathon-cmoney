@@ -1,52 +1,56 @@
 # Demo Runbook
 
-## Demo 目標
+## Goal
 
-90 秒證明：不用聊天、不用上傳、不用填表，也能建立第一檔使用者確認持股。
+120 秒證明：不用聊天、不用上傳、不用填表，LEO 在原本的籌碼 K 線研究流程中即可建立第一檔已確認持股，並留下可衡量的即時互動資料。
 
-## 前置
+## Setup
 
 - Persona：LEO
 - 日期：2025-12-31
 - 股票：2382 廣達
-- Portfolio 初始狀態：0 檔
-- 預先開啟 Web Prototype 個股頁
+- Portfolio：0 檔
+- 從 `apps/web/prototype/index.html` 的自選股頁開始
 
-## 操作與講法
+## Script
 
-### 1. 正常看盤（15 秒）
+### 1. Existing Workflow（15 sec）
 
-「LEO 沒有進入 AI Chat。他只是照常打開籌碼 K 線看廣達。」
+「LEO 不會打開另一個 AI Chat。他照常從自選股打開廣達。」點擊 2382。
 
-指出：收盤 272、近 20 日法人 −60,265 張、明確多空貼文 93.9% 偏多。
+### 2. Evidence, Not Guessing（25 sec）
 
-### 2. AI 先給價值（20 秒）
+依序切換盤後、社群、新聞。指出：近 20 日法人 −60,265 張；近 7 日明確多空貼文 93.9% 偏多。新聞目前清楚標示為 Demo Feed。
 
-「Mindfolio 沒先問持股，而是先把法人與社群背離整理成一張卡。」
+### 3. Reverse Onboarding（20 sec）
 
-### 3. 一鍵確認（15 秒）
+展開完整證據，點「是我的持股」。說明 LEO 沒有輸入 Prompt、股數、成本或券商資料。
 
-點擊「是我的持股」。
+### 4. Contextual AI, Not ChatGPT Page（20 sec）
 
-「LEO 不需要上傳券商截圖、輸入股數成本，也不需要打一個字。」
+點「為什麼會背離？」展示單一情境 follow-up。接著點「有點擔心」，說明這是 LEO 明確回覆的 Concern Signal，不是模型診斷。
 
-### 4. Portfolio 更新（20 秒）
+### 5. Personal Value（20 sec）
 
-點擊「查看我的庫存」。指出廣達已成為使用者確認持股，且今日背離事件成為第一優先。
+開「我的庫存」，展示廣達已加入、背離事件成為今日優先項目，而且系統明示不知道成本與股數。
 
-### 5. 收尾（20 秒）
+### 6. Measurable Loop（20 sec）
 
-「別人的 AI 等使用者開口；我們的 AI 先證明價值，再用一次點擊自然建立真實庫存情境。」
+開「營運 Dashboard」，展示 `stock_open`、`news_open`、`relationship_feedback`、`concern_feedback` 等事件與 local outbox 狀態。
 
-## 備援
+## Closing Line
 
-- Bedrock 失敗：使用固定卡片文案。
-- API 失敗：使用 Prototype 內建資料。
-- 網路失敗：播放錄製影片。
+「傳統 AI 等使用者想問題；Mindfolio 在值得注意的時刻先給證據，再用一次點擊建立持股情境與提醒偏好。」
 
-## 禁止說法
+## Backup
+
+- Bedrock 失敗：固定敘事與 follow-up。
+- API 失敗：事件保留 local outbox，清楚顯示 queued。
+- 網路失敗：直接開本機 reference 或播放錄影。
+
+## Forbidden Claims
 
 - AI 已準確猜出 LEO 的持股。
-- 93.9% 的使用者看多。
-- LEO 的焦慮是 93.9%。
-- AI 建議 LEO 買進或賣出廣達。
+- 93.9% 的使用者看多，或 LEO 的焦慮是 93.9%。
+- Demo Feed 是官方新聞資料。
+- AI 建議買進或賣出廣達。

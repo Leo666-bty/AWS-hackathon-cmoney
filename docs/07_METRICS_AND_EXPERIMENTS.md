@@ -1,50 +1,46 @@
 # Metrics & Experiments
 
-## 北極星
+## North Star
 
 > 至少完成一檔「使用者確認持股」的人數。
 
-這直接對應官方「最大化匯入庫存人數」。聊天次數、訊息數與停留時間不是北極星。
+這直接對應庫存匯入；聊天次數與停留時間不是北極星。
 
-## 漏斗
+## MVP Funnel
 
-| 階段 | 指標 |
-|---|---|
-| 洞察曝光 | Context Card impressions |
-| 願意回饋 | 一鍵回饋率 |
-| 完成建庫 | 首檔持股確認率／人數 |
-| 取得價值 | 確認後洞察查看率 |
-| 持續使用 | D7 回訪率 |
-| 保持更新 | 30 日持股狀態更新率 |
+| Stage | Metric | Event |
+|---|---|---|
+| 正常研究 | 個股開啟率 | `stock_open / watchlist_view` |
+| 看見價值 | 卡片曝光 | `card_impression` |
+| 查證 | 證據查看率 | `card_evidence_open / card_impression` |
+| 建立關係 | 一鍵回饋率 | `relationship_feedback / card_impression` |
+| 完成匯入 | 確認持股人數 | action = `confirmed_holding` |
+| 理解需求 | Concern 回覆率 | `concern_feedback / relationship_feedback` |
+| 延伸互動 | 情境追問開啟率 | `ai_followup_open / relationship_feedback` |
+| 取得價值 | Portfolio 查看率 | `portfolio_view / confirmed_holding` |
 
-## 最重要實驗
+## Dashboard Minimum
 
-### A：傳統先問
+三天版只顯示：事件數、卡片曝光、關係回饋、已確認持股，以及最近 15 筆事件的 queued/synced 狀態。它用於證明資料真的被收集，不是假裝完整 BI 後台。
 
-```text
-你有持有廣達嗎？
-```
+## Concern Label
 
-### B：洞察先行
+`worried`、`routine`、`mute` 是提醒策略的明確標籤。不得將它報告成焦慮盛行率或醫療指標。可衡量的是「哪一種卡片更常讓使用者要求整理證據或降低提醒」。
 
-```text
-先顯示法人與社群背離，再詢問關係。
-```
+## Primary Experiment
 
-比較：首檔持股確認率、關閉率與後續洞察查看率。
+- A：先問「你有持有廣達嗎？」
+- B：先顯示法人 × 社群背離，再詢問關係。
 
-## 提案目標值
+比較一鍵回饋率、持股確認率、不相關率與 time-to-action。
 
-下列只能標示為待驗證目標，不可當成既有成果：
+## Target, Not Result
 
 - 一鍵回饋率 ≥ 25%
 - 回饋者中的首檔持股確認率 ≥ 40%
 - 完成首檔確認時間 ≤ 5 秒
-- 確認後洞察查看率 ≥ 60%
-
-## AI 品質
-
+- 確認後 Portfolio 查看率 ≥ 60%
 - Evidence 數字正確率 100%
-- JSON schema 成功率 ≥ 95%
 - 投資建議違規率 0%
-- 「不相關」回饋率持續下降
+
+以上都是待驗證目標，Demo Dashboard 的單一 LEO session 不可當成成效證明。
