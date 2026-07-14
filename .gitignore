@@ -37,7 +37,11 @@ V2/apps/ai-training/artifacts/*
 !V2/apps/ai-training/artifacts/.gitkeep
 V2/apps/ai-training/outputs/
 
-# Organizer-provided source package stays local unless redistribution is approved.
+# Organizer-provided raw source package stays local unless redistribution is approved.
+# (Now under V2/data/ — the active version owns the data. Built catalog is separate.)
+V2/data/*.pdf
+V2/data/Delivery_Hackathon_DataPackage_20260624/*.csv
+# Legacy locations (pre-migration), kept harmless.
 data/*.pdf
 data/Delivery_Hackathon_DataPackage_20260624/*.csv
 V1/data/*.pdf

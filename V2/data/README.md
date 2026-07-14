@@ -2,7 +2,7 @@
 
 ## 原始來源
 
-原始資料仍只封存在 `V1/data/Delivery_Hackathon_DataPackage_20260624/`。V2 讀取：
+原始資料存放於 `V2/data/Delivery_Hackathon_DataPackage_20260624/`（gitignored，不進 remote）。V2 讀取：
 
 - `01_Price_Valuation_2025.csv`：每日原始開高低收，用來檢查使用者記得的成交價格。
 - `03_Return_Rate_2025.csv`：每日還原收盤價，用來建立公司行動調整因子。
@@ -10,7 +10,7 @@
 
 ## 生成方式
 
-執行 `V2/tools/build_market_catalog.py`，產生 `V2/demo/market-data.js`。輸出包含：
+執行 `V2/tools/build_market_catalog.py --json`，產生前端用的 `V2/demo/market-data.js` 與後端讀取的 `V2/data/market-catalog.json`。輸出包含：
 
 - 300 檔股票主檔。
 - 依同學會瀏覽人數排序的熱門股票。

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 from collections import defaultdict
@@ -10,8 +11,9 @@ from typing import Optional
 
 
 ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ROOT / "V1" / "data" / "Delivery_Hackathon_DataPackage_20260624"
+SOURCE = ROOT / "V2" / "data" / "Delivery_Hackathon_DataPackage_20260624"
 OUTPUT = ROOT / "V2" / "demo" / "market-data.js"
+JSON_OUTPUT = ROOT / "V2" / "data" / "market-catalog.json"
 
 
 def number(value: Optional[str], default: float = 0.0) -> float:
@@ -123,7 +125,33 @@ def build() -> dict:
     }
 
 
-if __name__ == "__main__":
-    payload = json.dumps(build(), ensure_ascii=False, separators=(",", ":"))
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--json",
+        nargs="?",
+        const=str(JSON_OUTPUT),
+        default=None,
+        metavar="PATH",
+        help=(
+            "Also write a pure JSON catalog for the backend to read "
+            f"(default: {JSON_OUTPUT})."
+        ),
+    )
+    args = parser.parse_args()
+
+    catalog = build()
+    payload = json.dumps(catalog, ensure_ascii=False, separators=(",", ":"))
+
     OUTPUT.write_text(f"const MARKET_DATABASE = {payload};\n", encoding="utf-8")
     print(f"Wrote {OUTPUT} ({len(payload)} bytes)")
+
+    if args.json is not None:
+        json_path = Path(args.json)
+        json_path.parent.mkdir(parents=True, exist_ok=True)
+        json_path.write_text(payload + "\n", encoding="utf-8")
+        print(f"Wrote {json_path} ({len(payload)} bytes)")
+
+
+if __name__ == "__main__":
+    main()
