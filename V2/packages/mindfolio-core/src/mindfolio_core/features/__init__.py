@@ -6,7 +6,9 @@ MONTHLY_FEATURE_KEYS = (
     "max_drawdown",
     "volume_change",
     "turnover",
-    "institutional_net",
+    "institutional_flow_ratio",
     "community_heat",
     "community_bullish_ratio",
 )
+
+WINSOR_QUANTILES = (0.01, 0.99)

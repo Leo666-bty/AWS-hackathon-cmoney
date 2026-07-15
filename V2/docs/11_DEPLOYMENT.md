@@ -16,12 +16,12 @@ EC2 — Docker Compose
 │   ├── SPA fallback
 │   └── /api/* → http://api:8000/api/*
 ├── api       FastAPI/Uvicorn :8000
-│   ├── market-catalog.json baked into image
+│   ├── market-catalog.json + market-context-2025-v1.json baked into image
 │   ├── DATABASE_URL → postgres:5432
 │   ├── retention/session services
 │   └── Bedrock via IAM Role；失敗時 deterministic fallback
 └── postgres  PostgreSQL 16 :5432（Compose internal only）
-    ├── 001_init.sql only on first empty-volume initialization
+    ├── ordered SQL files only on first empty-volume initialization
     └── pgdata named volume on EC2 EBS
 ```
 
@@ -33,10 +33,11 @@ EC2 — Docker Compose
 - `V2/apps/web/nginx.conf`
 - `V2/docker-compose.yml`
 - `V2/infra/schema/001_init.sql`
+- `V2/infra/schema/002_ai_report_cache.sql`
 
 Build context 必須是 `V2/`，讓 API image 能安裝本地
 `packages/mindfolio-core` 與 `apps/api`，並只複製版本化的
-`data/market-catalog.json`。
+`data/market-catalog.json` 與 `data/market-context-2025-v1.json`。
 
 ## 3. Recommended EC2 baseline
 
@@ -64,6 +65,7 @@ DATABASE_URL=postgresql://app:<same-password>@postgres:5432/mindfolio
 MINDFOLIO_ENV=production
 MINDFOLIO_CORS_ORIGINS=https://your-domain.example
 MINDFOLIO_MARKET_DATA_PATH=/app/data/market-catalog.json
+MINDFOLIO_MARKET_CONTEXT_PATH=/app/data/market-context-2025-v1.json
 
 MINDFOLIO_INVITE_IDENTITIES=<high-entropy-invite-code>:LEO
 MINDFOLIO_REPORT_TTL_HOURS=72
@@ -120,7 +122,7 @@ docker compose ps
 啟動順序由 health checks 控制：
 
 1. PostgreSQL 通過 `pg_isready`。
-2. FastAPI 載入 market catalog、repositories 與 retention services，通過
+2. FastAPI 載入 market catalog、pre-scored market context、repositories 與 retention services，通過
    `/api/v2/health`。
 3. nginx 啟動並提供 React 與 `/api` reverse proxy。
 
@@ -174,7 +176,8 @@ Response 必須包含 `report_id`、`result.persona_code`、
 3. 明確 consent 後建立 confirmed holdings。
 4. 呼叫 member dashboard，確認 fingerprint、portfolio、priority Action Card 與
    weekly review modules 可讀。
-5. 重送相同 claim／event request，確認 idempotency，不產生重複資料。
+5. 產生 AI Deep Dive 並點擊固定問題 chips，確認 evidence refs 與 fallback source。
+6. 重送相同 AI report request，確認 cache 生效；重送 claim／event request 不產生重複資料。
 
 正式 endpoint 與 payload 以 FastAPI `/api/v2/docs` 為準，不在部署腳本複製
 可能漂移的 token 或 identity contract。
@@ -191,8 +194,8 @@ PostgreSQL 恢復 healthy 後，claimed report、confirmed holdings、retention 
 
 ## 9. Schema and migration policy
 
-`/docker-entrypoint-initdb.d/001_init.sql` 只會在 `pgdata` 為空時執行。修改
-`001_init.sql` 不會更新既有 volume。
+`/docker-entrypoint-initdb.d/*.sql` 只會在 `pgdata` 為空時依序執行。新增
+`002_ai_report_cache.sql` 不會自動更新既有 volume；既有環境必須手動套用 migration。
 
 在第一個持久環境建立後：
 

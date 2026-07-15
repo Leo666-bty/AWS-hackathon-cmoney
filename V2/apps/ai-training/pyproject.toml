@@ -20,6 +20,7 @@ test = ["pytest>=8.3,<9"]
 
 [project.scripts]
 mindfolio-training-status = "mindfolio_training.main:main"
+mindfolio-train = "mindfolio_training.pipeline:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -172,6 +172,35 @@ const feedbackSchema = z.object({
 
 const eventBatchSchema = z.object({ accepted_event_ids: z.array(z.string()) });
 
+const evidenceSectionSchema = z.object({
+  title: z.string(),
+  body: z.string(),
+  evidence_refs: z.array(z.string()),
+});
+
+const questionIdSchema = z.enum(["why-persona", "most-influential-trade", "why-anomalous-month"]);
+
+const investmentAIReportSchema = z.object({
+  title: z.string(),
+  executive_summary: z.string(),
+  strengths: z.array(evidenceSectionSchema),
+  watchouts: z.array(evidenceSectionSchema),
+  market_moments: z.array(evidenceSectionSchema),
+  suggested_questions: z.array(z.object({ id: questionIdSchema, label: z.string() })),
+  source: z.enum(["bedrock", "fallback"]),
+  versions: z.record(z.string(), z.string()),
+  generated_at: z.string(),
+});
+
+const questionAnswerSchema = z.object({
+  question_id: questionIdSchema,
+  answer: z.string(),
+  evidence_refs: z.array(z.string()),
+  limitations: z.string(),
+  source: z.enum(["bedrock", "fallback"]),
+  prompt_version: z.string(),
+});
+
 const errorSchema = z.object({ detail: z.unknown().optional() });
 
 export type HealthResponse = z.infer<typeof healthSchema>;
@@ -183,6 +212,9 @@ export type ConfirmedHolding = z.infer<typeof confirmedHoldingSchema>;
 export type SessionResponse = z.infer<typeof sessionSchema>;
 export type ClaimResponse = z.infer<typeof claimSchema>;
 export type MemberDashboard = z.infer<typeof dashboardSchema>;
+export type InvestmentAIReport = z.infer<typeof investmentAIReportSchema>;
+export type InvestmentQuestionId = z.infer<typeof questionIdSchema>;
+export type InvestmentQuestionAnswer = z.infer<typeof questionAnswerSchema>;
 export type CardPreference = "review_evidence" | "routine" | "mute";
 export type InteractionEvent = {
   event_id: string;
@@ -339,5 +371,24 @@ export function submitEventBatch(events: InteractionEvent[], accessToken?: strin
     method: "POST",
     headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
     body: JSON.stringify({ events }),
+  });
+}
+
+export function generateInvestmentAIReport(reportId: string, accessToken: string): Promise<InvestmentAIReport> {
+  return request(`/reports/${reportId}/ai-report`, investmentAIReportSchema, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+}
+
+export function askInvestmentQuestion(
+  reportId: string,
+  questionId: InvestmentQuestionId,
+  accessToken: string,
+): Promise<InvestmentQuestionAnswer> {
+  return request(`/reports/${reportId}/questions`, questionAnswerSchema, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ question_id: questionId }),
   });
 }

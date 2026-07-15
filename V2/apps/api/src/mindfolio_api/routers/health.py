@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
 from mindfolio_api import __version__
@@ -16,12 +16,12 @@ class HealthResponse(BaseModel):
 
 
 @router.get("/health", response_model=HealthResponse)
-def health() -> HealthResponse:
+def health(request: Request) -> HealthResponse:
     settings = get_settings()
     return HealthResponse(
         status="ok",
         service="mindfolio-api",
         version=__version__,
-        model_status=settings.model_status,
+        model_status=request.app.state.market_context.status,
         narrative_status=settings.narrative_status,
     )

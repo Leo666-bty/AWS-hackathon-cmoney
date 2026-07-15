@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#06101d" />
+  <title>Mindfolio Time Machine｜CMoney AI Hackathon</title>
+  <meta name="description" content="Mindfolio Time Machine 黑客松提案簡報：從匿名投資重建到 Portfolio Radar。" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="deck-bar" aria-label="簡報控制列">
+    <a class="deck-brand" href="#slide-1" aria-label="回到封面">
+      <i>M</i>
+      <span><b>MINDFOLIO</b><small>CMONEY 2025 PORTFOLIO LAB</small></span>
+    </a>
+    <div class="deck-progress" aria-hidden="true"><span id="progressBar"></span></div>
+    <div class="deck-actions">
+      <span id="sectionLabel">OPENING</span>
+      <button type="button" id="notesButton" aria-pressed="false" title="顯示講者提示（N）">N</button>
+      <button type="button" id="overviewButton" aria-pressed="false" title="總覽（O）">O</button>
+      <button type="button" id="fullscreenButton" title="全螢幕（F）">F</button>
+      <b><span id="currentPage">01</span> / 20</b>
+    </div>
+  </header>
+
+  <main class="deck" id="deck">
+    <section class="slide cover is-active" id="slide-1" data-title="OPENING" aria-label="第 1 頁：封面">
+      <div class="ambient-grid" aria-hidden="true"></div>
+      <div class="slide-inner cover-layout">
+        <div class="cover-copy">
+          <p class="eyebrow">CMONEY × AWS AI HACKATHON · 2026</p>
+          <h1>重建五檔記憶，<br /><em>看見你的投資人格。</em></h1>
+          <p class="lead">陌生使用者不聊天、不上傳截圖、不連券商；只用模糊交易記憶，換取經 2025 行情驗證的投資報告，再把明確持股帶進 Portfolio Radar。</p>
+          <div class="cover-tags"><span>ZERO PROMPT</span><span>RECONSTRUCTION ENGINE</span><span>PORTFOLIO RADAR</span></div>
+        </div>
+        <aside class="terminal-card tilt">
+          <header><span>RECONSTRUCTION ENGINE</span><i>ONLINE</i></header>
+          <div class="flow-line"><b>選股</b><span>→</span><b>回憶</b><span>→</span><b>驗證</b><span>→</span><b>人格</b></div>
+          <div class="terminal-lines">
+            <p><i></i> market catalog: 300 stocks</p>
+            <p><i></i> stock-month contexts: 3,584</p>
+            <p><i></i> financial truth: FastAPI verified</p>
+            <p><i></i> AI narrative: Bedrock + fallback</p>
+          </div>
+          <div class="fingerprint"><small>INVESTMENT FINGERPRINT</small><strong>LHDX</strong><span>低接・長抱・分散・精準</span></div>
+        </aside>
+      </div>
+      <footer class="slide-footer"><span>Mindfolio Time Machine</span><b>01</b></footer>
+      <aside class="speaker-notes">開場只講一句：我們不是做另一個 ChatGPT，而是把陌生人的模糊投資記憶，轉成經市場資料驗證、可延續的 Portfolio Context。</aside>
+    </section>
+
+    <section class="slide" id="slide-2" data-title="PROBLEM" aria-label="第 2 頁：CMoney 的個人化斷點">
+      <div class="slide-inner">
+        <p class="eyebrow">THE PROBLEM</p>
+        <h2>CMoney 最懂股票，<br /><em>卻還不知道陌生用戶持有什麼。</em></h2>
+        <div class="comparison-grid three">
+          <article class="problem-card"><small>CHATGPT WEBUI</small><strong>先想問題</strong><p>使用者必須離開看盤流程、組織 Prompt，才開始得到價值。</p><span>高認知成本</span></article>
+          <article class="problem-card"><small>BROKER / SCREENSHOT</small><strong>先交資料</strong><p>券商授權、資產截圖、成本與股數都會提高隱私戒心。</p><span>高信任成本</span></article>
+          <article class="problem-card"><small>MANUAL PORTFOLIO</small><strong>先做功課</strong><p>完整建庫與後續維護都很麻煩，還沒看到價值就先流失。</p><span>高操作成本</span></article>
+        </div>
+        <blockquote>問題不是 AI 不夠聰明，而是產品要求使用者先付出，才開始提供價值。</blockquote>
+      </div>
+      <footer class="slide-footer"><span>商業創新 30% · 問題定義</span><b>02</b></footer>
+      <aside class="speaker-notes">CMoney 已有 ChatGPT WebUI，但低使用率透露互動模型錯了：投資者要快速理解，不想經營一段長對話。</aside>
+    </section>
+
+    <section class="slide" id="slide-3" data-title="TA &amp; CONTEXT" aria-label="第 3 頁：目標使用者">
+      <div class="slide-inner split persona-slide">
+        <div>
+          <p class="eyebrow">TARGET AUDIENCE</p>
+          <h2>有投資記憶，<br /><em>沒有建立庫存。</em></h2>
+          <p class="lead compact">LEO 會看籌碼 K 線，也記得 2025 年操作過哪些股票；但不一定記得精確交易日與成本，更不願意整理券商對帳單。</p>
+          <ul class="check-list">
+            <li>會查股票、看法人與社群訊號</li>
+            <li>記得股票與大概月份</li>
+            <li>不願上傳資產截圖</li>
+            <li>不會主動與 AI 長聊</li>
+            <li>願意花約 2 分鐘看自己的投資人格</li>
+          </ul>
+        </div>
+        <aside class="leo-card">
+          <header><i>LEO</i><div><b>自主投資人</b><span>籌碼 K 線使用者</span></div></header>
+          <div class="memory-quote">「我記得大概 4 月買台積電，應該是在那個月偏低的位置。」</div>
+          <div class="signal-row"><span>精確交易日</span><b>忘記</b></div>
+          <div class="signal-row"><span>完整成本</span><b>不想整理</b></div>
+          <div class="signal-row"><span>投資脈絡</span><b class="positive">想知道</b></div>
+        </aside>
+      </div>
+      <footer class="slide-footer"><span>必備項目 · TA 與情境</span><b>03</b></footer>
+      <aside class="speaker-notes">TA 不是所有投資人，而是已經有投資經驗、願意回憶，但不願先交完整財務資料的人。</aside>
+    </section>
+
+    <section class="slide" id="slide-4" data-title="SOLUTION" aria-label="第 4 頁：2025 投資時光機">
+      <div class="slide-inner">
+        <p class="eyebrow">THE SOLUTION</p>
+        <h2>一趟可以玩的<br /><em>2025 投資時光機。</em></h2>
+        <div class="journey-line six">
+          <article><i>01</i><b>選五檔</b><span>熱門推薦或搜尋 300 檔</span></article>
+          <article><i>02</i><b>回憶月份</b><span>不要求精確交易日</span></article>
+          <article><i>03</i><b>回憶價格</b><span>區間或實際價格</span></article>
+          <article><i>04</i><b>驗證行情</b><span>月份 Envelope 與公司行動</span></article>
+          <article><i>05</i><b>取得人格</b><span>報酬、可信度、投資指紋</span></article>
+          <article><i>06</i><b>延續價值</b><span>認領報告、Portfolio Radar</span></article>
+        </div>
+        <div class="statement-row">
+          <span>不是 FAQ Chatbot</span><span>不是券商損益表</span><span>不是固定心理測驗</span><b>是「市場資料驗證投資記憶」</b>
+        </div>
+      </div>
+      <footer class="slide-footer"><span>產品定位 · Zero Prompt</span><b>04</b></footer>
+      <aside class="speaker-notes">使用者是來玩，而不是來使用 AI。AI 與金融計算都退到後台，前台是一趟有結果、有分享動機的體驗。</aside>
+    </section>
+
+    <section class="slide" id="slide-5" data-title="LOW FRICTION" aria-label="第 5 頁：低門檻資料交換">
+      <div class="slide-inner">
+        <p class="eyebrow">PROGRESSIVE PROFILING</p>
+        <h2>低門檻不是零輸入，<br /><em>是降低敏感度與精度要求。</em></h2>
+        <div class="ladder">
+          <article><span>01</span><div><small>匿名探索</small><b>五檔熟悉股票</b></div><i>→</i><strong>個人化題目</strong></article>
+          <article><span>02</span><div><small>模糊回憶</small><b>月份＋價格區間</b></div><i>→</i><strong>報酬與人格</strong></article>
+          <article><span>03</span><div><small>報告認領</small><b>邀請碼／身份</b></div><i>→</i><strong>AI Deep Dive</strong></article>
+          <article><span>04</span><div><small>持股授權</small><b>明確選擇仍持有</b></div><i>→</i><strong>Portfolio Radar</strong></article>
+        </div>
+        <div class="privacy-strip"><b>0</b><span>登入（結果前）</span><b>0</b><span>券商連結</span><b>0</b><span>資產截圖</span><b>0</b><span>股數／總資產要求</span></div>
+      </div>
+      <footer class="slide-footer"><span>商業創新 30% · 低門檻資料收集</span><b>05</b></footer>
+      <aside class="speaker-notes">不要說一鍵建庫。V2 的真實優勢是「先匿名拿到核心價值，再逐層交換資料」，且敏感欄位維持 nullable。</aside>
+    </section>
+
+    <section class="slide" id="slide-6" data-title="CORE INNOVATION" aria-label="第 6 頁：Portfolio Reconstruction Engine">
+      <div class="slide-inner">
+        <p class="eyebrow">CORE INNOVATION</p>
+        <h2>把模糊人類記憶，<br /><em>轉成可重算的 Portfolio Event。</em></h2>
+        <div class="pipeline-grid">
+          <article><i>01</i><b>Entity Resolution</b><span>代號、名稱、產業對應唯一股票</span></article>
+          <article><i>02</i><b>Temporal Alignment</b><span>把「大概 4 月」對齊真實交易月份</span></article>
+          <article><i>03</i><b>Price Envelope</b><span>驗證輸入是否落在當月行情範圍</span></article>
+          <article><i>04</i><b>Corporate Action</b><span>處理拆股、除權息前後可比性</span></article>
+          <article><i>05</i><b>Reconstruction</b><span>重建報酬、持有期與資料可信度</span></article>
+          <article><i>06</i><b>Fingerprint</b><span>從事件計算五維投資指紋與人格</span></article>
+        </div>
+        <blockquote>LLM 能寫人格文案；但只有 Reconstruction Engine 能驗證這段投資記憶是否合理。</blockquote>
+      </div>
+      <footer class="slide-footer"><span>技術護城河 · Deterministic Financial Truth</span><b>06</b></footer>
+      <aside class="speaker-notes">這頁是技術創新的主頁。強調每一步可重算、可測試、可追溯，不讓 LLM 決定金融真相。</aside>
+    </section>
+
+    <section class="slide" id="slide-7" data-title="DATA GOVERNANCE" aria-label="第 7 頁：資料語意與持股閘門">
+      <div class="slide-inner split governance-slide">
+        <div>
+          <p class="eyebrow">DATA GOVERNANCE AS PRODUCT</p>
+          <h2>興趣、交易、持股，<br /><em>不能混成同一件事。</em></h2>
+          <div class="semantic-stack">
+            <article><small>QUIZ STOCK INTEREST</small><b>測驗選了這檔</b><span>不代表買過</span></article>
+            <article><small>RECONSTRUCTED TRADE</small><b>行情可驗證的歷史事件</b><span>不代表目前仍持有</span></article>
+            <article class="active"><small>CONFIRMED HOLDING</small><b>本人明確同意＋後端重驗</b><span>才寫入 Portfolio</span></article>
+          </div>
+        </div>
+        <aside class="gate-card">
+          <header><span>CONFIRMED HOLDING GATE</span><i>CONSENT REQUIRED</i></header>
+          <div class="gate-flow"><b>仍持有候選</b><span>→</span><b>認領報告</b><span>→</span><b>獨立授權</b><span>→</span><strong>Portfolio</strong></div>
+          <ul>
+            <li>認領報告不等於同意建立持股</li>
+            <li>只接受 report-scoped 候選</li>
+            <li>後端重新驗證，不信任前端結果</li>
+            <li>股數、成本與券商保持未知</li>
+          </ul>
+        </aside>
+      </div>
+      <footer class="slide-footer"><span>資料品質 · 隱私 · Consent</span><b>07</b></footer>
+      <aside class="speaker-notes">這是 V2 比一般人格測驗更成熟的地方。真正可用的 CMoney 資產不是測驗答案，而是 report-scoped、明確同意的持股關係。</aside>
+    </section>
+
+    <section class="slide" id="slide-8" data-title="GROWTH LOOP" aria-label="第 8 頁：兩階段商業飛輪">
+      <div class="slide-inner">
+        <p class="eyebrow">ACQUISITION → RETENTION</p>
+        <h2>人格讓陌生人進來，<br /><em>Radar 讓他留下。</em></h2>
+        <div class="loop-diagram">
+          <article><small>01 · ACQUIRE</small><b>匿名 Time Machine</b><span>先取得看得見的個人結果</span></article>
+          <i>→</i>
+          <article><small>02 · SHARE</small><b>匿名人格圖卡</b><span>不公開股票、金額與交易明細</span></article>
+          <i>→</i>
+          <article><small>03 · ACTIVATE</small><b>認領＋持股授權</b><span>把結果綁定會員與明確持股</span></article>
+          <i>→</i>
+          <article><small>04 · RETAIN</small><b>Portfolio Radar</b><span>證據卡、AI Deep Dive、每週回顧</span></article>
+        </div>
+        <div class="loop-bottom"><span>分享帶入下一個匿名 Session</span><b>↺</b><span>回饋累積未來排序 Labels</span></div>
+      </div>
+      <footer class="slide-footer"><span>商業創新 30% · 10x 陌生用戶機制</span><b>08</b></footer>
+      <aside class="speaker-notes">Time Machine 不是一次性活動的終點。結果頁提供認領價值，Radar 才是長期留存入口。</aside>
+    </section>
+
+    <section class="slide" id="slide-9" data-title="DATA APPLICATION" aria-label="第 9 頁：官方 CSV 資料應用">
+      <div class="slide-inner">
+        <p class="eyebrow">OFFICIAL DATA APPLICATION</p>
+        <h2>同一份 CSV，形成<br /><em>重建地基與 AI 情境。</em></h2>
+        <div class="data-map">
+          <div class="source-column">
+            <article><b>價格／估值</b><span>收盤、成交量、週轉率</span></article>
+            <article><b>還原報酬</b><span>公司行動與可比價格</span></article>
+            <article><b>法人買賣</b><span>外資、投信、自營商</span></article>
+            <article><b>產業／股利</b><span>分散度與基本分類</span></article>
+            <article><b>社群彙總</b><span>發回文、多空、熱度</span></article>
+          </div>
+          <div class="data-arrow"><span>2025 DAILY CSV</span><i>→</i></div>
+          <div class="output-column">
+            <article><small>PRODUCT DATA</small><b>Market Catalog</b><span>300 檔搜尋、熱門排序、月份 Envelope</span></article>
+            <article><small>AI DATA</small><b>Monthly Feature Table</b><span>3,584 個 stock-month、8 個核心特徵</span></article>
+          </div>
+        </div>
+        <p class="guardrail-note">社群資料只代表全站對股票的彙總討論，不代表 LEO 個人情緒；官方資料也沒有真實持股標籤。</p>
+      </div>
+      <footer class="slide-footer"><span>數據應用 20% · CSV → Product + ML</span><b>09</b></footer>
+      <aside class="speaker-notes">這頁要直接回答評審「每份 CSV 到底拿來做什麼」，不要只放資料 logo。</aside>
+    </section>
+
+    <section class="slide" id="slide-10" data-title="DATA PIPELINE" aria-label="第 10 頁：資料管線">
+      <div class="slide-inner">
+        <p class="eyebrow">DATA PIPELINE</p>
+        <h2>每日資料離線處理，<br /><em>Runtime 只讀可驗證 Artifact。</em></h2>
+        <div class="architecture-flow data-flow">
+          <article><small>RAW</small><b>官方 CSV</b><span>價格・報酬・法人・社群</span></article><i>→</i>
+          <article><small>TRANSFORM</small><b>Monthly Builder</b><span>清理、聚合、避免 future leakage</span></article><i>→</i>
+          <article><small>TRAIN</small><b>KMeans + IF</b><span>Regime 與 Anomaly</span></article><i>→</i>
+          <article><small>PUBLISH</small><b>Versioned JSON</b><span>Metrics・Version・SHA-256</span></article><i>→</i>
+          <article><small>SERVE</small><b>FastAPI O(1)</b><span>stock_id + YYYY-MM</span></article>
+        </div>
+        <div class="metric-grid four">
+          <article><small>STOCKS</small><strong>300</strong><span>可搜尋股票</span></article>
+          <article><small>SAMPLES</small><strong>3,584</strong><span>完整 stock-month</span></article>
+          <article><small>FEATURES</small><strong>8</strong><span>monthly-features-v1</span></article>
+          <article><small>RUNTIME ML</small><strong>0</strong><span>API 不安裝 sklearn</span></article>
+        </div>
+      </div>
+      <footer class="slide-footer"><span>數據應用 20% · 可重現資料工程</span><b>10</b></footer>
+      <aside class="speaker-notes">重點是 training-serving skew 與 failure domain：Training 產出預評分 JSON，API image 不需要 sklearn，Artifact 壞掉也不阻擋重建。</aside>
+    </section>
+
+    <section class="slide" id="slide-11" data-title="FINANCIAL ENGINE" aria-label="第 11 頁：價格驗證與公司行動">
+      <div class="slide-inner split technical-proof">
+        <div>
+          <p class="eyebrow">DETERMINISTIC FINANCIAL TRUTH</p>
+          <h2>先驗證與重算，<br /><em>再讓 AI 解釋。</em></h2>
+          <div class="formula-card"><small>COMPARABLE USER PRICE</small><code>raw_user_price × (adjusted_close / raw_close)</code></div>
+          <ul class="check-list compact-list">
+            <li>精確價格必須命中當月 Raw Price Envelope</li>
+            <li>公司行動月份切分前後 Price Regime</li>
+            <li>跨 Regime 禁止使用模糊價格區間</li>
+            <li>Complete endpoint 再次驗證全部五檔</li>
+            <li>前端不計算報酬、人格或持股候選</li>
+          </ul>
+        </div>
+        <aside class="validation-card">
+          <header><span>2330 · 2025-04</span><i>VALIDATION</i></header>
+          <div class="price-envelope"><span>780</span><i><b style="width:72%"></b></i><span>952</span></div>
+          <div class="input-case invalid"><small>輸入價格</small><b>1,120</b><span>超出當月行情，阻擋送出</span></div>
+          <div class="input-case valid"><small>修正價格</small><b>900</b><span>命中 Envelope，可進入重建</span></div>
+          <p>通過驗證只代表行情合理，不代表交易真的發生。</p>
+        </aside>
+      </div>
+      <footer class="slide-footer"><span>技術力 · Validation + Corporate Action</span><b>11</b></footer>
+      <aside class="speaker-notes">Demo 可以故意輸入錯價。這比秀 API 文件更直觀地證明後端引擎存在。</aside>
+    </section>
+
+    <section class="slide" id="slide-12" data-title="AI TRAINING" aria-label="第 12 頁：AI 訓練">
+      <div class="slide-inner">
+        <p class="eyebrow">AI TRAINING · IMPLEMENTED</p>
+        <h2>模型不猜持股，<br /><em>而是辨識買進月份的市場情境。</em></h2>
+        <div class="model-grid">
+          <article><header><span>MODEL A</span><i>KMEANS</i></header><h3>Market Regime</h3><p>把 stock-month 分成可解釋的歷史市場型態，例如高波動承壓、修復、法人偏多或盤整。</p><div class="model-tags"><span>k = 3…6</span><span>balance gate ≤ 75%</span><span>seed = 42</span></div></article>
+          <article><header><span>MODEL B</span><i>ISOLATION FOREST</i></header><h3>Market Anomaly</h3><p>找出某檔股票在特定月份相對市場與自身不尋常的報酬、波動、法人與社群組合。</p><div class="model-tags"><span>200 estimators</span><span>percentile score</span><span>evidence keys</span></div></article>
+          <article class="purpose-card"><small>PRODUCT PURPOSE</small><h3>讓人格不只是一個標籤</h3><p>回看 LEO 的五次進場：哪些發生在高波動、法人與價格同向，或社群與法人背離的月份。</p></article>
+        </div>
+        <div class="not-model-row"><span>不預測未來報酬</span><span>不診斷心理人格</span><span>不從瀏覽猜真實持股</span><span>不取代價格驗證</span></div>
+      </div>
+      <footer class="slide-footer"><span>AI 善用性 25% · ML Training Purpose</span><b>12</b></footer>
+      <aside class="speaker-notes">清楚區分：Persona 是 deterministic，ML 是歷史情境；官方資料沒有個人標籤，所以不做假持股模型。</aside>
+    </section>
+
+    <section class="slide" id="slide-13" data-title="AI SERVING" aria-label="第 13 頁：模型產物與線上服務">
+      <div class="slide-inner">
+        <p class="eyebrow">TRAINING → SERVING</p>
+        <h2>模型離線訓練，<br /><em>線上服務保持小而穩。</em></h2>
+        <div class="artifact-layout">
+          <article class="artifact-code">
+            <header><span>market-context-2025-v1.json</span><i>SHA-256 VERIFIED</i></header>
+            <pre>{
+  "stock_id": "2330",
+  "month": "2025-04",
+  "regime_label": "高波動修復",
+  "regime_match": "strong",
+  "anomaly_level": "attention",
+  "salient_feature_keys": [
+    "volatility",
+    "institutional_flow_ratio"
+  ]
+}</pre>
+          </article>
+          <div class="tradeoff-column">
+            <article class="positive-card"><small>WHY THIS DESIGN</small><b>優點</b><ul><li>O(1) 查詢</li><li>API 不載入 sklearn</li><li>版本、Metrics、Checksum 可追溯</li><li>模型失敗不阻擋主流程</li></ul></article>
+            <article class="warning-card"><small>TRADE-OFF</small><b>代價</b><ul><li>新資料需重新發布 Artifact</li><li>不適合盤中即時 Streaming</li><li>正式產品需 Model Registry</li></ul></article>
+          </div>
+        </div>
+      </div>
+      <footer class="slide-footer"><span>AI 善用性 25% · Production-minded ML</span><b>13</b></footer>
+      <aside class="speaker-notes">這頁回答「訓練完怎麼用」。不是把 joblib 丟進 FastAPI，而是預先評分、版本化發布、Runtime fail-soft。</aside>
+    </section>
+
+    <section class="slide" id="slide-14" data-title="GENERATIVE AI" aria-label="第 14 頁：結構化 AI Deep Dive">
+      <div class="slide-inner split ai-slide">
+        <div>
+          <p class="eyebrow">ZERO-PROMPT GENERATIVE AI</p>
+          <h2>不是自由聊天，<br /><em>是有證據的 Deep Dive。</em></h2>
+          <p class="lead compact">Bedrock 只接收 FastAPI 組好的 verified context，輸出通過 Pydantic Schema 的結構化報告；數字、人格與持股都不能被模型改寫。</p>
+          <div class="chip-list"><button>為什麼我是這種投資人格？</button><button>哪筆交易最影響結果？</button><button>哪個買進月份最不尋常？</button></div>
+          <div class="ai-boundary"><span>固定 question_id</span><span>evidence_refs</span><span>report ownership</span><span>cache</span><span>guardrail</span><span>fallback</span></div>
+        </div>
+        <aside class="deep-dive-card">
+          <header><div><small>AI DEEP DIVE</small><b>從交易記憶回看市場情境</b></div><span>Bedrock 生成</span></header>
+          <div class="deep-columns">
+            <article><small>STRENGTH</small><b>長抱策略一致</b><p>五檔中三檔持有至年底。</p><code>trade:holding_count</code></article>
+            <article><small>WATCHOUT</small><b>主題集中</b><p>產業分散度低於五檔基準。</p><code>fingerprint:diversity</code></article>
+            <article><small>MARKET MOMENT</small><b>異常進場月份</b><p>一筆進場落在高波動修復情境。</p><code>model:2025-v1</code></article>
+          </div>
+          <p>Converse 整合已打通；正式 IAM／Production Runtime 於部署環境驗證。所有失敗路徑使用相同證據的 deterministic fallback。</p>
+        </aside>
+      </div>
+      <footer class="slide-footer"><span>AI 善用性 25% · Bedrock + Structured UI</span><b>14</b></footer>
+      <aside class="speaker-notes">這是對 ChatGPT 低使用率的產品回答：不放聊天框，只提供三個低門檻、與個人報告直接相關的問題。</aside>
+    </section>
+
+    <section class="slide" id="slide-15" data-title="ARCHITECTURE" aria-label="第 15 頁：完整系統架構">
+      <div class="slide-inner">
+        <p class="eyebrow">SYSTEM ARCHITECTURE</p>
+        <h2>同一套 Python Domain，<br /><em>分清金融真相、ML 與 LLM。</em></h2>
+        <div class="system-architecture">
+          <div class="arch-layer"><small>EXPERIENCE</small><article><b>React + TypeScript</b><span>Landing・Builder・Reconstruction・Result・Activate・Portfolio Radar</span></article></div>
+          <i>HTTPS / JSON</i>
+          <div class="arch-layer"><small>APPLICATION</small><article><b>FastAPI + Pydantic</b><span>14 API・Session・Ownership・Cache・Guardrails</span></article></div>
+          <div class="arch-services"><article><b>Deterministic Core</b><span>Validation・Return・Fingerprint・Persona</span></article><article><b>Market Context</b><span>Pre-scored Regime・Anomaly</span></article><article><b>AI Deep Dive</b><span>Bedrock Converse・Schema・Fallback</span></article></div>
+          <i>DATA / PROVIDER</i>
+          <div class="arch-bottom"><article><b>Catalog JSON</b><span>300 stocks</span></article><article><b>Context JSON</b><span>3,584 samples</span></article><article><b>PostgreSQL 16</b><span>Reports・Holdings・Events・Cache</span></article><article><b>Amazon Bedrock</b><span>gpt-oss-120b</span></article></div>
+        </div>
+      </div>
+      <footer class="slide-footer"><span>技術可行性 10% · React + FastAPI + PostgreSQL + AWS</span><b>15</b></footer>
+      <aside class="speaker-notes">部署是一台 EC2 上的 nginx、FastAPI、PostgreSQL Docker Compose。Bedrock 由 API 透過 IAM Role 呼叫，不把憑證放前端。</aside>
+    </section>
+
+    <section class="slide" id="slide-16" data-title="LIVE DEMO" aria-label="第 16 頁：Live Demo">
+      <div class="slide-inner">
+        <p class="eyebrow">150-SECOND LIVE DEMO</p>
+        <h2>一條真的跑得動的<br /><em>獲客 → 持股 → 留存閉環。</em></h2>
+        <div class="demo-timeline">
+          <article><time>00:00</time><b>匿名進場</b><span>熱門推薦＋搜尋 300 檔，選滿五檔。</span></article>
+          <article><time>00:25</time><b>模糊重建</b><span>月份、價格區間、仍持有／已賣出。</span></article>
+          <article class="highlight"><time>00:55</time><b>故意輸入錯價</b><span>FastAPI Envelope 阻擋，再修正完成。</span></article>
+          <article><time>01:20</time><b>取得結果</b><span>人格、推估報酬、可信度、匿名分享卡。</span></article>
+          <article><time>01:45</time><b>啟用 Portfolio</b><span>邀請碼認領報告，第二次同意 confirmed holdings。</span></article>
+          <article class="highlight"><time>02:10</time><b>Portfolio Radar</b><span>開啟 AI Deep Dive，點固定問題 chip。</span></article>
+        </div>
+        <div class="demo-proof"><span>不是前端假算</span><span>不是固定題庫</span><span>不是自由聊天</span><span>不是測驗即持股</span><b>兩階段皆已串接</b></div>
+      </div>
+      <footer class="slide-footer"><span>完成度 15% · LEO Demo Script</span><b>16</b></footer>
+      <aside class="speaker-notes">正式 Demo 優先跑 React + FastAPI + PostgreSQL Compose；V2/demo 只是視覺 reference，不作為降級 runtime。</aside>
+    </section>
+
+    <section class="slide" id="slide-17" data-title="BUSINESS VALUE" aria-label="第 17 頁：KPI 與商業價值">
+      <div class="slide-inner split business-slide">
+        <div>
+          <p class="eyebrow">NORTH STAR</p>
+          <h2>Verified Holding<br /><em>Activation</em></h2>
+          <p class="lead compact">完成重建、明確同意，且後端成功保存至少一檔「2025-12-31 仍持有」關係的人數。</p>
+          <div class="funnel-mini"><span>開始</span><i>→</i><span>完成</span><i>→</i><span>分享</span><i>→</i><span>認領</span><i>→</i><b>確認持股</b><i>→</i><b>Radar 回訪</b></div>
+        </div>
+        <aside class="kpi-panel">
+          <header><span>EXPERIMENT TARGETS</span><i>待 A/B 驗證</i></header>
+          <div><small>Landing → Start</small><b>≥ 35%</b></div>
+          <div><small>Start → Complete</small><b>≥ 65%</b></div>
+          <div><small>Result → Share</small><b>≥ 12%</b></div>
+          <div><small>Result → Claim CTA</small><b>≥ 15%</b></div>
+          <div><small>Member → 1 Holding</small><b>≥ 30%</b></div>
+        </aside>
+        <div class="business-impact full-width"><article><b>陌生獲客</b><span>人格圖卡形成 Referral Loop</span></article><article><b>資料資產</b><span>模糊記憶轉成結構化事件</span></article><article><b>會員啟用</b><span>取得明確 Consent 的持股關係</span></article><article><b>留存轉換</b><span>Radar、Deep Dive 與每週回顧</span></article></div>
+      </div>
+      <footer class="slide-footer"><span>商業創新 30% · 成效衡量</span><b>17</b></footer>
+      <aside class="speaker-notes">所有百分比都是上線後實驗目標，不是 Demo 成效。黑客松能證明事件與漏斗可量測，不能宣稱轉換提升。</aside>
+    </section>
+
+    <section class="slide closing" id="slide-18" data-title="CLOSING" aria-label="第 18 頁：總結">
+      <div class="ambient-grid" aria-hidden="true"></div>
+      <div class="slide-inner closing-layout">
+        <p class="eyebrow">WHY MINDFOLIO</p>
+        <h2>人格讓人進來，<br />技術讓資料可信，<br /><em>Radar 讓人留下。</em></h2>
+        <div class="closing-pillars">
+          <article><small>01</small><b>低門檻獲客</b><span>Zero Prompt、匿名、模糊回憶</span></article>
+          <article><small>02</small><b>可驗證技術</b><span>行情 Envelope、公司行動、Fingerprint</span></article>
+          <article><small>03</small><b>AI 有正確分工</b><span>ML 找情境、LLM 解釋、規則守真相</span></article>
+          <article><small>04</small><b>可持續商業價值</b><span>分享、認領、確認持股、Radar 回訪</span></article>
+        </div>
+        <blockquote>這不是一個你去問問題的聊天機器人，而是一台你會想完成、想分享，最後願意留下真實持股的投資時光機。</blockquote>
+      </div>
+      <footer class="slide-footer"><span>Mindfolio Time Machine × Portfolio Radar</span><b>18</b></footer>
+      <aside class="speaker-notes">正式收尾停在這頁。後面兩頁只在評審追問模型與完成度時使用。</aside>
+    </section>
+
+    <section class="slide appendix" id="slide-19" data-title="APPENDIX · ML" aria-label="第 19 頁：模型指標附錄">
+      <div class="slide-inner">
+        <p class="eyebrow">APPENDIX A · ACTUAL MODEL METRICS</p>
+        <h2>第一版無監督模型，<br /><em>如實呈現、不包裝 Accuracy。</em></h2>
+        <div class="metric-grid six">
+          <article><small>SAMPLES</small><strong>3,584</strong><span>stock-month</span></article>
+          <article><small>CLUSTERS</small><strong>6</strong><span>KMeans selected</span></article>
+          <article><small>SILHOUETTE</small><strong>0.1896</strong><span>baseline quality</span></article>
+          <article><small>LARGEST CLUSTER</small><strong>34.46%</strong><span>balanced result</span></article>
+          <article><small>ANOMALY RATE</small><strong>5.02%</strong><span>significant</span></article>
+          <article><small>CHECKSUM</small><strong>SHA-256</strong><span>artifact integrity</span></article>
+        </div>
+        <div class="model-honesty">
+          <article><b>為什麼不只追最高 Silhouette？</b><p>候選模型曾出現單一群集占 89.5% 的退化結果，因此加入「最大群集 ≤ 75%」選模 Gate，再於合格候選中選最高 Silhouette。</p></article>
+          <article><b>0.1896 是否代表模型不好？</b><p>它代表股票月份特徵並非天然高度分離。P0 將模型定位為可解釋歷史 Context，而不是預測器；價值需再透過 evidence open 與使用者理解度驗證。</p></article>
+          <article><b>模型會改變人格嗎？</b><p>不會。Persona 仍由 deterministic Portfolio Fingerprint Mapping 產生；ML 只補充買進月份的 Regime 與 Anomaly。</p></article>
+        </div>
+      </div>
+      <footer class="slide-footer"><span>Appendix · market-context-2025-v1</span><b>19</b></footer>
+      <aside class="speaker-notes">只有被問到模型品質才進這頁。不要主動把 silhouette 包裝成成效，也不要稱 regime_match 為預測機率。</aside>
+    </section>
+
+    <section class="slide appendix" id="slide-20" data-title="APPENDIX · DELIVERY" aria-label="第 20 頁：完成度與 Roadmap 附錄">
+      <div class="slide-inner">
+        <p class="eyebrow">APPENDIX B · DELIVERY STATUS</p>
+        <h2>核心閉環已完成，<br /><em>Roadmap 邊界明確。</em></h2>
+        <div class="delivery-grid">
+          <article class="done"><header><span>IMPLEMENTED</span><i>✓</i></header><ul><li>React 六條主要 Route</li><li>FastAPI 14 支 API</li><li>300 檔 Market Catalog</li><li>Reconstruction Engine</li><li>Confirmed Holding Gate</li><li>Portfolio Radar 四模組</li><li>KMeans + IsolationForest</li><li>Structured AI Deep Dive</li><li>PostgreSQL Reports / Events / Cache</li><li>Docker Compose 本機驗收</li></ul></article>
+          <article class="verified"><header><span>VERIFIED</span><i>65 + 6</i></header><ul><li>Python tests：65</li><li>React tests：6</li><li>Strict TypeScript</li><li>Vite production build</li><li>ESLint</li><li>Artifact schema / checksum</li><li>Report ownership isolation</li><li>Idempotent event batch</li><li>Bedrock deterministic fallback</li><li>Git diff whitespace check</li></ul></article>
+          <article class="roadmap"><header><span>NOT CLAIMED</span><i>→</i></header><ul><li>正式 CMoney SSO</li><li>EC2 HTTPS / Domain 驗收</li><li>Live CMoney feed</li><li>排程式 Weekly Review</li><li>Mute 真正影響選卡排序</li><li>完整持股維護頁</li><li>Ranking model with real labels</li><li>高可用、多節點部署</li><li>自動 Model Registry</li><li>股價預測與買賣建議</li></ul></article>
+        </div>
+        <p class="final-note">Bedrock Converse 整合視為已打通；正式 IAM／Production Runtime 驗收於生產部署階段完成。</p>
+      </div>
+      <footer class="slide-footer"><span>Appendix · Completeness &amp; Feasibility</span><b>20</b></footer>
+      <aside class="speaker-notes">若評審問「哪些是真的」，用這頁清楚回答。不要把 snapshot weekly review、live feed 或 ranking 說成已完成。</aside>
+    </section>
+  </main>
+
+  <nav class="slide-dots" id="slideDots" aria-label="簡報頁面導覽"></nav>
+  <div class="keyboard-help" id="keyboardHelp" aria-hidden="true">
+    <span><kbd>←</kbd><kbd>→</kbd> 切頁</span><span><kbd>O</kbd> 總覽</span><span><kbd>N</kbd> 講者提示</span><span><kbd>F</kbd> 全螢幕</span>
+  </div>
+  <script src="./slides.js"></script>
+</body>
+</html>

@@ -24,3 +24,4 @@ docs
 tools
 data/*
 !data/market-catalog.json
+!data/market-context-2025-v1.json

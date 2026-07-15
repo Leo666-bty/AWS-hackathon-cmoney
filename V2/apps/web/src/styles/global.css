@@ -299,6 +299,26 @@ legend { margin-bottom: 15px; font-weight: 800; }
 .moment-feedback > p:last-child { color: var(--muted); font-size: 9px; line-height: 1.5; }
 .feedback-error { margin-top: 10px; padding: 9px; border-radius: 8px; color: #ffc1b7; background: rgba(255, 138, 119, .08); font-size: 9px; line-height: 1.5; }
 .weekly-review { display: grid; grid-template-columns: 1fr 200px; gap: 30px; align-items: center; margin-top: 16px; }
+.ai-deep-dive { margin-top: 16px; padding: 28px; scroll-margin-top: 128px; }
+.ai-deep-dive > header { display: flex; align-items: end; justify-content: space-between; gap: 16px; }
+.ai-deep-dive h2, .ai-deep-dive h3 { margin: 0; }
+.ai-deep-dive > header > span { padding: 7px 10px; border-radius: 999px; color: var(--cyan); background: rgba(85, 230, 215, .08); font-size: 9px; }
+.deep-dive-gate { max-width: 760px; margin-top: 24px; }
+.deep-dive-gate > p, .deep-dive-summary { color: var(--muted); line-height: 1.75; }
+.deep-dive-content > h3 { margin-top: 24px; font-size: clamp(24px, 3vw, 38px); }
+.deep-dive-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0; }
+.deep-dive-columns > div { padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: #071521; }
+.deep-dive-columns > div > small { color: var(--cyan); font-size: 8px; letter-spacing: .12em; }
+.deep-dive-columns article { margin-top: 14px; }
+.deep-dive-columns p { color: #aabfcd; font-size: 11px; line-height: 1.65; }
+.deep-dive-columns code, .deep-dive-questions code { display: block; color: #6f899e; font-size: 8px; overflow-wrap: anywhere; }
+.deep-dive-questions { padding-top: 20px; border-top: 1px solid var(--line); }
+.deep-dive-questions > small { color: var(--muted); }
+.deep-dive-questions > div { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.deep-dive-questions button { padding: 9px 11px; border: 1px solid rgba(85, 230, 215, .28); border-radius: 9px; color: var(--cyan); background: rgba(85, 230, 215, .06); cursor: pointer; }
+.deep-dive-questions button:disabled { opacity: .5; cursor: wait; }
+.deep-dive-questions > article { padding: 16px; border-left: 2px solid var(--lime); background: rgba(201, 255, 99, .04); }
+.deep-dive-questions > article p { color: #bed0da; line-height: 1.7; }
 .weekly-review p:not(.eyebrow) { color: var(--muted); }
 .weekly-review > div > small { color: #6f899e; font-size: 9px; }
 .weekly-heading { display: flex; align-items: center; gap: 10px; }
@@ -317,7 +337,7 @@ legend { margin-bottom: 15px; font-weight: 800; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 900px) {
-  .landing-page, .builder-grid, .result-hero, .result-summary-grid, .result-layout, .activation-hero, .radar-hero, .radar-grid, .moment-layout { grid-template-columns: 1fr; }
+  .landing-page, .builder-grid, .result-hero, .result-summary-grid, .result-layout, .activation-hero, .radar-hero, .radar-grid, .moment-layout, .deep-dive-columns { grid-template-columns: 1fr; }
   .engine-preview { transform: none; }
   .selected-panel { position: static; }
   .score-grid { grid-template-columns: repeat(2, 1fr); }

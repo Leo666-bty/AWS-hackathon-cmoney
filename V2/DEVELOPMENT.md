@@ -62,7 +62,36 @@ make build
 
 封測邀請登入使用 `.env` 的 `MINDFOLIO_INVITE_IDENTITIES`。正式環境還必須設定至少 32 字元的隨機 `MINDFOLIO_SESSION_SECRET`；API 會拒絕使用 development default 啟動 production。
 
-training status 只顯示 feature contract 與預計模型；在真正完成資料切割、訓練與評估前，不會發布模型版本或 metrics。
+正式 runtime artifact 已發布於 `data/market-context-2025-v1.json`。重新訓練時使用
+`apps/ai-training/README.md` 的 pipeline 指令；API request 不執行 training。
+
+## Manual P0 validation
+
+啟動 API 與 Web 後，不重新整理 wizard 頁面，依序操作：
+
+1. 開啟 `http://localhost:5173`，進入 Time Machine。
+2. 選五檔股票並完成月份／價格區間與持有關係；至少一檔標記「仍持有」。
+3. Result 確認人格、重建報酬與 AI narrative，並看到 AI Deep Dive 解鎖 teaser。
+4. 進入 `/activate`，輸入開發邀請碼 `demo-leo`，認領報告並確認至少一檔持股。
+5. 進入 `/app`，確認 Portfolio Radar 顯示同一份 report 與本人確認持股。
+6. 點擊「產生 AI 深度解讀」，確認 summary、strength、watchout、market moment 與 source badge。
+7. 點擊三個固定問題之一，確認前端只送 `question_id`，沒有自由文字欄位。
+8. 再次產生同一報告，確認 API 回傳 cache，不建立第二份內容。
+
+DevTools Network 應看到：
+
+```text
+POST /api/v2/reconstructions/complete
+POST /api/v2/auth/session
+POST /api/v2/reports/{report_id}/claim
+POST /api/v2/reports/{report_id}/confirmed-holdings
+GET  /api/v2/me/dashboard
+POST /api/v2/reports/{report_id}/ai-report
+POST /api/v2/reports/{report_id}/questions
+```
+
+`GET /api/v2/health` 的 `model_status` 應為 `ready`。Bedrock 未啟用時 report
+`source` 為 `fallback` 是預期行為，不代表前後端未接通。
 
 ## Bedrock narrative
 

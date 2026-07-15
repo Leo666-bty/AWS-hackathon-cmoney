@@ -7,13 +7,15 @@ import type { MemberDashboard } from "../shared/api/client";
 import { saveMemberSession } from "../shared/auth/session";
 import { PortfolioRadarRoute } from "./PortfolioRadarRoute";
 
-const { getMemberDashboard, saveCardFeedback, trackEvent } = vi.hoisted(() => ({
+const { askInvestmentQuestion, generateInvestmentAIReport, getMemberDashboard, saveCardFeedback, trackEvent } = vi.hoisted(() => ({
+  askInvestmentQuestion: vi.fn(),
+  generateInvestmentAIReport: vi.fn(),
   getMemberDashboard: vi.fn<() => Promise<MemberDashboard>>(),
   saveCardFeedback: vi.fn(),
   trackEvent: vi.fn(),
 }));
 
-vi.mock("../shared/api/client", () => ({ getMemberDashboard, saveCardFeedback }));
+vi.mock("../shared/api/client", () => ({ askInvestmentQuestion, generateInvestmentAIReport, getMemberDashboard, saveCardFeedback }));
 
 vi.mock("../shared/analytics/events", () => ({ trackEvent }));
 
@@ -74,6 +76,41 @@ describe("PortfolioRadarRoute", () => {
     saveMemberSession("signed-session", "LEO");
     getMemberDashboard.mockResolvedValue(dashboard);
     saveCardFeedback.mockResolvedValue({ card_id: "card-2382", preference: "routine", saved_at: "2026-07-15T00:00:00Z" });
+    generateInvestmentAIReport.mockResolvedValue({
+      title: "LEO 的 Investment DNA 深度解讀",
+      executive_summary: "這是歷史資料回顧。",
+      strengths: [{ title: "代表成果", body: "廣達表現突出。", evidence_refs: ["trade:0"] }],
+      watchouts: [{ title: "值得回看", body: "回看進場月份。", evidence_refs: ["trade:1"] }],
+      market_moments: [],
+      suggested_questions: [{ id: "why-persona", label: "為什麼我是這種投資人格？" }],
+      source: "fallback",
+      versions: { context: "v1" },
+      generated_at: "2026-07-15T00:00:00Z",
+    });
+    askInvestmentQuestion.mockResolvedValue({
+      question_id: "why-persona",
+      answer: "來自五筆交易的綜合計分。",
+      evidence_refs: ["trade:0"],
+      limitations: "不構成投資建議。",
+      source: "fallback",
+      prompt_version: "investment-question-v1",
+    });
+  });
+
+  it("unlocks structured AI deep dive and uses fixed question chips", async () => {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter><PortfolioRadarRoute /></MemoryRouter>
+      </QueryClientProvider>,
+    );
+
+    fireEvent.click(await screen.findByRole("button", { name: "產生 AI 深度解讀" }));
+    expect(await screen.findByText("LEO 的 Investment DNA 深度解讀")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "為什麼我是這種投資人格？" }));
+    expect(await screen.findByText("來自五筆交易的綜合計分。")).toBeInTheDocument();
+    expect(generateInvestmentAIReport).toHaveBeenCalledWith("report-1", "signed-session");
+    expect(askInvestmentQuestion).toHaveBeenCalledWith("report-1", "why-persona", "signed-session");
   });
 
   afterEach(() => {

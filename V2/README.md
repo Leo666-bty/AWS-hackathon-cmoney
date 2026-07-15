@@ -27,7 +27,7 @@ V2 不再是固定五檔歷史選擇題。使用者可以從 CMoney 熱門推薦
 | 爽點＋病毒鉤子 | `POST /reconstructions/complete` | 回傳人格／報酬／指紋／分數＋分享卡 |
 | Activation | `POST /auth/session`、`POST /reports/{id}/claim` | 邀請碼換短效 session，將匿名報告歸屬會員 |
 | North Star（資產） | `POST /reports/{id}/confirmed-holdings` | 第二次明確同意後留下確認持股關係 |
-| 留存 | `GET /me/dashboard`、卡片 feedback、event batch | Radar、可追溯證據、低門檻回饋與重試安全事件 |
+| 留存 | `GET /me/dashboard`、AI Deep Dive、固定問題 chips、卡片 feedback、event batch | Radar、買進月份情境、低門檻回饋與重試安全事件 |
 
 > **一句話 pitch**：陌生人把模糊記憶變成**經行情驗證的投資重建 + 可分享的人格**，並主動確認仍持有的股票；AI 負責解讀，護城河是重建引擎。API 合約細節見 [前後端架構](docs/09_FRONTEND_BACKEND_ARCHITECTURE.md)。
 
@@ -40,26 +40,27 @@ React + TypeScript Frontend
   → FastAPI REST API
       → File Market Catalog
       → Reconstruction & Scoring Services
-      → AI Narrative Service
-      → PostgreSQL Confirmed Holdings
-      → [future] Approved Model Inference / Live CMoney Data
+      → Pre-scored Market Context JSON
+      → Structured AI Deep Dive / fallback
+      → PostgreSQL Consent State + Report Cache
+      → [future] Live CMoney Data
 ```
 
 目前 `demo/` 是靜態 UX reference，內嵌資料與前端計算只用來示範流程，不代表正式安全邊界。正式版的價格驗證、報酬、可信度、人格向量與 AI context 必須全部由 FastAPI 重算。
 
 ## 目前完成範圍
 
-- **`apps/api`（後端 API）：P0 已完成** — 包含行情重建、短效 session、匿名報告認領、持股授權、Portfolio Radar aggregate、卡片偏好與 idempotent event batch（共 12 支 `/api/v2` 端點：獲客 6 + 留存 6）；deterministic 引擎與 AI fallback 不依賴 Bedrock 可用性；Python suite 共 60 tests 綠。
+- **`apps/api`（後端 API）：P0 已完成** — 包含行情重建、短效 session、報告認領、持股授權、Portfolio Radar、AI Deep Dive cache、固定問題 ID、卡片偏好與 idempotent event batch（共 14 支 `/api/v2` 端點）；deterministic 引擎與 fallback 不依賴 Bedrock；Python suite 共 65 tests 綠。
 - `packages/mindfolio-core`：API 與離線訓練共用的 deterministic domain（envelope、reconstruction、validation、models）。
-- **`apps/web`（正式前端）：Acquisition + Retention P0 已完成** — Landing、300 檔搜尋、逐檔重建、匿名人格結果、報告認領、獨立持股授權與四模組 Portfolio Radar；React tests、strict TypeScript build 與 ESLint 零警告通過。
-- `apps/ai-training`：離線模型 scaffold（feature 契約 + CLI 狀態）；目前未訓練模型，也不產生假 metrics。
+- **`apps/web`（正式前端）：Acquisition + Retention + AI P0 已完成** — Landing、300 檔搜尋、逐檔重建、匿名人格結果、報告認領、獨立持股授權、Portfolio Radar 與結構化 AI Deep Dive；React 6 tests、strict TypeScript build 與 ESLint 通過。
+- **`apps/ai-training`：P0 已完成** — 官方 CSV 聚合為 3,584 個 stock-month，KMeans + IsolationForest 離線訓練並輸出版本化、具 checksum 的 pre-scored artifact；API image 不安裝 sklearn。
 - 根目錄 workspace、Python 共用 virtual environment 設定與前後端測試／建置指令。
 
 部署程式已完成：`api + web + postgres` 可由 Docker Compose 在單一 EC2
 執行，且本機容器驗收已通過。Bedrock `openai.gpt-oss-120b` Converse
 已完成線上驗證與後端整合；本機可用 Bearer token，正式部署改用 IAM
 Role，所有失敗路徑保留 deterministic fallback。尚未完成的是實際 EC2
-上線、HTTPS／網域、CMoney SSO、離線模型訓練與即時行情 feed
+上線、HTTPS／網域、CMoney SSO 與即時行情 feed
 （操作見 [部署決策](docs/11_DEPLOYMENT.md)）。
 
 ## 核心閉環
@@ -88,6 +89,7 @@ Portfolio Radar 閉環；正式產品仍需將邀請碼入口替換為 CMoney SS
 - [資料庫快照產生器](tools/build_market_catalog.py)
 - [前後端分離架構](docs/09_FRONTEND_BACKEND_ARCHITECTURE.md)
 - [AI Training 計畫](docs/10_AI_TRAINING_PLAN.md)
+- [AI P0 最小整合規格](docs/14_AI_MINIMAL_INTEGRATION_SPEC.md)
 - [部署決策](docs/11_DEPLOYMENT.md)
 - [V2 團隊共用實作 Spec](docs/12_V2_END_TO_END_SPEC.md)
 - [Time Machine × Portfolio Radar 整合需求 Spec](docs/13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md)

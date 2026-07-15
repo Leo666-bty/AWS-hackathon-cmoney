@@ -10,6 +10,7 @@ from mindfolio_api.repositories.holdings import (
     build_holdings_repository,
 )
 from mindfolio_api.repositories.market_data import MarketCatalog
+from mindfolio_api.repositories.market_context import MarketContextRepository
 from mindfolio_api.repositories.retention import (
     RetentionRepository,
     build_retention_repository,
@@ -50,6 +51,7 @@ def create_app(
     catalog: MarketCatalog | None = None,
     holdings_repo: HoldingsRepository | None = None,
     retention_repo: RetentionRepository | None = None,
+    market_context_repo: MarketContextRepository | None = None,
 ) -> FastAPI:
     settings = get_settings()
     if settings.env.casefold() == "production" and (
@@ -65,6 +67,8 @@ def create_app(
         holdings_repo = build_holdings_repository(settings.database_url)
     if retention_repo is None:
         retention_repo = build_retention_repository(settings.database_url)
+    if market_context_repo is None:
+        market_context_repo = MarketContextRepository.from_file(settings.market_context_path)
 
     app = FastAPI(
         title="Mindfolio Time Machine API",
@@ -75,6 +79,7 @@ def create_app(
     app.state.catalog = catalog
     app.state.holdings = holdings_repo
     app.state.retention = retention_repo
+    app.state.market_context = market_context_repo
     app.state.bedrock_client = build_bedrock_client()
     app.add_middleware(
         CORSMiddleware,

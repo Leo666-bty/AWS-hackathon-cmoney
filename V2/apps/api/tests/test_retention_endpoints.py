@@ -211,3 +211,49 @@ def test_feedback_and_event_batch_are_retry_safe() -> None:
     first = client.post("/api/v2/events/batch", json=payload, headers=headers)
     second = client.post("/api/v2/events/batch", json=payload, headers=headers)
     assert first.json() == second.json() == {"accepted_event_ids": ["event-retry-safe-001"]}
+
+
+def test_claimed_report_unlocks_cached_ai_deep_dive_and_fixed_questions() -> None:
+    client = _client()
+    report = _complete(client)
+    headers = _auth(client)
+    client.post(
+        f"/api/v2/reports/{report['report_id']}/claim",
+        json={"claim_token": report["claim_token"]},
+        headers=headers,
+    )
+
+    first = client.post(f"/api/v2/reports/{report['report_id']}/ai-report", headers=headers)
+    second = client.post(f"/api/v2/reports/{report['report_id']}/ai-report", headers=headers)
+    assert first.status_code == second.status_code == 200
+    assert first.json() == second.json()
+    assert first.json()["source"] == "fallback"
+    assert first.json()["market_moments"]
+    assert first.json()["market_moments"][0]["evidence_refs"][1].startswith("market:2382:2025-")
+    assert [item["id"] for item in first.json()["suggested_questions"]] == [
+        "why-persona", "most-influential-trade", "why-anomalous-month"
+    ]
+
+    answer = client.post(
+        f"/api/v2/reports/{report['report_id']}/questions",
+        json={"question_id": "most-influential-trade"},
+        headers=headers,
+    )
+    assert answer.status_code == 200
+    assert answer.json()["evidence_refs"]
+    assert "不構成投資建議" in answer.json()["limitations"]
+
+    free_text = client.post(
+        f"/api/v2/reports/{report['report_id']}/questions",
+        json={"question_id": "請推薦股票"},
+        headers=headers,
+    )
+    assert free_text.status_code == 422
+
+
+def test_ai_deep_dive_requires_report_ownership() -> None:
+    client = _client()
+    report = _complete(client)
+    headers = _auth(client)
+    response = client.post(f"/api/v2/reports/{report['report_id']}/ai-report", headers=headers)
+    assert response.status_code == 404

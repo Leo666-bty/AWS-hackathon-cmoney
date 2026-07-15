@@ -117,6 +117,8 @@ Live Market Feed      → Moment Engine         → current context card
 AI 的工作：
 
 - 把 verified `ReconstructionResult` 轉成繁體中文敘事。
+- 結合離線預先評分的買進月份市場情境，產生結構化 AI Deep Dive。
+- 只回答三個 server-defined 證據型問題 ID，不提供自由聊天。
 - 遵守 schema 與禁語 guardrail。
 - provider 失敗時回 deterministic fallback。
 
@@ -125,6 +127,7 @@ AI 不做：
 - 股價、報酬、人格或持股候選計算。
 - 投資買賣建議、目標價或報酬保證。
 - 從未驗證輸入直接生成金融結論。
+- 在 API request 內執行 sklearn inference 或 training。
 
 ## 7. 架構取捨
 
@@ -133,8 +136,8 @@ AI 不做：
 | React reducer/context | 零額外依賴、跨 route 夠用 | refresh 會失去匿名 draft；正式版改 server session |
 | Zod typed client | runtime 可攔 contract drift | 手寫 schema 有維護成本；CI 後續改 OpenAPI codegen |
 | JSON market snapshot | 快、可重現、無 DB 查詢成本 | 不適合即時更新；live feed 另建 adapter |
-| Sync FastAPI services | 邏輯簡單、deterministic 計算可預測 | Bedrock 高延遲時需 async／worker |
-| PostgreSQL 四表（holdings + reports + feedback + events）| 支援報告認領、卡片偏好與 event，隱私仍最小化 | 獲客 wizard draft 仍在瀏覽器；真正註冊登入待補 |
+| Sync FastAPI + pre-scored JSON | 邏輯簡單、O(1) 查表且 production 不需 sklearn | 新資料需重新發布 artifact |
+| PostgreSQL 四表（holdings + reports + feedback + events）| 支援報告認領、AI report cache、卡片偏好與 event | 獲客 wizard draft 仍在瀏覽器；真正註冊登入待補 |
 
 ## 8. 驗收條件
 
@@ -149,7 +152,8 @@ AI 不做：
 - [x] confirmed holdings 只能經 session-authenticated、report-scoped 路徑寫入（舊未驗證端點已移除）。
 - [x] `GET /me/dashboard` 回傳 report／portfolio／priority card／weekly review。
 - [x] `POST /events/batch` 以 `event_id` idempotent 寫入。
-- [x] React production build 與 Python test suite（60 tests）通過。
+- [x] 結構化 AI Deep Dive、固定問題 ID、ownership、cache 與 fallback 完成。
+- [x] React production build、ESLint、React 6 tests 與 Python 65 tests 通過。
 - [x] 單一 EC2 用 Docker Compose 定義（web + api + PostgreSQL）與本機容器驗收。
 - [ ] 實際 EC2／IAM Role／HTTPS 驗收、真正註冊登入、rate limit 與 event analytics。
 - [ ] 真實 Bedrock 上線驗證（目前走 fallback）、action card `mute` 影響排序（Feature 006）、`docs/api/004..007` SDD 資料夾補齊。

@@ -11,6 +11,7 @@ from mindfolio_api.auth import (
 )
 from mindfolio_api.repositories.holdings import HoldingsRepository, HoldingsUnavailable
 from mindfolio_api.repositories.market_data import MarketCatalog
+from mindfolio_api.repositories.market_context import MarketContextRepository
 from mindfolio_api.repositories.retention import (
     InvalidClaimToken,
     ReportClaimConflict,
@@ -22,6 +23,7 @@ from mindfolio_api.repositories.retention import (
 from mindfolio_api.routers.holdings import get_holdings
 from mindfolio_api.routers.stocks import get_catalog
 from mindfolio_api.schemas.reconstruction import TradeConfig
+from mindfolio_api.schemas.ai_report import InvestmentAIReport, QuestionAnswer, QuestionRequest
 from mindfolio_api.schemas.retention import (
     CardFeedbackRequest,
     CardFeedbackResponse,
@@ -41,6 +43,8 @@ from mindfolio_api.services.reconstruction import (
     complete_reconstruction,
 )
 from mindfolio_api.services.retention import build_action_card, build_dashboard
+from mindfolio_api.ai.deep_dive import answer_question, build_context, cache_key, generate_report
+from mindfolio_api.config import get_settings
 from mindfolio_core.domain.models import ConfirmedHolding
 
 router = APIRouter(tags=["retention"])
@@ -48,6 +52,10 @@ router = APIRouter(tags=["retention"])
 
 def get_retention(request: Request) -> RetentionRepository:
     return request.app.state.retention
+
+
+def get_market_context(request: Request) -> MarketContextRepository:
+    return request.app.state.market_context
 
 
 @router.post("/auth/session", response_model=SessionResponse)
@@ -122,6 +130,54 @@ def confirm_report_holdings(
         raise HTTPException(status_code=503, detail="Report store is unavailable.")
     except HoldingsUnavailable:
         raise HTTPException(status_code=503, detail="Holdings store is unavailable.")
+
+
+@router.post("/reports/{report_id}/ai-report", response_model=InvestmentAIReport)
+def investment_ai_report(
+    report_id: str,
+    request: Request,
+    identity: MemberIdentity = Depends(require_member),
+    retention: RetentionRepository = Depends(get_retention),
+    market: MarketContextRepository = Depends(get_market_context),
+) -> InvestmentAIReport:
+    try:
+        stored = retention.get_member_report(identity.member_id, report_id)
+        if stored is None:
+            raise HTTPException(status_code=404, detail="Claimed report not found.")
+        context = build_context(stored, market)
+        expected_key = cache_key(context)
+        if stored.get("ai_report") and stored.get("ai_report_cache_key") == expected_key:
+            return InvestmentAIReport.model_validate(stored["ai_report"])
+        generated = generate_report(context, request.app.state.bedrock_client, get_settings())
+        retention.save_ai_report(
+            identity.member_id,
+            report_id,
+            generated.model_dump(mode="json"),
+            expected_key,
+            generated.generated_at,
+        )
+        return generated
+    except ReportNotFound:
+        raise HTTPException(status_code=404, detail="Claimed report not found.")
+    except RetentionUnavailable:
+        raise HTTPException(status_code=503, detail="Report store is unavailable.")
+
+
+@router.post("/reports/{report_id}/questions", response_model=QuestionAnswer)
+def investment_question(
+    report_id: str,
+    payload: QuestionRequest,
+    identity: MemberIdentity = Depends(require_member),
+    retention: RetentionRepository = Depends(get_retention),
+    market: MarketContextRepository = Depends(get_market_context),
+) -> QuestionAnswer:
+    try:
+        stored = retention.get_member_report(identity.member_id, report_id)
+        if stored is None:
+            raise HTTPException(status_code=404, detail="Claimed report not found.")
+        return answer_question(payload.question_id, build_context(stored, market))
+    except RetentionUnavailable:
+        raise HTTPException(status_code=503, detail="Report store is unavailable.")
 
 
 @router.get("/me/dashboard", response_model=MemberDashboard)

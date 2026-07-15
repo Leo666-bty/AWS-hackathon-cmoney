@@ -3,7 +3,8 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    MINDFOLIO_MARKET_DATA_PATH=/app/data/market-catalog.json
+    MINDFOLIO_MARKET_DATA_PATH=/app/data/market-catalog.json \
+    MINDFOLIO_MARKET_CONTEXT_PATH=/app/data/market-context-2025-v1.json
 
 WORKDIR /app
 
@@ -14,6 +15,7 @@ COPY apps/api/ ./apps/api/
 RUN python -m pip install ./packages/mindfolio-core ./apps/api
 
 COPY data/market-catalog.json ./data/market-catalog.json
+COPY data/market-context-2025-v1.json ./data/market-context-2025-v1.json
 
 RUN useradd --create-home --uid 10001 mindfolio \
     && chown -R mindfolio:mindfolio /app

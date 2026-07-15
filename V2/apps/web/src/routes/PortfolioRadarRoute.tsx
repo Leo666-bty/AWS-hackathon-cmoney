@@ -7,7 +7,14 @@ import {
   PriorityActionCard,
   WeeklyReviewPanel,
 } from "../features/portfolio-radar/PortfolioRadarModules";
-import { getMemberDashboard, saveCardFeedback, type CardPreference } from "../shared/api/client";
+import {
+  askInvestmentQuestion,
+  generateInvestmentAIReport,
+  getMemberDashboard,
+  saveCardFeedback,
+  type CardPreference,
+  type InvestmentQuestionId,
+} from "../shared/api/client";
 import { getErrorMessage } from "../shared/api/errors";
 import { trackEvent } from "../shared/analytics/events";
 import { clearMemberSession, getAccessToken } from "../shared/auth/session";
@@ -33,6 +40,18 @@ export function PortfolioRadarRoute() {
       trackEvent("card_feedback", "portfolio_radar", { action: variables.preference });
       void queryClient.invalidateQueries({ queryKey: ["member-dashboard"] });
     },
+  });
+
+  const deepDive = useMutation({
+    mutationFn: (reportId: string) => generateInvestmentAIReport(reportId, token ?? ""),
+    onMutate: () => trackEvent("ai_report_open", "portfolio_radar"),
+    onSuccess: (report) => trackEvent("ai_report_generated", "portfolio_radar", { action: report.source }),
+  });
+
+  const question = useMutation({
+    mutationFn: ({ reportId, questionId }: { reportId: string; questionId: InvestmentQuestionId }) => askInvestmentQuestion(reportId, questionId, token ?? ""),
+    onMutate: ({ questionId }) => trackEvent("ai_question_chip_click", "portfolio_radar", { action: questionId }),
+    onSuccess: (answer) => trackEvent(answer.source === "fallback" ? "ai_answer_fallback" : "ai_answer_rendered", "portfolio_radar", { action: answer.question_id }),
   });
 
   useEffect(() => {
@@ -112,6 +131,36 @@ export function PortfolioRadarRoute() {
         onFollowUp={selectFollowUp}
         onFeedback={saveFeedback}
       />
+
+      <section id="deep-dive" className="ai-deep-dive panel-card" aria-labelledby="deep-dive-title">
+        <header>
+          <div><p className="eyebrow">AI DEEP DIVE</p><h2 id="deep-dive-title">從交易記憶回看市場情境</h2></div>
+          {deepDive.data && <span>{deepDive.data.source === "bedrock" ? "Bedrock 生成" : "安全備援"}</span>}
+        </header>
+        {!data.report ? <div className="empty-module">先認領 Time Machine 報告，才能建立個人化解讀。</div> : !deepDive.data ? (
+          <div className="deep-dive-gate">
+            <p>系統會把五筆重建結果與買進月份的市場 regime、法人及全站社群證據串在一起。沒有自由聊天，也不會產生買賣建議。</p>
+            <button className="button primary" type="button" disabled={deepDive.isPending} onClick={() => deepDive.mutate(data.report!.report_id)}>{deepDive.isPending ? "正在整理歷史證據…" : "產生 AI 深度解讀"}</button>
+            {deepDive.isError && <p className="feedback-error" role="alert">{getErrorMessage(deepDive.error)}</p>}
+          </div>
+        ) : (
+          <div className="deep-dive-content">
+            <h3>{deepDive.data.title}</h3>
+            <p className="deep-dive-summary">{deepDive.data.executive_summary}</p>
+            <div className="deep-dive-columns">
+              <div><small>STRENGTH</small>{deepDive.data.strengths.map((section) => <article key={section.title}><b>{section.title}</b><p>{section.body}</p><code>{section.evidence_refs.join(" · ")}</code></article>)}</div>
+              <div><small>WATCHOUT</small>{deepDive.data.watchouts.map((section) => <article key={section.title}><b>{section.title}</b><p>{section.body}</p><code>{section.evidence_refs.join(" · ")}</code></article>)}</div>
+              <div><small>MARKET MOMENT</small>{deepDive.data.market_moments.map((section) => <article key={section.title}><b>{section.title}</b><p>{section.body}</p><code>{section.evidence_refs.join(" · ")}</code></article>)}</div>
+            </div>
+            <div className="deep-dive-questions">
+              <small>不用輸入 Prompt，直接選一個問題</small>
+              <div>{deepDive.data.suggested_questions.map((item) => <button type="button" key={item.id} disabled={question.isPending} onClick={() => question.mutate({ reportId: data.report!.report_id, questionId: item.id })}>{item.label}</button>)}</div>
+              {question.data && <article role="status"><b>Mindfolio：</b><p>{question.data.answer}</p><small>{question.data.limitations}</small><code>{question.data.evidence_refs.join(" · ")}</code></article>}
+              {question.isError && <p className="feedback-error" role="alert">{getErrorMessage(question.error)}</p>}
+            </div>
+          </div>
+        )}
+      </section>
 
       <WeeklyReviewPanel review={data.weekly_review} />
     </main>

@@ -51,6 +51,9 @@ class RetentionRepository(Protocol):
 
     def claim_report(self, report_id: str, claim_token: str, member_id: str) -> dict[str, Any]: ...
     def get_member_report(self, member_id: str, report_id: str | None = None) -> dict[str, Any] | None: ...
+    def save_ai_report(
+        self, member_id: str, report_id: str, report: dict[str, Any], cache_key: str, generated_at: datetime
+    ) -> None: ...
     def save_feedback(self, member_id: str, card_id: str, preference: str) -> datetime: ...
     def get_feedback(self, member_id: str, card_id: str) -> str | None: ...
     def add_events(self, member_id: str | None, events: list[InteractionEventInput]) -> list[str]: ...
@@ -83,6 +86,9 @@ class InMemoryRetentionRepository:
             "created_at": now,
             "claimed_at": None,
             "expires_at": expires_at,
+            "ai_report": None,
+            "ai_report_cache_key": None,
+            "ai_report_generated_at": None,
         }
         return ReportHandle(report_id=report_id, claim_token=claim_token, expires_at=expires_at)
 
@@ -109,6 +115,16 @@ class InMemoryRetentionRepository:
         if not matches:
             return None
         return max(matches, key=lambda report: report["created_at"]).copy()
+
+    def save_ai_report(
+        self, member_id: str, report_id: str, report: dict[str, Any], cache_key: str, generated_at: datetime
+    ) -> None:
+        stored = self._reports.get(report_id)
+        if stored is None or stored["claimed_by"] != member_id:
+            raise ReportNotFound(report_id)
+        stored["ai_report"] = report
+        stored["ai_report_cache_key"] = cache_key
+        stored["ai_report_generated_at"] = generated_at
 
     def save_feedback(self, member_id: str, card_id: str, preference: str) -> datetime:
         now = datetime.now(UTC)
@@ -222,6 +238,30 @@ class PgRetentionRepository:
                 cur.execute(sql, params)
                 row = cur.fetchone()
                 return dict(row) if row else None
+        except RetentionUnavailable:
+            raise
+        except Exception as exc:  # noqa: BLE001
+            raise RetentionUnavailable(str(exc)) from exc
+
+    def save_ai_report(
+        self, member_id: str, report_id: str, report: dict[str, Any], cache_key: str, generated_at: datetime
+    ) -> None:
+        from psycopg.types.json import Jsonb
+
+        try:
+            with self._connect() as conn, conn.cursor() as cur:
+                cur.execute(
+                    """
+                    UPDATE reconstruction_reports
+                    SET ai_report = %s, ai_report_cache_key = %s, ai_report_generated_at = %s
+                    WHERE report_id = %s AND claimed_by = %s
+                    """,
+                    (Jsonb(report), cache_key, generated_at, report_id, member_id),
+                )
+                if cur.rowcount != 1:
+                    raise ReportNotFound(report_id)
+        except ReportNotFound:
+            raise
         except RetentionUnavailable:
             raise
         except Exception as exc:  # noqa: BLE001

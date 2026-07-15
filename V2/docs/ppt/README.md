@@ -1,0 +1,53 @@
+# Mindfolio Time Machine HTML 簡報
+
+## 開啟方式
+
+直接以瀏覽器開啟 [`index.html`](index.html)。簡報不依賴外部 CDN、字型或 JavaScript 套件，可離線展示。
+
+## 頁數與報告方式
+
+- 共 20 頁。
+- 第 1～18 頁為約 10 分鐘主簡報。
+- 第 19～20 頁為模型品質與交付狀態附錄，建議僅在 Q&A 使用。
+- 每頁內建講者提示，按 `N` 顯示。
+
+## 操作
+
+| 操作 | 快捷鍵 |
+|---|---|
+| 下一頁 | `→`、`PageDown`、`Space` |
+| 上一頁 | `←`、`PageUp` |
+| 第一頁／最後一頁 | `Home`／`End` |
+| 顯示講者提示 | `N` |
+| 縮圖總覽 | `O` |
+| 全螢幕 | `F` |
+
+手機與平板可左右滑動切頁。
+
+## 匯出 PDF
+
+使用瀏覽器的「列印」功能，選擇：
+
+- 方向：橫向
+- 邊界：無
+- 背景圖形：開啟
+- 紙張：簡報已定義為 16:9（13.333 × 7.5 英吋）
+
+列印版會自動隱藏控制列與講者提示，每頁輸出一張投影片。
+
+## 內容依據
+
+簡報以 V2 現行文件、程式與模型 Artifact 為準，核心來源為：
+
+- `00_PROJECT_CHARTER.md`
+- `03_DATA_AND_GUARDRAILS.md`
+- `05_DEMO_RUNBOOK.md`
+- `08_TECHNICAL_INNOVATION.md`
+- `09_FRONTEND_BACKEND_ARCHITECTURE.md`
+- `10_AI_TRAINING_PLAN.md`
+- `12_V2_END_TO_END_SPEC.md`
+- `13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md`
+- `14_AI_MINIMAL_INTEGRATION_SPEC.md`
+- 專案根目錄 `CHANGELOG.md`
+
+Bedrock Converse 整合在簡報中描述為「已打通介面與 fallback；正式環境 IAM／runtime 待部署驗證」，不宣稱已完成正式環境驗收。

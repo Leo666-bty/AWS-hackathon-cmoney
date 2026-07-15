@@ -1,5 +1,20 @@
 # Changelog & Product Journey
 
+## 2026-07-15 — V2.11：AI P0 實作、前後端整合與可驗證市場情境
+
+- 將 `14_AI_MINIMAL_INTEGRATION_SPEC.md` 從規劃更新為已實作／已驗證，並同步修正 Project Charter、Pitch、Implementation、Architecture、Training、Deployment 與 End-to-End Spec。
+- 完成官方 2025 CSV 的 monthly feature pipeline，實際產出 3,584 個 stock-month samples；features 涵蓋報酬、波動、最大回落、成交量、週轉率、法人流量比例與全站社群訊號。
+- 完成 KMeans Market Regime 與 IsolationForest anomaly training；選模加入最大群集 75% balance gate，避免只追求 silhouette 而產生單一群集占 89.5% 的退化結果。
+- 發布版本化 `market-context-2025-v1.json`，包含 3,584 筆預先評分 context、真實 metrics、feature/model version 與 SHA-256 checksum；training features 與 joblib 保持可重建且不進 runtime image。
+- FastAPI 新增 fail-soft `MarketContextRepository`，以 `stock_id:YYYY-MM` O(1) 查表；production API 不安裝或載入 sklearn，artifact 缺失、版本錯誤或 checksum 不符時不阻斷原本 reconstruction。
+- 新增 report-owner-only 的 `POST /reports/{report_id}/ai-report` 與 `POST /reports/{report_id}/questions`，支援結構化 AI Deep Dive、PostgreSQL cache、evidence refs、Bedrock schema guardrail 與 deterministic fallback。
+- AI 問答僅接受 `why-persona`、`most-influential-trade`、`why-anomalous-month` 三個 server-defined question IDs，不加入自由聊天框。
+- React `/result` 新增 AI Deep Dive teaser；`/app` 新增 summary、strength、watchout、market moment、source badge 與三個低門檻問題 chips，並完成 Zod API contract 與互動事件。
+- 新增 `002_ai_report_cache.sql`，Docker image 納入 pre-scored artifact，Compose schema 改為有序目錄掛載；既有 PostgreSQL volume 仍需手動套用 migration。
+- 恢復 `15_OPTIMIZATION_CHECKLIST.md`，明確標示為 Post-P0 backlog，不屬本次三天 MVP 開發範圍。
+- 補齊本機手動驗證流程與 DevTools API sequence；修正 Docker context 排除 artifact，以及重建月份 `01` 與 artifact key `2025-01` 不一致的 lookup 問題。
+- 最終驗證：Python 65 tests、React 6 tests、TypeScript、Vite production build、ESLint、Docker Compose config 與 Git diff whitespace check 全數通過。
+
 ## 2026-07-15 — V2.10：AI 最小整合需求規格
 
 - 新增 `14_AI_MINIMAL_INTEGRATION_SPEC.md`，定義不改現有 React、FastAPI、`mindfolio-core` 與 PostgreSQL 拓撲的 AI 增量方案。

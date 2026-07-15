@@ -26,15 +26,15 @@
 ## 技術一句話
 
 > React 負責讓陌生用戶低門檻完成重建；FastAPI 先驗證並以 deterministic
-> engine 計算結果，最後才讓 AI service 生成文案。Market Regime／Anomaly
-> training 與 inference 是已定義 artifact contract 的下一階段，目前尚未訓練。
+> engine 計算結果；離線 KMeans／IsolationForest 再補上買進月份市場情境，
+> AI service 最後才把已驗證證據轉成結構化 Deep Dive。
 
 ## 成長一句話
 
 > 匿名人格卡讓每個結果成為下一個陌生人的入口；Progressive Profiling 再用完整回放與 Portfolio Radar，逐層把匿名流量轉成會員與明確確認的持股資料。
 
-React × FastAPI 兩階段 vertical slice 已完成（12 支 API、V2 Python suite 60 tests、
-React production build）。Live Demo 直接操作正式 React 流程，並可用
+React × FastAPI + AI P0 已完成（14 支 API、V2 Python 65 tests、React 6 tests、
+production build 與 lint）。Live Demo 直接操作正式 React 流程，並可用
 `/api/v2/docs` 證明 validation／complete 是後端重算；`V2/demo/` 只作為
 presentation-only 的靜態視覺 reference。
 

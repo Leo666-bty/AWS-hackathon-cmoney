@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173"
     model_status: str = "not_loaded"
     market_data_path: str = "./data/market-catalog.json"
+    market_context_path: str = "./data/market-context-2025-v1.json"
 
     # --- Bedrock AI narrative (feature 002) ---
     # Disabled by default so tests and offline demos take the deterministic

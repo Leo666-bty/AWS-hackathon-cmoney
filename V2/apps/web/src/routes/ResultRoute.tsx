@@ -87,7 +87,7 @@ export function ResultRoute() {
       </section>
 
       <section className="consent-panel panel-card">
-        <div><p className="eyebrow">FROM ACQUISITION TO RETENTION</p><h2>保存報告，開啟 Portfolio Radar</h2><p>先認領這份匿名報告，再逐檔確認「仍持有」候選。認領不等於同意建立持股，兩個動作會分開處理。</p><div className="value-list"><span>跨階段保存人格報告</span><span>只追蹤本人確認持股</span><span>每週整理有來源日期的證據</span></div></div>
+        <div><p className="eyebrow">FROM ACQUISITION TO RETENTION</p><h2>保存報告，開啟 Portfolio Radar</h2><p>先認領這份匿名報告，再逐檔確認「仍持有」候選。認領後可解鎖買進月份的市場情境與三個證據型追問；認領不等於同意建立持股。</p><div className="value-list"><span>跨階段保存人格報告</span><span>只追蹤本人確認持股</span><span>解鎖市場情境 AI Deep Dive</span></div></div>
         {response.report ? <Link className="button primary" to="/activate">保存報告並開啟 Radar →</Link> : <button className="button primary" type="button" disabled>報告保存服務暫時不可用</button>}
       </section>
 

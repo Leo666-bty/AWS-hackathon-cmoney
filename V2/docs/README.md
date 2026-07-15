@@ -17,6 +17,8 @@
 | [`12_V2_END_TO_END_SPEC.md`](12_V2_END_TO_END_SPEC.md) | V2 React × FastAPI vertical slice、契約、狀態與驗收條件 |
 | [`13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md`](13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md) | Time Machine 獲客銜接 Portfolio Radar 留存的需求基準與後續 SDD 拆分 |
 | [`14_AI_MINIMAL_INTEGRATION_SPEC.md`](14_AI_MINIMAL_INTEGRATION_SPEC.md) | 不改現有架構的 ML 情境、完整 AI 報告與證據型問答整合需求 |
+| [`15_OPTIMIZATION_CHECKLIST.md`](15_OPTIMIZATION_CHECKLIST.md) | P0 之後的安全、部署、模型品質與產品實驗 backlog；不屬本次開發範圍 |
+| [`ppt/index.html`](ppt/index.html) | 20 頁 HTML 提案簡報；沿用 V2 UI 視覺，含鍵盤操作、講者提示、總覽與列印版 |
 
 > 後端 SDD 功能規格（spec/plan/tasks）在 [`api/`](api/)：001 資料地基、002 重建引擎、003 確認持股。
 
@@ -33,3 +35,4 @@
 - 開發共識與驗收：`12_V2_END_TO_END_SPEC.md`
 - 獲客到留存整合需求：`13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md`
 - AI 最小改動整合需求：`14_AI_MINIMAL_INTEGRATION_SPEC.md`
+- Post-P0 優化候選：`15_OPTIMIZATION_CHECKLIST.md`

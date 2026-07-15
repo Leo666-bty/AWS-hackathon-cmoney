@@ -36,14 +36,12 @@ V2/
 └── demo/                       # 現有靜態 UX reference，非正式架構
 ```
 
-以上骨架已建立。**兩階段 MVP vertical slice 已完成**：12 支 API（獲客 6 + 留存
-6）、deterministic 重建引擎、AI 敘事 fallback、Postgres 四表持久層（confirmed
+以上骨架已建立。**兩階段 MVP vertical slice 與 AI P0 已完成**：14 支 API（獲客 6 + 留存／AI 8）、deterministic 重建引擎、AI 敘事 fallback、Postgres 四表持久層（confirmed
 holdings + reconstruction_reports + action_card_feedback + interaction_events）、
 邀請碼 session 與 report-scoped confirmed holdings，以及 React 六 route 串接
 （含 `/activate`、`/app` Portfolio Radar）。Docker Compose 已包含 nginx web、API
 與 PostgreSQL，並完成本機容器驗收。**尚未完成**：實際 EC2 上線、HTTPS／網域、
-真實 Bedrock 權限驗證（`bedrock_enabled` 預設 false，目前走 fallback）、離線模型
-訓練（`apps/ai-training` 仍是 scaffold）、真正的註冊登入（目前為邀請碼 adapter）、
+真實 Bedrock 權限驗證（`bedrock_enabled` 預設 false，目前走 fallback）、真正的註冊登入（目前為邀請碼 adapter）、
 action card `mute` 尚未影響排序（Feature 006）、以及 `docs/api/004..007` per-feature
 SDD 資料夾尚未補齊（paper-trail 缺口）。
 
@@ -60,7 +58,7 @@ SDD 資料夾尚未補齊（paper-trail 缺口）。
 - [x] deterministic return／fingerprint services
 - [x] React 選股、逐檔重建、結果與持股同意流程
 - [x] 單一 EC2 用 Docker Compose（web + api + PostgreSQL）部署定義與本機驗收
-- [ ] 第一版 regime／anomaly model training
+- [x] 第一版 regime／anomaly model training 與 pre-scored runtime artifact
 - [ ] 實際 EC2／IAM Role／HTTPS runtime 驗收
 
 ## 已完成：FastAPI backend
@@ -94,7 +92,7 @@ SDD 資料夾尚未補齊（paper-trail 缺口）。
 - 先實作不需要個人標籤的 market regime clustering 與 anomaly detector。
 - 使用者 persona 先保持 deterministic；有足夠明確回饋後才訓練 ranking／clustering。
 - model artifact 必須保存 feature version、training data range、metrics 與 generated_at。
-- FastAPI 只載入已核准 artifact 做 inference，不在 request 中重新訓練。
+- FastAPI 只載入已核准的 pre-scored JSON，不安裝 sklearn，也不在 request 中重新訓練。
 
 ## Phase 2：資料品質
 
