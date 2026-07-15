@@ -59,7 +59,8 @@ SDD 資料夾尚未補齊（paper-trail 缺口）。
 - [x] React 選股、逐檔重建、結果與持股同意流程
 - [x] 單一 EC2 用 Docker Compose（web + api + PostgreSQL）部署定義與本機驗收
 - [x] 第一版 regime／anomaly model training 與 pre-scored runtime artifact
-- [ ] 實際 EC2／IAM Role／HTTPS runtime 驗收
+- [x] 實際 EC2 部署上線（Compose；Bedrock 以短期 API key 實測 live）
+- [ ] 正式 IAM Role 授權與 HTTPS／網域驗收
 
 ## 已完成：FastAPI backend
 

@@ -19,7 +19,9 @@ EC2 — Docker Compose
 │   ├── market-catalog.json + market-context-2025-v1.json baked into image
 │   ├── DATABASE_URL → postgres:5432
 │   ├── retention/session services
-│   └── Bedrock via IAM Role；失敗時 deterministic fallback
+│   └── Bedrock：黑客松 workshop 帳號不開 IAM Role，實際以短期 API key
+│       （`AWS_BEARER_TOKEN_BEDROCK`，~12h 過期需重產）授權並已實測 live；
+│       正式環境改 EC2 IAM Role。失敗時 deterministic fallback
 └── postgres  PostgreSQL 16 :5432（Compose internal only）
     ├── ordered SQL files only on first empty-volume initialization
     └── pgdata named volume on EC2 EBS

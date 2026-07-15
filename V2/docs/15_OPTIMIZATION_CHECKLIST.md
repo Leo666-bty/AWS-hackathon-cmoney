@@ -52,6 +52,10 @@
 - **離線 feature 測試 vacuous pass ＋ 其掩蓋的 NaN fallback bug**：`apps/ai-training/tests/test_features.py` 的 `data_dir` 指向 `V1/data/...`（實際 CSV 在 `V2/data/...`），且 `if not data_dir.exists(): return`，因此該測試目前空過。它掩蓋了 `features.py` 的 `group["daily_return"].std(ddof=0) or 0.0` / `drawdown.min() or 0.0` —— Python `float('nan') or 0.0` 會回傳 `nan` 而非 `0.0`（NaN 為真值），使原本想「無法計算時歸零」的 fallback 從未生效（該 row 後續被 `dropna` 整筆丟棄）。觸發條件極窄（某 stock-month 無任何有效 `daily_return`），現有 3,584-context artifact 大概率未受影響。修正測試路徑（`parents[3] / "data/..."`）後才會真正驗證。
 - **pipeline balance-gate 靜默放行 ＋ 假 provenance**：`pipeline.py` 的 `max(balanced or candidates, ...)` 在無任何候選通過 ≤75% gate 時，會靜默退回未過濾候選，但 metadata 的 `selection_policy` 仍無條件宣稱套用了 gate。現有 artifact 最大群 34.46% 遠低於門檻故為 latent，但屬對文件宣稱的 provenance 落差；建議加旗標並補 `test_pipeline.py`。
 
+- **前端死碼 `confirmHoldings()`**：`apps/web/src/shared/api/client.ts` 仍留一個無呼叫者的函式，指向已移除的舊 `POST /confirmed-holdings` 端點。呼叫會 404，但目前無任何 caller，不影響 Demo；demo 後刪除。
+- **Fallback AI 報告標題寫死「LEO」**：`ai/deep_dive.py` `_fallback_report` 的 title 硬編 LEO。單一 demo 身份無感；多身份前改為由 identity 帶入。
+- **分享按鈕依賴 `navigator.clipboard`**：`ResultRoute.tsx` 在 HTTP（非 secure context）下瀏覽器可能拒絕 clipboard 且靜默失敗。目前 EC2 為 HTTP——**台上不要點分享**；HTTPS 上線或加 fallback 後解除。
+
 > 已於本輪（收尾）修正、不再列為落差：AI Deep Dive guardrail 改為封鎖投資「建議」語句（建議買/賣、目標價、保證獲利、穩賺、焦慮診斷…）而非裸字「買進/賣出」，讓合法歷史敘述（如「買進月份」）不再被誤擋回 fallback，仍守住法遵界線；AI cache key 現已納入 artifact `content_sha256`（重訓即失效，不再 stale-forever）；`save_ai_report` 快取寫入失敗改為 best-effort（已產生的報告仍回傳，不再 503）；`_fallback_report` 具例外邊界（退回最小報告）；兩支 AI 端點會攔截 `ValidationError`；新增雙身份 cross-member 隔離測試。
 
 ## 3. P2：取得真實互動資料後評估

@@ -84,7 +84,8 @@ Portfolio Radar 閉環；正式產品仍需將邀請碼入口替換為 CMoney SS
 
 ## 快速入口
 
-- [可操作 Demo](demo/index.html)
+- [線上產品（React + FastAPI，已部署）](http://34.229.72.35/)
+- [靜態 UX 參考](demo/index.html)（早期 HTML/JS mockup，非正式 runtime）
 - [文件中心](docs/README.md)
 - [資料生成與來源](data/README.md)
 - [資料庫快照產生器](tools/build_market_catalog.py)

@@ -373,8 +373,8 @@ FastAPI → in-memory holdings store（DATABASE_URL 未設定時）
 - Bedrock 為可選功能，由 API 端授權，不把憑證放前端。Demo（workshop 帳號無法建 IAM Role）以短期 Bedrock API key（bearer token）授權；正式環境改用 EC2 IAM Role，不在 `.env` 放長期 AWS key。
 
 完整啟動、驗收、安全組與備份注意事項見 `11_DEPLOYMENT.md`。目前已部署並上線於
-單機 EC2（Docker Compose）；尚未完成的是正式 runtime 驗收——IAM Role、真實
-Bedrock、自訂網域與 HTTPS。
+單機 EC2（Docker Compose），真實 Bedrock 已於該機實測 live（短期 API key）；
+尚未完成的是正式 IAM Role 授權、自訂網域與 HTTPS。
 
 ## Testing and verification
 

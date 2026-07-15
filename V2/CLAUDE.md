@@ -106,7 +106,8 @@ Retention (6, `routers/retention.py`, session-authenticated):
 
 AI Deep Dive (2, `routers/retention.py`, session-authenticated, report-owner-only):
 - `POST /api/v2/reports/{report_id}/ai-report` (structured `InvestmentAIReport`;
-  PostgreSQL-cached by `context|model|prompt` version; Bedrock schema-validated +
+  PostgreSQL-cached by `context|model|content_sha256|prompt` (artifact checksum
+  in the key so a re-trained artifact invalidates); Bedrock schema-validated +
   guardrailed, any failure → deterministic fallback, `source` flags which)
 - `POST /api/v2/reports/{report_id}/questions` (only 3 server-defined question IDs:
   `why-persona`, `most-influential-trade`, `why-anomalous-month`; no free chat)
