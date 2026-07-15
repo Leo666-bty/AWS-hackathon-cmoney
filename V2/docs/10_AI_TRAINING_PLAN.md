@@ -1,5 +1,8 @@
 # AI Training Plan
 
+> Online product integration、完整 AI 報告與問答契約以
+> [`14_AI_MINIMAL_INTEGRATION_SPEC.md`](14_AI_MINIMAL_INTEGRATION_SPEC.md) 為準；本文件維持 training strategy 的 source of truth。
+
 ## 目標
 
 V2 的 AI training 不用來猜使用者真實持股、預測未來獲利或判定心理人格。可落地的訓練任務分成兩層：

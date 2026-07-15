@@ -1,5 +1,12 @@
 # Changelog & Product Journey
 
+## 2026-07-15 — V2.10：AI 最小整合需求規格
+
+- 新增 `14_AI_MINIMAL_INTEGRATION_SPEC.md`，定義不改現有 React、FastAPI、`mindfolio-core` 與 PostgreSQL 拓撲的 AI 增量方案。
+- 將 ML 限定於 Market Regime clustering 與 anomaly detection，維持 deterministic reconstruction 為金融事實來源。
+- 定義 claim 後 lazy generation 的完整 AI 報告、evidence-based 單輪問答、artifact contract、fallback、guardrails 與 persistence 增量。
+- 更新 AI Training Plan 與文件中心索引；本版僅交付規格，尚未訓練模型或實作 online inference。
+
 ## 2026-07-15 — V2.9：獲客 × 留存閉環與單機部署整合
 
 - 完成 Time Machine 匿名獲客到 Portfolio Radar 留存的 P0 vertical slice：短效 session、報告認領、獨立持股同意、個人化 dashboard、卡片回饋與 idempotent event batch。

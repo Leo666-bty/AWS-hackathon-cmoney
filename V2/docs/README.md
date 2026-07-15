@@ -16,6 +16,7 @@
 | [`11_DEPLOYMENT.md`](11_DEPLOYMENT.md) | 部署決策：單一 EC2 上以 Docker Compose 執行 web + api + postgres |
 | [`12_V2_END_TO_END_SPEC.md`](12_V2_END_TO_END_SPEC.md) | V2 React × FastAPI vertical slice、契約、狀態與驗收條件 |
 | [`13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md`](13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md) | Time Machine 獲客銜接 Portfolio Radar 留存的需求基準與後續 SDD 拆分 |
+| [`14_AI_MINIMAL_INTEGRATION_SPEC.md`](14_AI_MINIMAL_INTEGRATION_SPEC.md) | 不改現有架構的 ML 情境、完整 AI 報告與證據型問答整合需求 |
 
 > 後端 SDD 功能規格（spec/plan/tasks）在 [`api/`](api/)：001 資料地基、002 重建引擎、003 確認持股。
 
@@ -31,3 +32,4 @@
 - 互動 reference：`../demo/`
 - 開發共識與驗收：`12_V2_END_TO_END_SPEC.md`
 - 獲客到留存整合需求：`13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md`
+- AI 最小改動整合需求：`14_AI_MINIMAL_INTEGRATION_SPEC.md`
