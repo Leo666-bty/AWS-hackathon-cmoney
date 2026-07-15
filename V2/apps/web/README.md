@@ -13,7 +13,7 @@
 
 留存（Portfolio Radar）:
 
-- `/activate`：邀請碼啟用，換取 server-derived session token（demo `demo-leo:LEO`）。
+- `/activate`：邀請碼啟用，換取 server-derived session token（現場設定為 `123456:Neal,000000:Leo`）。
 - `/app`：Portfolio Radar dashboard（報告/指紋、持股、priority action card、
   weekly review），由 `features/portfolio-radar/` 提供。
 

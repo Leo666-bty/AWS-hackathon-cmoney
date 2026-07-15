@@ -1,23 +1,25 @@
-# Mindfolio Time Machine HTML 簡報
+# Mindfolio Time Machine 簡報
 
-本目錄有三份簡報，皆離線可用、不依賴外部 CDN／字型／JS 套件：
+正式 PowerPoint：
+
+- **[`Mindfolio-Time-Machine-Pitch.pptx`](Mindfolio-Time-Machine-Pitch.pptx)**：前 6 頁為 8 分鐘主簡報，第 7～9 頁為部署、資料與成效衡量 Q&A 附錄。
+
+另有三份離線 HTML，不依賴外部 CDN／字型／JS 套件：
 
 - **[`pitch_v2.html`](pitch_v2.html) — 10 分鐘正式舞台版**：10 頁，依評分比重重排創新、技術、資料、AI、完成度；包含 3 分鐘 Live Demo 段落與真實 Bedrock 截圖。逐頁講稿見 [`pitch_v2.md`](pitch_v2.md)。
 - **[`index.html`](index.html) — 20 頁正式繳交／詳細版**：完整技術、資料、模型指標、系統架構與交付狀態，供書面審查與 Q&A。
-- **[`pitch.html`](pitch.html) — 舊 6 頁極短版**：保留作為時間被壓縮時的備援，不再是主要版本。
+- **[`pitch.html`](pitch.html) — 6 頁極短版**：保留作為時間被壓縮時的備援。
 
 ## 可直接繳交的 PDF
 
 - [`mindfolio-time-machine-proposal-v2.pdf`](../../output/pdf/mindfolio-time-machine-proposal-v2.pdf)：20 頁正式提案文件。
 - [`mindfolio-pitch-v2.pdf`](../../output/pdf/mindfolio-pitch-v2.pdf)：10 頁上台報告版本。
 
-匯出 PDF：瀏覽器列印 → 橫向 → 邊界無 → 背景圖形開。
-
 ## 開啟方式（詳細版）
 
 直接以瀏覽器開啟 [`index.html`](index.html)。簡報不依賴外部 CDN、字型或 JavaScript 套件，可離線展示。
 
-## 頁數與報告方式
+## 詳細 HTML 版的頁數與報告方式
 
 - 共 20 頁。
 - 第 1～18 頁為約 10 分鐘主簡報。
@@ -36,17 +38,6 @@
 | 全螢幕 | `F` |
 
 手機與平板可左右滑動切頁。
-
-## 匯出 PDF
-
-使用瀏覽器的「列印」功能，選擇：
-
-- 方向：橫向
-- 邊界：無
-- 背景圖形：開啟
-- 紙張：簡報已定義為 16:9（13.333 × 7.5 英吋）
-
-列印版會自動隱藏控制列與講者提示，每頁輸出一張投影片。
 
 ## 內容依據
 

@@ -28,8 +28,8 @@ Landing
   → /app Portfolio Radar（dashboard／card／weekly review）
 ```
 
-身份由邀請碼 adapter 發出的 server-derived session 推導（demo `demo-leo:LEO`
-映射到 `LEO`）；留存端點一律不信任 client 傳入的 user ID。
+身份由邀請碼 adapter 發出的 server-derived session 推導（現場設定
+`123456:Neal,000000:Leo`）；留存端點一律不信任 client 傳入的 user ID。
 
 ## 3. 前端範圍
 

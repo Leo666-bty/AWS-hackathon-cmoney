@@ -96,7 +96,7 @@ apps/web/
 | Server state | Query cache／mutation | 熱門股票、搜尋結果、price envelope、validation request |
 | Wizard state | `useReducer` + Context | 已選五檔、每檔 trade draft、後端 complete response |
 | Field state | Component `useState` | 月份、價格模式、實際價格 |
-| Durable identity | Invite-code session | `/activate` 以邀請碼換 session token；身份由伺服器端 session 推導（`member_id`），前端不再夾帶 `user_id`。Demo 身份為 `LEO`（`invite_identities="demo-leo:LEO"`）|
+| Durable identity | Invite-code session | `/activate` 以邀請碼換 session token；身份由伺服器端 session 推導（`member_id`），前端不再夾帶 `user_id`。現場設定為 `invite_identities="123456:Neal,000000:Leo"`。|
 | Calculated result | 不存本地真相 | 一律使用 FastAPI response |
 
 獲客流程仍以小型 reducer/context 實作，不導入大型 global store；重新整理會回到入口，這是匿名獲客階段的已知取捨。留存側則已有 server-derived 身份：complete 回傳 report handle（`report_id` + `claim_token`），登入後 `/activate` 認領報告即把獲客結果綁定到會員身份，跨階段不再依賴前端夾帶 `user_id`。
@@ -254,7 +254,8 @@ POST /api/v2/auth/session
 ```
 
 `{ "invite_code" }` → `{ access_token, token_type: "bearer", member_id, display_name }`。
-邀請碼透過 `invite_identities` adapter 映射到 member（demo 為 `demo-leo:LEO`）；
+邀請碼透過 `invite_identities` adapter 映射到 member（現場設定為
+`123456:Neal,000000:Leo`）；
 無效碼 → 401。
 
 ### Claim report

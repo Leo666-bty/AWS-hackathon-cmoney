@@ -37,7 +37,7 @@ PostgreSQL. `docker-compose.yml` runs web, API and PostgreSQL together on one EC
 CSVs into a versioned, checksummed pre-scored artifact (`market-context-2025-v1.json`,
 3,584 stock-month contexts); the API reads that JSON O(1) and never installs or
 loads sklearn/joblib. Identity is server-derived: an invite-code adapter issues a
-session token (demo `LEO` via `invite_identities="demo-leo:LEO"`); the retention
+session token (on-site `Neal` / `Leo` via `invite_identities="123456:Neal,000000:Leo"`); the retention
 surface never trusts a client-supplied `user_id`. Real Bedrock is verified
 working live on EC2 (Converse, `openai.gpt-oss-120b-1:0`, authed with a
 short-term Bedrock API key / bearer token because the workshop account blocks

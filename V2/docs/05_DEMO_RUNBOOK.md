@@ -39,9 +39,9 @@
 複製匿名分享文案，指出不包含持股與報酬明細。接著完整走出兩階段閉環：
 
 1. `complete` 已回傳 report handle（`report_id` + `claim_token`）。到 `/activate`
-   輸入邀請碼（demo `demo-leo:LEO`）換取 session token——身份由伺服器端 session
+   輸入現場評審邀請碼 `123456`（映射 Neal；備援碼 `000000` 映射 Leo）換取 session token——身份由伺服器端 session
    推導，前端不再夾帶 `user_id`。
-2. 以該 session 認領剛才的報告（`POST /reports/{id}/claim`），把獲客結果綁定到會員 `LEO`。
+2. 以該 session 認領剛才的報告（`POST /reports/{id}/claim`），把獲客結果綁定到該會員身份。
 3. 勾選 consent 後確認持股，走 report-scoped 的
    `POST /reports/{id}/confirmed-holdings`：後端只寫入重新驗證後的
    `holding_candidates`，並記錄 `source_report_id`。

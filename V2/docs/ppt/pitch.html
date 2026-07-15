@@ -39,7 +39,7 @@
     .tag{color:var(--mint);border:1px solid var(--line);border-radius:999px;padding:.4em 1.1em;font-size:2vmin}
 
     /* flow arrows */
-    .flow{display:flex;gap:1.4vmin;align-items:stretch;margin-top:6vmin;flex-wrap:nowrap}
+    .flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:1.4vmin;align-items:stretch;margin-top:6vmin}
     .flow .step{background:var(--panel);border:1px solid var(--line);border-radius:2vmin;
       padding:2.6vmin 2.4vmin;flex:1 1 0;min-width:0}
     .flow .step small{color:var(--mint);font-size:1.8vmin;letter-spacing:.08em}
@@ -56,29 +56,42 @@
     .layer p{color:var(--muted);font-size:2.3vmin;line-height:1.4}
 
     /* demo slide */
-    .demo{align-items:flex-start}
-    .url{font-size:8vmin;font-weight:900;color:var(--lime);margin:2vmin 0;letter-spacing:-.01em}
+    .demo{align-items:stretch}
+    .demo-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:6vmin;align-items:center;margin-top:2vmin}
+    .demo-copy{min-width:0}
+    .url{display:inline-block;font-size:6.7vmin;font-weight:900;color:var(--lime);margin:2vmin 0;letter-spacing:-.01em;text-decoration:none}
     .codes{display:flex;gap:2vmin;margin-top:2vmin;flex-wrap:wrap}
     .codes span{background:var(--panel);border:1px solid var(--line);border-radius:1.4vmin;padding:1.6vmin 2.6vmin;font-size:2.8vmin}
     .codes b{color:var(--lime)}
+    .live-proof{background:var(--panel);border:1px solid var(--line);border-radius:2.4vmin;padding:4vmin;box-shadow:0 3vmin 8vmin rgba(0,0,0,.28)}
+    .live-proof small{color:var(--mint);font-size:2vmin;letter-spacing:.14em}
+    .live-proof strong{display:block;color:var(--lime);font-size:4.2vmin;margin:1.6vmin 0 2.4vmin}
+    .proof-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1vmin}
+    .proof-row span{border-top:1px solid var(--line);padding-top:1.5vmin;color:var(--ink);font-size:2.2vmin;text-align:center}
+    .live-proof p{color:var(--muted);font-size:2.1vmin;line-height:1.45;margin-top:2.5vmin}
 
     /* moat + screenshot */
-    .split{display:grid;grid-template-columns:1.05fr .95fr;gap:5vmin;align-items:center;margin-top:2vmin}
+    .split{display:grid;grid-template-columns:.72fr 1.28fr;gap:4vmin;align-items:center;margin-top:2vmin}
     .shot{border:1px solid var(--line);border-radius:2vmin;overflow:hidden;background:var(--panel2);
       box-shadow:0 3vmin 8vmin rgba(0,0,0,.45)}
-    .shot img{display:block;width:100%}
+    .shot img{display:block;width:100%;height:38vmin;object-fit:cover;object-position:center top}
     .shot .ph{display:grid;place-items:center;height:34vmin;color:var(--muted);font-size:2.4vmin;text-align:center;padding:4vmin;gap:1vmin}
     .shot .ph b{color:var(--lime);font-size:3vmin}
 
-    /* flywheel */
-    .wheel{display:flex;gap:1.4vmin;align-items:center;margin-top:5vmin;flex-wrap:wrap}
-    .wheel .n{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:2vmin 3vmin;font-size:2.8vmin;font-weight:700}
-    .wheel .n.hot{border-color:var(--lime);color:var(--lime)}
-    .wheel .arrow{color:var(--lime);font-size:4vmin}
-    .north{margin-top:6vmin;font-size:3vmin;color:var(--muted)}
-    .north b{color:var(--ink);font-size:3.6vmin}
-    .data-line{position:absolute;left:9vmin;bottom:12vmin;color:var(--muted);font-size:2.4vmin}
-    .data-line b{color:var(--lime);font-size:3.4vmin}
+    /* retention + measurement */
+    .audience-paths{display:grid;grid-template-columns:1fr 1fr;gap:2.4vmin;margin-top:4vmin}
+    .audience-path{background:var(--panel);border:1px solid var(--line);border-radius:2vmin;padding:2.7vmin 3vmin}
+    .audience-path small{color:var(--mint);font-size:1.8vmin;letter-spacing:.1em}
+    .audience-path b{display:block;font-size:2.8vmin;margin:1vmin 0;color:var(--ink)}
+    .audience-path p{color:var(--muted);font-size:2.2vmin;line-height:1.35}
+    .audience-path.return{border-color:rgba(182,243,74,.55)}
+    .audience-path.return b{color:var(--lime)}
+    .north{margin-top:2.5vmin;background:rgba(182,243,74,.08);border-left:.45vmin solid var(--lime);padding:1.6vmin 2vmin;font-size:2.2vmin;color:var(--muted)}
+    .north b{color:var(--ink);font-size:2.5vmin}
+    .measure{margin-top:1.8vmin;color:var(--muted);font-size:2vmin}
+    .measure b{color:var(--mint)}
+    .data-line{position:absolute;left:9vmin;bottom:9vmin;color:var(--muted);font-size:2vmin}
+    .data-line b{color:var(--lime);font-size:2.8vmin}
 
     .close h1{font-size:8vmin}
     .brand{position:absolute;top:5vmin;left:9vmin;display:flex;align-items:center;gap:1.4vmin;color:var(--muted);font-size:2vmin;letter-spacing:.2em}
@@ -108,16 +121,16 @@
     <!-- 1 HOOK -->
     <section class="slide on">
       <div class="brand"><i>M</i><span>MINDFOLIO · CMONEY × AWS 2026</span></div>
-      <p class="eyebrow">AI 掌握股票庫存</p>
+      <p class="eyebrow">TA · 尚未在 APP 建立持股庫存的自主投資人</p>
       <h1>想知道用戶手上抱著什麼?<br /><span class="lime">先別問他。</span></h1>
-      <p class="sub">拿到用戶真實庫存,是投資產品最難的一件事。我們的答案很反直覺——先讓他看見自己,他就會自己告訴你。</p>
+      <p class="sub">從想快速看懂自己的新手，到記得交易、卻不想整理股數、成本與對帳單的老手——都需要先看見價值，才願意提供持股。</p>
       <div class="foot"><span>Mindfolio Time Machine</span><b>01</b></div>
     </section>
 
     <!-- 2 SOLUTION -->
     <section class="slide">
       <p class="eyebrow">為什麼沒人願意交出持股</p>
-      <h1><span class="strike">不信任 · 怕麻煩 · 沒好處</span><br />所以我們 <span class="lime">先給價值,再要資料。</span></h1>
+      <h1><span class="strike">不信任 · 怕麻煩 · 沒好處</span><br />所以我們 <span class="lime">先給價值，再要資料。</span></h1>
       <div class="flow">
         <div class="step"><small>PLAY</small><b>玩 2025 時光機</b></div>
         <div class="arrow">→</div>
@@ -125,30 +138,39 @@
         <div class="arrow">→</div>
         <div class="step"><small>ASK</small><b>「這幾檔還持有嗎?」</b></div>
         <div class="arrow">→</div>
-        <div class="step"><small>KEEP</small><b>真實庫存進 Radar</b></div>
+        <div class="step"><small>KEEP</small><b>確認持股進 Radar</b></div>
       </div>
-      <div class="foot"><span>3 分鐘 · 不打字 · 不連券商 · 不上傳對帳單</span><b>02</b></div>
+      <div class="foot"><span>五檔股票＋大概月份＋價格區間 · 核心結果前不用登入 · 不連券商</span><b>02</b></div>
     </section>
 
     <!-- 3 LIVE DEMO -->
     <section class="slide demo">
-      <p class="eyebrow">LIVE DEMO · 現在就在線上</p>
-      <h1>一趟三分鐘的<span class="lime">投資時光機</span>。</h1>
-      <div class="url">34.229.72.35</div>
-      <div class="codes"><span>評審邀請碼 <b>123456</b></span><span>或 <b>000000</b></span></div>
-      <p class="sub">這不是簡報構想——是現在跑在 AWS 上、你用手機就能打開的產品。</p>
+      <div class="demo-grid">
+        <div class="demo-copy">
+          <p class="eyebrow">LIVE DEMO · 現在就在線上</p>
+          <h1>一趟三分鐘的<span class="lime">投資時光機</span>。</h1>
+          <a class="url" href="http://34.229.72.35/">34.229.72.35</a>
+          <div class="codes"><span>評審邀請碼 <b>123456</b></span></div>
+        </div>
+        <aside class="live-proof">
+          <small>RUNNING ON AWS</small>
+          <strong>不是構想，已經上線。</strong>
+          <div class="proof-row"><span>可開</span><span>可算</span><span>可保存</span></div>
+          <p>Web、API 與資料庫以 Docker Compose 部署在同一台 EC2；非技術評審只要打開連結，就能直接驗證完整流程。</p>
+        </aside>
+      </div>
       <div class="foot"><span>Builder → 重建 → 人格結果 → 認領 → Radar → AI Deep Dive</span><b>03</b></div>
     </section>
 
     <!-- 4 TRUST MOAT + SCREENSHOT -->
     <section class="slide">
-      <p class="eyebrow">護城河① · 為什麼 AI 的數字能信</p>
-      <h1>AI,<span class="lime">不算任何一個數字。</span></h1>
+      <p class="eyebrow">護城河① · 金融結果先驗證，再讓 AI 解釋</p>
+      <h1>生成式 AI，<span class="lime">不負責算金融結果。</span></h1>
       <div class="split">
         <div class="layers">
-          <div class="layer"><small>算數字</small><b>確定性引擎</b><p>報酬·人格·可信度,同輸入必同輸出</p></div>
-          <div class="layer"><small>給情境</small><b>離線 ML</b><p>市場情境+異常,只描述不預測</p></div>
-          <div class="layer k"><small>寫解讀</small><b>Bedrock</b><p>只把已驗證證據寫成人話,每句附證據</p></div>
+          <div class="layer"><small>算結果</small><b>確定性引擎</b><p>報酬、人格與資料信心，同一輸入必有同一輸出</p></div>
+          <div class="layer"><small>給情境</small><b>離線 ML</b><p>辨識市場情境與異常，只描述歷史、不預測未來</p></div>
+          <div class="layer k"><small>寫解讀</small><b>Bedrock</b><p>把已驗證證據寫成人話，每個解讀重點皆可追溯</p></div>
         </div>
         <div class="shot">
           <img src="./assets/bedrock-deep-dive.png" alt="AI Deep Dive（Bedrock 生成）"
@@ -156,30 +178,29 @@
           <div class="ph" style="display:none"><b>Bedrock 生成</b><span>把截圖存成<br/>docs/ppt/assets/bedrock-deep-dive.png</span></div>
         </div>
       </div>
-      <div class="foot"><span>金融數字零幻覺 —— 是架構保證的,不是 prompt 求來的</span><b>04</b></div>
+      <div class="foot"><span>金融結果不由 LLM 生成；輸出無法通過檢查，就切換安全備援</span><b>04</b></div>
     </section>
 
-    <!-- 5 DATA MOAT / FLYWHEEL -->
+    <!-- 5 RETENTION / MEASUREMENT -->
     <section class="slide">
-      <p class="eyebrow">護城河② · 越滾越大的資料飛輪</p>
-      <h1>從一次體驗,<br />變成 <span class="lime">持續回訪的資料資產。</span></h1>
-      <div class="wheel">
-        <span class="n">玩一次</span><span class="arrow">→</span>
-        <span class="n hot">留下一筆真實持股</span><span class="arrow">→</span>
-        <span class="n">解讀更準</span><span class="arrow">→</span>
-        <span class="n">更多人願意交出</span><span class="arrow">↺</span>
+      <p class="eyebrow">RETENTION · MEASUREMENT</p>
+      <h1>第一次拿到價值，<br /><span class="lime">下一次才願意更新持股。</span></h1>
+      <div class="audience-paths">
+        <div class="audience-path"><small>第一次體驗 · 新手也能開始</small><b>3 分鐘小卡 → 人格＋重建報酬</b><p>不要求精確交易日、股數或完整成本，先讓使用者看懂自己。</p></div>
+        <div class="audience-path return"><small>回訪情境 · 年度 RECAP 感</small><b>更新「仍持有」→ 換一份新報告</b><p>有經驗的投資人用回顧整理持股，Portfolio Radar 延續解讀。</p></div>
       </div>
-      <p class="north"><b>North Star:Verified Holding Activation</b> —— 有多少人真的把持股交給你。</p>
-      <div class="data-line">CMoney 價量 · 籌碼 · 社群 三類資料入模 → <b>3,584</b> 個市場情境</div>
-      <div class="foot"><span>商業創新 30% · 數據應用 20%</span><b>05</b></div>
+      <p class="north"><b>North Star｜Verified Holding Activation</b> = 完成重建＋明確同意＋成功保存至少一檔確認持股。</p>
+      <p class="measure"><b>上線後驗證：</b>重建完成率 → 持股確認率 → D7 回訪率；所有成效都以真實流量量測。</p>
+      <div class="data-line">CMoney 2025 價量 · 籌碼 · 社群 → <b>3,584</b> 筆預評分個股月份情境</div>
+      <div class="foot"><span>先定義成功，再用真實流量驗證</span><b>05</b></div>
     </section>
 
     <!-- 6 CLOSE -->
     <section class="slide close">
       <div class="brand"><i>M</i><span>MINDFOLIO</span></div>
       <p class="eyebrow">TIME MACHINE</p>
-      <h1>三分鐘的時光機,<br />換來 <span class="lime">第一筆本人確認的持股關係。</span></h1>
-      <p class="sub">CMoney 給了我們 2025 一整年的資料;我們把它變成一台時光機——用戶進來玩 3 分鐘,離開的時候,把 CMoney 最想要的東西留下了。</p>
+      <h1>三分鐘的時光機，<br />換來 <span class="lime">第一筆本人確認的持股關係。</span></h1>
+      <p class="sub">新手從一張小卡開始；有經驗的投資人用一次次 Recap 更新持股。CMoney 得到的不是匿名點擊，而是本人明確確認、可以持續服務的持股關係。</p>
       <div class="foot"><span>Mindfolio Time Machine · 謝謝</span><b>06</b></div>
     </section>
 
@@ -192,12 +213,12 @@
   <script>
     const slides=[...document.querySelectorAll(".slide")];
     const notesText=[
-      "開場鉤子。一句話講完誰在台上：『各位好,我們是 Mindfolio。這題核心只有一件事——拿到用戶真實庫存,這是投資產品最難的事。我們的答案很反直覺:別開口問。』約 30 秒。",
-      "為什麼沒人填持股:不信任、怕麻煩、沒好處。所以我們不從要資料開始,從給價值開始——做一台時光機,玩完信任建立了,才問一句『還持有嗎』。約 50 秒,收尾接 demo。",
-      "切到瀏覽器實際操作 3 分鐘。走位:Builder 點 5 檔 → 重建一檔(月份+區間+即時驗證)→ 結果頁人格卡(不要點分享按鈕)→ /activate 輸 123456 認領 → Radar 庫存+證據卡 → AI Deep Dive 黃金報告特寫收尾。",
-      "回到剛看到的東西:AI 生成的數字能信嗎?報酬/人格/可信度全由確定性引擎算,同輸入必同輸出;ML 只給情境;Bedrock 只把驗證過的證據寫成人話,每句帶證據編號。零幻覺是架構保證的。指著截圖的『Bedrock 生成』badge。約 55 秒。",
-      "這才是對 CMoney 真正的價值:每個玩過的人留下一筆真實持股。用價量、籌碼、社群資料預先算好 3,584 個情境來解讀。持股越多→解讀越準→越多人交出→資料飛輪。North Star 就是有多少人真的把持股交給你。約 50 秒。",
-      "收尾金句,慢、穩、看著評審講完。約 20 秒。"
+      "開場先講 TA：『我們服務的是還沒有在 App 建立庫存的自主投資人。新手想快速看懂自己，老手記得交易、卻不想先整理股數、成本和對帳單。要拿到持股，第一步不是問，而是先讓他看見價值。』約 35 秒。",
+      "不願輸入的原因是不信任、怕麻煩、沒好處。我們先讓他用五檔股票、大概月份和價格區間完成時光機，核心結果前不用登入；拿到人格與重建報酬後，才問『還持有嗎』。約 50 秒，收尾接 Demo。",
+      "切到瀏覽器實際操作約 2 分 30 秒。走位：Builder 點 5 檔 → 重建一檔（月份＋區間＋即時驗證）→ 結果頁人格卡 → /activate 輸 123456 認領 → Radar 確認持股＋證據卡 → AI Deep Dive 黃金報告特寫收尾。若網路不穩，立刻切錄影備援。",
+      "回到剛看到的畫面：報酬、人格與資料信心由確定性引擎產生；離線 ML 只辨識買進月份的歷史情境；Bedrock 把已驗證證據寫成人話。生成結果若新增數字、語意不合或不是繁中，就會被拒絕並切安全備援。約 60 秒。",
+      "目前沒有真實用戶數據，所以不報假轉換率。我們先把假設和量測方式定義清楚：新手用三分鐘小卡得到第一次價值；有經驗的投資人用年度 Recap 感的回顧更新持股。上線後看重建完成率、持股確認率與 D7 回訪率；North Star 是成功保存至少一檔本人確認持股。約 55 秒。",
+      "收尾慢、穩：『我們不是用 AI 猜持股，而是先給使用者一份值得交換的報告，再取得第一筆本人確認、可以持續服務的持股關係。』約 20 秒。"
     ];
     let i=0;
     const notes=document.getElementById("notes");
