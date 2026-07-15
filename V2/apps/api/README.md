@@ -11,7 +11,7 @@
 deterministic 計算在 `packages/mindfolio-core`；AI 敘事（Bedrock + 固定模板
 fallback，絕不 raise）在 `ai/`；預先評分市場情境 artifact 由 `MarketContextRepository`
 以 checksum 驗證後 fail-soft 讀取（API 不載入 sklearn/joblib）；持股與
-reports/feedback/events 走 PostgreSQL（DB 不可用 → 503）。V2 Python suite 65 tests
+reports/feedback/events 走 PostgreSQL（DB 不可用 → 503）。V2 Python suite 67 tests
 綠，並對真實 300 檔 catalog 驗證。
 
 > 已移除（安全性）：舊的未驗證 `POST /confirmed-holdings` 與

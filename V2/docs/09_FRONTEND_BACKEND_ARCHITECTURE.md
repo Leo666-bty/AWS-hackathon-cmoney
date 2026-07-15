@@ -370,7 +370,7 @@ FastAPI → in-memory holdings store（DATABASE_URL 未設定時）
 - API 從 image 內的 `market-catalog.json` 與 pre-scored context JSON 讀市場資料，以 Compose service name
   `postgres` 連資料庫。
 - PostgreSQL 不發布 5432；named volume `pgdata` 落在 EC2 EBS。
-- Bedrock 為可選功能，只能由 API 經 EC2 IAM Role 存取；不得在 `.env` 放 AWS key。
+- Bedrock 為可選功能，由 API 端授權，不把憑證放前端。Demo（workshop 帳號無法建 IAM Role）以短期 Bedrock API key（bearer token）授權；正式環境改用 EC2 IAM Role，不在 `.env` 放長期 AWS key。
 
 完整啟動、驗收、安全組與備份注意事項見 `11_DEPLOYMENT.md`。目前已部署並上線於
 單機 EC2（Docker Compose）；尚未完成的是正式 runtime 驗收——IAM Role、真實
@@ -390,11 +390,14 @@ Bedrock、自訂網域與 HTTPS。
 ## Current status
 
 **React × FastAPI + AI P0 已完成**（14 支端點：獲客 6、留存 6、AI 2；
-V2 Python 65 tests、React 6 tests、production build 與 lint 通過）。市場資料與
+V2 Python 67 tests、React 6 tests、production build 與 lint 通過）。市場資料與
 pre-scored context 走版本化檔案，確認持股與 reports/cache/feedback/events 走 Postgres
 四表 schema。`V2/demo/` 是靜態互動 reference；`apps/ai-training/` 已完成離線模型 pipeline。
 
-尚未完成（roadmap，勿誇大）：真實 Bedrock 已配置但未實測（`bedrock_enabled` 預設
-false，narrative 目前走 deterministic fallback）；action-card `mute` 偏好已儲存但尚未
+真實 Bedrock 已於 EC2 實測 live：Deep Dive 回傳「Bedrock 生成」、evidence-grounded
+的解讀（Converse，`openai.gpt-oss-120b-1:0`，短期 API key 授權）；repo 預設
+`bedrock_enabled=false`，部署以環境變數開啟，任何失敗仍走 deterministic fallback。
+
+尚未完成（roadmap，勿誇大）：正式 IAM Role 授權（demo 走 bearer token）；action-card `mute` 偏好已儲存但尚未
 影響下一張卡片排序（Feature 006）；留存程式碼已上線，但 `docs/api/004..007` 的
 per-feature SDD spec/plan/tasks 資料夾尚未補齊，屬未結清的 paper-trail 缺口。

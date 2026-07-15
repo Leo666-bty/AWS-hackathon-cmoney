@@ -16,7 +16,7 @@
 
 ### 2.1 真實 AWS Runtime 驗證
 
-- 以 EC2 IAM Role 驗證 Bedrock `converse`。
+- 以 EC2 IAM Role 授權 Bedrock `converse`（demo 已用短期 API key 實測 live；正式版改 IAM Role）。
 - 驗證 timeout、invalid schema、guardrail hit 與 fallback telemetry。
 - 記錄 AI report latency、fallback rate 與單次生成成本。
 

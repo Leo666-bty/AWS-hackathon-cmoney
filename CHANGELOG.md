@@ -1,5 +1,13 @@
 # Changelog & Product Journey
 
+## 2026-07-15 — V2.13：真實 Bedrock 於 EC2 上線驗證、簡報與文件對齊
+
+- **真實 Bedrock 已於部署的 EC2 實測 live**：AI Deep Dive 回傳「Bedrock 生成」badge 與 evidence-grounded（帶 `trade:` / `market:` refs）的 LLM 敘事，模型 `openai.gpt-oss-120b-1:0` 走 Converse。
+- 授權採**短期 Bedrock API key（bearer token）**，因 workshop 帳號不開 IAM Role；`AWS_BEARER_TOKEN_BEDROCK` 由 boto3 自動讀取。repo 預設 `bedrock_enabled=false`，部署以環境變數開啟，任何失敗仍走 deterministic fallback。
+- 修正 Deep Dive guardrail：改為封鎖投資「建議」語句（建議買/賣、目標價、保證獲利、穩賺、焦慮診斷…）而非裸字「買進/賣出」，否則本產品的歷史敘述（如「買進月份」）會被誤擋回 fallback；仍守法遵界線。
+- 全面對齊「Bedrock 已 live」：`README`、`CLAUDE.md`、`07/09/12/14/15` 與 `docs/ppt/`（Slide 14/15/20 + README）由「已配置未實測 / IAM Role」更新為「已於 EC2 實測 live（短期 API key，非 IAM）」，並補上「已部署上線 http://34.229.72.35」、測試數 65→67。
+- 未誇大：正式 IAM Role 授權、HTTPS/網域、CMoney SSO、即時行情仍列為 roadmap。
+
 ## 2026-07-15 — V2.12：AI Deep Dive 稽核收尾與文件全面對齊
 
 - 對 V2.11 AI 功能碼做嚴苛程式稽核：確認跨會員權限隔離、月份 key 正規化、無 secret／SQLi 皆正確；修正四個 hardening bug。

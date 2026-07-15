@@ -38,11 +38,14 @@ CSVs into a versioned, checksummed pre-scored artifact (`market-context-2025-v1.
 3,584 stock-month contexts); the API reads that JSON O(1) and never installs or
 loads sklearn/joblib. Identity is server-derived: an invite-code adapter issues a
 session token (demo `LEO` via `invite_identities="demo-leo:LEO"`); the retention
-surface never trusts a client-supplied `user_id`. Not yet done: real Bedrock is
-configured but unverified (`bedrock_enabled` default false → deterministic
-fallback); the action-card `mute` preference is stored but not yet acted on
+surface never trusts a client-supplied `user_id`. Real Bedrock is verified
+working live on EC2 (Converse, `openai.gpt-oss-120b-1:0`, authed with a
+short-term Bedrock API key / bearer token because the workshop account blocks
+IAM roles); the repo default stays `bedrock_enabled=false` (enabled via env var
+on deploy) and any failure still falls back deterministically. Not yet done:
+the action-card `mute` preference is stored but not yet acted on
 (Moment-Engine ranking deferred to Feature 006); `docs/api/004..007` per-feature
-SDD folders are not yet written. Python suite: 65 tests (web: 6).
+SDD folders are not yet written. Python suite: 67 tests (web: 6).
 
 ## Toolchain & commands (NOT uv)
 

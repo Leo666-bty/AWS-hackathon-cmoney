@@ -153,10 +153,11 @@ AI 不做：
 - [x] `GET /me/dashboard` 回傳 report／portfolio／priority card／weekly review。
 - [x] `POST /events/batch` 以 `event_id` idempotent 寫入。
 - [x] 結構化 AI Deep Dive、固定問題 ID、ownership、cache 與 fallback 完成。
-- [x] React production build、ESLint、React 6 tests 與 Python 65 tests 通過。
+- [x] React production build、ESLint、React 6 tests 與 Python 67 tests 通過。
 - [x] 單一 EC2 用 Docker Compose 定義（web + api + PostgreSQL）與本機容器驗收。
-- [ ] 實際 EC2／IAM Role／HTTPS 驗收、真正註冊登入、rate limit 與 event analytics。
-- [ ] 真實 Bedrock 上線驗證（目前走 fallback）、action card `mute` 影響排序（Feature 006）、`docs/api/004..007` SDD 資料夾補齊。
+- [ ] HTTPS／自訂網域驗收、真正註冊登入、rate limit 與 event analytics。
+- [x] 真實 Bedrock 上線驗證：已於 EC2 實測 live（Converse + 短期 API key），任何失敗仍走 deterministic fallback。
+- [ ] 正式 IAM Role 授權、action card `mute` 影響排序（Feature 006）、`docs/api/004..007` SDD 資料夾補齊。
 
 ## 9. 模組路徑
 

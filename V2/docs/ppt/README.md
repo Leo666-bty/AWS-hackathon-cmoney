@@ -50,4 +50,4 @@
 - `14_AI_MINIMAL_INTEGRATION_SPEC.md`
 - 專案根目錄 `CHANGELOG.md`
 
-Bedrock Converse 整合在簡報中描述為「已打通介面與 fallback；正式環境 IAM／runtime 待部署驗證」，不宣稱已完成正式環境驗收。
+Bedrock Converse 已於 EC2 實測 live（短期 Bedrock API key 授權、evidence-grounded 敘事、「Bedrock 生成」badge）；簡報據此描述為「已上線驗證」，但不誇大為永久 production runtime —— 授權採短期 key、repo 預設 `bedrock_enabled=false`、任何失敗仍走 deterministic fallback，正式 IAM Role 授權於生產階段完成。

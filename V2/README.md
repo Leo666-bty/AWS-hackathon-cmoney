@@ -50,19 +50,19 @@ React + TypeScript Frontend
 
 ## 目前完成範圍
 
-- **`apps/api`（後端 API）：P0 已完成** — 包含行情重建、短效 session、報告認領、持股授權、Portfolio Radar、AI Deep Dive cache、固定問題 ID、卡片偏好與 idempotent event batch（共 14 支 `/api/v2` 端點）；deterministic 引擎與 fallback 不依賴 Bedrock；Python suite 共 65 tests 綠。
+- **`apps/api`（後端 API）：P0 已完成** — 包含行情重建、短效 session、報告認領、持股授權、Portfolio Radar、AI Deep Dive cache、固定問題 ID、卡片偏好與 idempotent event batch（共 14 支 `/api/v2` 端點）；deterministic 引擎與 fallback 不依賴 Bedrock；Python suite 共 67 tests 綠。
 - `packages/mindfolio-core`：API 與離線訓練共用的 deterministic domain（envelope、reconstruction、validation、models）。
 - **`apps/web`（正式前端）：Acquisition + Retention + AI P0 已完成** — Landing、300 檔搜尋、逐檔重建、匿名人格結果、報告認領、獨立持股授權、Portfolio Radar 與結構化 AI Deep Dive；React 6 tests、strict TypeScript build 與 ESLint 通過。
 - **`apps/ai-training`：P0 已完成** — 官方 CSV 聚合為 3,584 個 stock-month，KMeans + IsolationForest 離線訓練並輸出版本化、具 checksum 的 pre-scored artifact；API image 不安裝 sklearn。
 - 根目錄 workspace、Python 共用 virtual environment 設定與前後端測試／建置指令。
 
 部署程式已完成：`api + web + postgres` 由 Docker Compose 在單一 EC2
-執行，且已實際上線（單機 Compose；正式 runtime 驗收仍待進行）。Bedrock
-`openai.gpt-oss-120b-1:0` Converse
-介面與後端已整合，但 `bedrock_enabled` 預設 false、目前走 deterministic
-fallback，真實 Bedrock runtime（EC2 IAM Role）尚未實測驗證；所有失敗路徑
-保留 fallback。尚未完成的是 HTTPS／自訂網域、CMoney SSO 與即時行情 feed
-（操作見 [部署決策](docs/11_DEPLOYMENT.md)）。
+執行，且已實際上線（單機 Compose）。**真實 Bedrock `openai.gpt-oss-120b-1:0`
+Converse 已於 EC2 實測驗證通過** —— AI Deep Dive 回傳「Bedrock 生成」、evidence
+grounded 的解讀；授權採短期 Bedrock API key（bearer token，因 workshop 帳號不開
+IAM Role），repo 預設 `bedrock_enabled=false`，部署以環境變數開啟，任何失敗仍自動
+deterministic fallback。尚未完成的是 HTTPS／自訂網域、正式 IAM Role 授權、
+CMoney SSO 與即時行情 feed（操作見 [部署決策](docs/11_DEPLOYMENT.md)）。
 
 ## 核心閉環
 

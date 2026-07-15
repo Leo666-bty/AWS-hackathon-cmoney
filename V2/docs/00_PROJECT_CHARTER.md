@@ -67,7 +67,7 @@ FAQ／ChatGPT 型應用還有另一個根本限制：使用者必須先想到問
 - Backend 使用 FastAPI + Python，統一承擔驗證、報酬、Fingerprint、人格與 AI orchestration。
 - deterministic finance calculation 與 AI 共用 Python environment，但維持不同 service boundary。
 - Offline AI training 與 FastAPI 共用 feature definitions 與 model contract，不在 request path 訓練。
-- React × FastAPI + AI P0 已完成：14 支 API、300 檔 catalog、五檔重建、report-scoped holdings、Portfolio Radar、離線市場情境模型與結構化 AI Deep Dive。V2 Python 65 tests、React 6 tests、build 與 lint 通過；`V2/demo/` 保留為靜態 UX reference。
+- React × FastAPI + AI P0 已完成：14 支 API、300 檔 catalog、五檔重建、report-scoped holdings、Portfolio Radar、離線市場情境模型與結構化 AI Deep Dive。V2 Python 67 tests、React 6 tests、build 與 lint 通過；`V2/demo/` 保留為靜態 UX reference。
 
 ## 非目標
 

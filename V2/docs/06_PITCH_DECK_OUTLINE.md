@@ -33,7 +33,7 @@
 
 > 匿名人格卡讓每個結果成為下一個陌生人的入口；Progressive Profiling 再用完整回放與 Portfolio Radar，逐層把匿名流量轉成會員與明確確認的持股資料。
 
-React × FastAPI + AI P0 已完成（14 支 API、V2 Python 65 tests、React 6 tests、
+React × FastAPI + AI P0 已完成（14 支 API、V2 Python 67 tests、React 6 tests、
 production build 與 lint）。Live Demo 直接操作正式 React 流程，並可用
 `/api/v2/docs` 證明 validation／complete 是後端重算；`V2/demo/` 只作為
 presentation-only 的靜態視覺 reference。

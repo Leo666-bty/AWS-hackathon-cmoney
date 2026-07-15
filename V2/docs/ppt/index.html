@@ -322,7 +322,7 @@
             <article><small>WATCHOUT</small><b>主題集中</b><p>產業分散度低於五檔基準。</p><code>fingerprint:diversity</code></article>
             <article><small>MARKET MOMENT</small><b>異常進場月份</b><p>一筆進場落在高波動修復情境。</p><code>model:2025-v1</code></article>
           </div>
-          <p>Converse 整合已打通；正式 IAM／Production Runtime 於部署環境驗證。所有失敗路徑使用相同證據的 deterministic fallback。</p>
+          <p>Bedrock Converse 已於 EC2 實測 live（短期 API key，非 IAM）；每段解讀附 evidence ref，任何失敗走相同證據的 deterministic fallback。</p>
         </aside>
       </div>
       <footer class="slide-footer"><span>AI 善用性 25% · Bedrock + Structured UI</span><b>14</b></footer>
@@ -343,7 +343,7 @@
         </div>
       </div>
       <footer class="slide-footer"><span>技術可行性 10% · React + FastAPI + PostgreSQL + AWS</span><b>15</b></footer>
-      <aside class="speaker-notes">部署是一台 EC2 上的 nginx、FastAPI、PostgreSQL Docker Compose。Bedrock 由 API 透過 IAM Role 呼叫，不把憑證放前端。</aside>
+      <aside class="speaker-notes">部署是一台 EC2 上的 nginx、FastAPI、PostgreSQL Docker Compose，已上線 http://34.229.72.35。Bedrock 由 API 透過短期 Bedrock API key（bearer token；workshop 帳號不開 IAM）呼叫，不把憑證放前端；正式版改 IAM Role。</aside>
     </section>
 
     <section class="slide" id="slide-16" data-title="LIVE DEMO" aria-label="第 16 頁：Live Demo">
@@ -430,11 +430,11 @@
         <p class="eyebrow">APPENDIX B · DELIVERY STATUS</p>
         <h2>核心閉環已完成，<br /><em>Roadmap 邊界明確。</em></h2>
         <div class="delivery-grid">
-          <article class="done"><header><span>IMPLEMENTED</span><i>✓</i></header><ul><li>React 六條主要 Route</li><li>FastAPI 14 支 API</li><li>300 檔 Market Catalog</li><li>Reconstruction Engine</li><li>Confirmed Holding Gate</li><li>Portfolio Radar 四模組</li><li>KMeans + IsolationForest</li><li>Structured AI Deep Dive</li><li>PostgreSQL Reports / Events / Cache</li><li>Docker Compose 本機驗收</li></ul></article>
-          <article class="verified"><header><span>VERIFIED</span><i>65 + 6</i></header><ul><li>Python tests：65</li><li>React tests：6</li><li>Strict TypeScript</li><li>Vite production build</li><li>ESLint</li><li>Artifact schema / checksum</li><li>Report ownership isolation</li><li>Idempotent event batch</li><li>Bedrock deterministic fallback</li><li>Git diff whitespace check</li></ul></article>
+          <article class="done"><header><span>IMPLEMENTED</span><i>✓</i></header><ul><li>React 六條主要 Route</li><li>FastAPI 14 支 API</li><li>300 檔 Market Catalog</li><li>Reconstruction Engine</li><li>Confirmed Holding Gate</li><li>Portfolio Radar 四模組</li><li>KMeans + IsolationForest</li><li>Structured AI Deep Dive（真 Bedrock live）</li><li>PostgreSQL Reports / Events / Cache</li><li>已部署上線 EC2（http://34.229.72.35）</li></ul></article>
+          <article class="verified"><header><span>VERIFIED</span><i>67 + 6</i></header><ul><li>Python tests：67</li><li>React tests：6</li><li>Strict TypeScript</li><li>Vite production build</li><li>ESLint</li><li>Artifact schema / checksum</li><li>Report ownership isolation</li><li>Idempotent event batch</li><li>Bedrock live + deterministic fallback</li><li>Git diff whitespace check</li></ul></article>
           <article class="roadmap"><header><span>NOT CLAIMED</span><i>→</i></header><ul><li>正式 CMoney SSO</li><li>EC2 HTTPS / Domain 驗收</li><li>Live CMoney feed</li><li>排程式 Weekly Review</li><li>Mute 真正影響選卡排序</li><li>完整持股維護頁</li><li>Ranking model with real labels</li><li>高可用、多節點部署</li><li>自動 Model Registry</li><li>股價預測與買賣建議</li></ul></article>
         </div>
-        <p class="final-note">Bedrock Converse 整合視為已打通；正式 IAM／Production Runtime 驗收於生產部署階段完成。</p>
+        <p class="final-note">Bedrock Converse 已於 EC2 實測 live（短期 API key）；正式 IAM Role 授權於生產部署階段完成。</p>
       </div>
       <footer class="slide-footer"><span>Appendix · Completeness &amp; Feasibility</span><b>20</b></footer>
       <aside class="speaker-notes">若評審問「哪些是真的」，用這頁清楚回答。不要把 snapshot weekly review、live feed 或 ranking 說成已完成。</aside>
