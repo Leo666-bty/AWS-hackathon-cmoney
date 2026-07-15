@@ -77,11 +77,11 @@ describe("PortfolioRadarRoute", () => {
     getMemberDashboard.mockResolvedValue(dashboard);
     saveCardFeedback.mockResolvedValue({ card_id: "card-2382", preference: "routine", saved_at: "2026-07-15T00:00:00Z" });
     generateInvestmentAIReport.mockResolvedValue({
-      title: "LEO 的 Investment DNA 深度解讀",
+      title: "投資輪廓深度解讀",
       executive_summary: "這是歷史資料回顧。",
       strengths: [{ title: "代表成果", body: "廣達表現突出。", evidence_refs: ["trade:0"] }],
       watchouts: [{ title: "值得回看", body: "回看進場月份。", evidence_refs: ["trade:1"] }],
-      market_moments: [],
+      market_moments: [{ title: "市場情境", body: "買進月份屬於盤整觀察。", evidence_refs: ["market:2382:2025-01"] }],
       suggested_questions: [{ id: "why-persona", label: "為什麼我是這種投資人格？" }],
       source: "fallback",
       versions: { context: "v1" },
@@ -106,7 +106,12 @@ describe("PortfolioRadarRoute", () => {
     );
 
     fireEvent.click(await screen.findByRole("button", { name: "產生 AI 深度解讀" }));
-    expect(await screen.findByText("LEO 的 Investment DNA 深度解讀")).toBeInTheDocument();
+    expect(await screen.findByText("投資輪廓深度解讀")).toBeInTheDocument();
+    expect(screen.getByText("代表性成果")).toBeInTheDocument();
+    expect(screen.getAllByText("值得回看")).toHaveLength(2);
+    expect(screen.getByText("買進月份情境")).toBeInTheDocument();
+    expect(screen.getByText("第 1 筆交易")).toBeInTheDocument();
+    expect(screen.getByText("2382・2025-01 市場情境")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "為什麼我是這種投資人格？" }));
     expect(await screen.findByText("來自五筆交易的綜合計分。")).toBeInTheDocument();
     expect(generateInvestmentAIReport).toHaveBeenCalledWith("report-1", "signed-session");

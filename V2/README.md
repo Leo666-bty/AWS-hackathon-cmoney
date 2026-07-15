@@ -50,7 +50,7 @@ React + TypeScript Frontend
 
 ## 目前完成範圍
 
-- **`apps/api`（後端 API）：P0 已完成** — 包含行情重建、短效 session、報告認領、持股授權、Portfolio Radar、AI Deep Dive cache、固定問題 ID、卡片偏好與 idempotent event batch（共 14 支 `/api/v2` 端點）；deterministic 引擎與 fallback 不依賴 Bedrock；Python suite 共 67 tests 綠。
+- **`apps/api`（後端 API）：P0 已完成** — 包含行情重建、短效 session、報告認領、持股授權、Portfolio Radar、AI Deep Dive cache、固定問題 ID、卡片偏好與 idempotent event batch（共 14 支 `/api/v2` 端點）；deterministic 引擎與 fallback 不依賴 Bedrock；Python suite 共 77 tests 綠。
 - `packages/mindfolio-core`：API 與離線訓練共用的 deterministic domain（envelope、reconstruction、validation、models）。
 - **`apps/web`（正式前端）：Acquisition + Retention + AI P0 已完成** — Landing、300 檔搜尋、逐檔重建、匿名人格結果、報告認領、獨立持股授權、Portfolio Radar 與結構化 AI Deep Dive；React 6 tests、strict TypeScript build 與 ESLint 通過。
 - **`apps/ai-training`：P0 已完成** — 官方 CSV 聚合為 3,584 個 stock-month，KMeans + IsolationForest 離線訓練並輸出版本化、具 checksum 的 pre-scored artifact；API image 不安裝 sklearn。

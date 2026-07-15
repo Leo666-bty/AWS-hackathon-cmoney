@@ -60,7 +60,7 @@ export function FingerprintPanel({ report }: { report: DashboardReport | null })
               );
             })}
           </div>
-          <p className="data-note">重建信心 {report.confidence}／100・歷史報告不受後續市場資料改寫</p>
+          <p className="data-note">資料信心分數 {report.confidence}／100・歷史報告不受後續市場資料改寫</p>
         </>
       ) : <div className="empty-module">尚未認領 Time Machine 報告。</div>}
     </article>

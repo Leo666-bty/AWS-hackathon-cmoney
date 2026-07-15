@@ -4,9 +4,9 @@
 |---|---|
 | 團隊 | Mindfolio（2 人：前端／AI 功能 Leo、後端／部署 Neal） |
 | 命題 | AI 掌握股票庫存 —— 把「資訊提供」變成「投資陪伴」 |
-| Live Demo | http://34.229.72.35/ （評審邀請碼：`1234` 或 `0000`；封測邀請碼由團隊提供，正式版替換為 CMoney SSO） |
+| Live Demo | http://34.229.72.35/ （評審邀請碼：`123456`（Neal）或 `000000`（Leo）；正式版替換為 CMoney SSO） |
 | GitHub | https://github.com/Leo666-bty/AWS-hackathon-cmoney |
-| 定版 | tag `v2.13`（14 支 API、Python 67 + React 6 tests、真實 Bedrock 已於 EC2 實測 live） |
+| 程式基準 | tag `v2.13` + zh-TW AI hardening（14 支 API、目前 Python 77 + React 6 tests、真實 Bedrock 已於 EC2 實測 live） |
 
 ## 一、目標 TA 與使用情境
 
@@ -60,5 +60,5 @@ React + TS  →  FastAPI /api/v2（14 端點）
 | 商業創新 30% | 反向 Onboarding：可分享人格測驗 → 信任 → 自願交出真實庫存；資料飛輪 |
 | AI 善用性 25% | 兩層 AI：離線 ML 情境 + Bedrock evidence-grounded 解讀（已 live）；零 prompt UX |
 | 數據應用 20% | 價量/籌碼/社群三類資料入模；3,584 預評分情境；還原收盤重建引擎 |
-| 完成度 15% | 兩階段閉環全上線（EC2）；14 API；67+6 tests |
+| 完成度 15% | 兩階段閉環全上線（EC2）；14 API；77+6 tests |
 | 技術可行性 10% | 確定性引擎 + fail-soft 架構 + 單機可部署；法遵內建 |

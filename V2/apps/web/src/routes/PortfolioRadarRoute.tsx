@@ -19,6 +19,18 @@ import { getErrorMessage } from "../shared/api/errors";
 import { trackEvent } from "../shared/analytics/events";
 import { clearMemberSession, getAccessToken } from "../shared/auth/session";
 
+function formatEvidenceRef(ref: string): string {
+  const trade = /^trade:(\d+)$/.exec(ref);
+  if (trade) return `第 ${Number(trade[1]) + 1} 筆交易`;
+  const market = /^market:([^:]+):(\d{4}-\d{2})$/.exec(ref);
+  if (market) return `${market[1]}・${market[2]} 市場情境`;
+  return ref;
+}
+
+function formatEvidenceRefs(refs: string[]): string {
+  return refs.map(formatEvidenceRef).join("・");
+}
+
 export function PortfolioRadarRoute() {
   const queryClient = useQueryClient();
   const token = getAccessToken();
@@ -148,14 +160,14 @@ export function PortfolioRadarRoute() {
             <h3>{deepDive.data.title}</h3>
             <p className="deep-dive-summary">{deepDive.data.executive_summary}</p>
             <div className="deep-dive-columns">
-              <div><small>STRENGTH</small>{deepDive.data.strengths.map((section) => <article key={section.title}><b>{section.title}</b><p>{section.body}</p><code>{section.evidence_refs.join(" · ")}</code></article>)}</div>
-              <div><small>WATCHOUT</small>{deepDive.data.watchouts.map((section) => <article key={section.title}><b>{section.title}</b><p>{section.body}</p><code>{section.evidence_refs.join(" · ")}</code></article>)}</div>
-              <div><small>MARKET MOMENT</small>{deepDive.data.market_moments.map((section) => <article key={section.title}><b>{section.title}</b><p>{section.body}</p><code>{section.evidence_refs.join(" · ")}</code></article>)}</div>
+              <div><small>代表性成果</small>{deepDive.data.strengths.map((section) => <article key={section.title}><b>{section.title}</b><p>{section.body}</p><code aria-label="證據來源">{formatEvidenceRefs(section.evidence_refs)}</code></article>)}</div>
+              <div><small>值得回看</small>{deepDive.data.watchouts.map((section) => <article key={section.title}><b>{section.title}</b><p>{section.body}</p><code aria-label="證據來源">{formatEvidenceRefs(section.evidence_refs)}</code></article>)}</div>
+              <div><small>買進月份情境</small>{deepDive.data.market_moments.map((section) => <article key={section.title}><b>{section.title}</b><p>{section.body}</p><code aria-label="證據來源">{formatEvidenceRefs(section.evidence_refs)}</code></article>)}</div>
             </div>
             <div className="deep-dive-questions">
               <small>不用輸入 Prompt，直接選一個問題</small>
               <div>{deepDive.data.suggested_questions.map((item) => <button type="button" key={item.id} disabled={question.isPending} onClick={() => question.mutate({ reportId: data.report!.report_id, questionId: item.id })}>{item.label}</button>)}</div>
-              {question.data && <article role="status"><b>Mindfolio：</b><p>{question.data.answer}</p><small>{question.data.limitations}</small><code>{question.data.evidence_refs.join(" · ")}</code></article>}
+              {question.data && <article role="status"><b>Mindfolio：</b><p>{question.data.answer}</p><small>{question.data.limitations}</small><code aria-label="證據來源">{formatEvidenceRefs(question.data.evidence_refs)}</code></article>}
               {question.isError && <p className="feedback-error" role="alert">{getErrorMessage(question.error)}</p>}
             </div>
           </div>

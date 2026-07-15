@@ -149,7 +149,8 @@ Runtime 規則：
 - 僅限已登入會員存取已由自己 claim 的 report。
 - 第一次開啟時生成；相同 cache key 直接重用。
 - cache key 至少包含 context schema、feature、model 與 prompt version。
-- Bedrock 失敗、timeout 或 guardrail 不通過時，回傳 deterministic fallback。
+- Bedrock 輸出未通過 guardrail 時記錄拒絕原因並修復重試一次；provider 失敗、
+  timeout 或第二次仍不合格時回傳 deterministic fallback。
 
 ### 5.2 結構化輸出
 
@@ -169,6 +170,16 @@ generated_at
 
 每個段落包含 `body` 與 `evidence_refs[]`。所有 evidence ref 必須存在於 server 組好的 `InvestmentAIContext`。
 
+Bedrock 只生成 `title`、`executive_summary` 與三類 evidence section 文案；
+`source`、`versions`、`generated_at` 與三個問題標籤皆由 server 組裝，不信任模型輸出。
+所有使用者可見文案必須是台灣繁體中文，且每欄至多一個重點；英文／混合語言、
+過長、未知 evidence ref 或 schema 不合格時直接使用繁體中文 deterministic fallback。
+
+所有可顯示數字先由 deterministic backend 格式化到 `display_facts`；LLM 只接收
+`display_facts` 與 evidence key，不接收原始精度數字，且只能逐字引用、不能自行計算
+或四捨五入。`confidence` 顯示為「資料信心分數」、`return_pct` 為
+「持有期間重建報酬」、market `monthly_return` 為「買進月份市場月報酬」。
+
 ### 5.3 固定問題 ID
 
 P0 只接受：
@@ -187,6 +198,9 @@ P0 只接受：
 - 不得把群集結果包裝成真實人格診斷。
 - 不得把全站社群情緒描述成 LEO 的個人情緒。
 - 不得使用 context 以外的數字或證據。
+- `regime_label` 只是市場情境群集標籤，不得改寫成該股當月法人流向事實。
+- `anomaly_level=general` 不得描述為異常事件或高度異常。
+- 不得把同時出現的市場資料寫成因果關係。
 
 ## 6. API 與資料庫
 

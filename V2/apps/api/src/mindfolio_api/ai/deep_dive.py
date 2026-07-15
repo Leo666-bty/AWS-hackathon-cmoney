@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from datetime import UTC, datetime
 from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field
 
 from mindfolio_api.config import Settings
 from mindfolio_api.repositories.market_context import MarketContextRepository
@@ -18,8 +21,8 @@ from mindfolio_core.domain.models import ReconstructionResult
 
 logger = logging.getLogger(__name__)
 
-CONTEXT_VERSION = "investment-ai-context-v1"
-PROMPT_VERSION = "investment-report-v1"
+CONTEXT_VERSION = "investment-ai-context-v2"
+PROMPT_VERSION = "investment-report-v2-zh-tw"
 QUESTION_PROMPT_VERSION = "investment-question-v1"
 QUESTION_LABELS: dict[QuestionId, str] = {
     "why-persona": "為什麼我是這種投資人格？",
@@ -37,6 +40,123 @@ FORBIDDEN = (
     "現在買", "現在賣", "加碼", "減碼", "目標價", "保證獲利",
     "穩賺", "必漲", "必跌", "焦慮診斷",
 )
+
+_HAN_CHARACTER = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff]")
+_LATIN_CHARACTER = re.compile(r"[A-Za-z]")
+_NUMBER_TOKEN = re.compile(r"(?<![A-Za-z0-9])[-+]?\d+(?:,\d{3})*(?:\.\d+)?%?")
+_POSITIVE_INSTITUTIONAL_CLAIMS = (
+    "法人淨流入", "法人實際淨流入", "法人買超", "法人流入", "法人流向有利", "法人實際偏多",
+)
+_NEGATIVE_INSTITUTIONAL_CLAIMS = (
+    "法人淨流出", "法人實際淨流出", "法人賣超", "法人流出", "法人流向不利", "法人實際偏空",
+)
+_STRONG_ANOMALY_CLAIMS = ("高度異常", "顯著異常", "明顯異常", "異常事件")
+
+
+class _GeneratedEvidenceSection(BaseModel):
+    """Provider-owned prose only; public response metadata stays server-owned."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    title: str = Field(min_length=2, max_length=32)
+    body: str = Field(min_length=10, max_length=180)
+    evidence_refs: list[str] = Field(min_length=1, max_length=2)
+
+
+class _GeneratedInvestmentAIContent(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    title: str = Field(min_length=4, max_length=48)
+    executive_summary: str = Field(min_length=20, max_length=280)
+    strengths: list[_GeneratedEvidenceSection] = Field(min_length=1, max_length=1)
+    watchouts: list[_GeneratedEvidenceSection] = Field(min_length=1, max_length=1)
+    market_moments: list[_GeneratedEvidenceSection] = Field(max_length=1)
+
+
+def _display_ratio(value: Any) -> str | None:
+    return None if value is None else f"{float(value) * 100:.1f}%"
+
+
+def _display_number(value: Any) -> str | None:
+    return None if value is None else f"{float(value):,.0f}"
+
+
+def _institutional_direction(value: Any) -> str:
+    if value is None:
+        return "法人流向資料缺失"
+    number = float(value or 0)
+    if number > 0:
+        return "法人淨流入"
+    if number < 0:
+        return "法人淨流出"
+    return "法人流向持平"
+
+
+def _anomaly_interpretation(level: str) -> str:
+    return {
+        "general": "一般級，不得描述為異常事件或高度異常",
+        "attention": "注意級，只能描述為值得留意",
+        "significant": "顯著級，可描述為顯著偏離一般情境",
+    }.get(level, "未知級，不得自行推論")
+
+
+def _normalized_2025_month(value: str) -> str:
+    return value if value.startswith("2025-") else f"2025-{value}"
+
+
+def _display_facts(
+    result: ReconstructionResult,
+    trades: list[dict[str, Any]],
+    evidence: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    market_facts: dict[str, dict[str, Any]] = {}
+    for trade in trades:
+        market_ref = trade.get("market_ref")
+        if not market_ref:
+            continue
+        item = evidence[market_ref]
+        metrics = item.get("evidence", {})
+        institutional_net = metrics.get("institutional_net")
+        buy_month = _normalized_2025_month(trade["buy_month"])
+        year, month = buy_month.split("-")
+        market_facts[market_ref] = {
+            "stock_id": trade["stock_id"],
+            "stock_name": trade["name"],
+            "buy_month": buy_month,
+            "buy_month_label": f"{year} 年 {int(month)} 月",
+            "market_regime_cluster_label": item["regime_label"],
+            "market_regime_rule": "這是市場情境群集標籤，不等於該股當月法人流向事實",
+            "anomaly_level": item["anomaly_level"],
+            "anomaly_interpretation": _anomaly_interpretation(item["anomaly_level"]),
+            "anomaly_score": f"{float(item['anomaly_score']):.3f}",
+            "market_monthly_return": _display_ratio(metrics.get("monthly_return")),
+            "institutional_net": _display_number(institutional_net),
+            "institutional_direction": _institutional_direction(institutional_net),
+            "institutional_flow_ratio": _display_ratio(metrics.get("institutional_flow_ratio")),
+            "community_bullish_ratio": _display_ratio(metrics.get("community_bullish_ratio")),
+            "source_as_of": item.get("source_as_of"),
+        }
+    return {
+        "portfolio": {
+            "reconstruction_year": "2025",
+            "trade_count": str(len(trades)),
+            "persona_name": result.persona_name,
+            "average_reconstruction_return": f"{result.average_return:.1f}%",
+            "data_confidence_score": str(result.confidence),
+        },
+        "trades": {
+            trade["trade_ref"]: {
+                "stock_id": trade["stock_id"],
+                "stock_name": trade["name"],
+                "buy_month": _normalized_2025_month(trade["buy_month"]),
+                "exit_month": _normalized_2025_month(trade["exit_month"]),
+                "relation": "仍持有" if trade["relation"] == "holding" else "已賣出",
+                "holding_period_reconstruction_return": f"{float(trade['return_pct']):.1f}%",
+            }
+            for trade in trades
+        },
+        "markets": market_facts,
+    }
 
 
 def build_context(report: dict[str, Any], market: MarketContextRepository) -> dict[str, Any]:
@@ -63,6 +183,7 @@ def build_context(report: dict[str, Any], market: MarketContextRepository) -> di
         "result": result.model_dump(mode="json"),
         "trades": trades,
         "evidence": evidence,
+        "display_facts": _display_facts(result, trades, evidence),
     }
 
 
@@ -97,7 +218,7 @@ def _fallback_report(context: dict[str, Any]) -> InvestmentAIReport:
             evidence_refs=[anomalous["trade_ref"], anomalous["market_ref"]],
         ))
     return InvestmentAIReport(
-        title="LEO 的 Investment DNA 深度解讀",
+        title="投資輪廓深度解讀",
         executive_summary=f"你的五筆 2025 交易重建呈現「{result['persona_name']}」，平均重建報酬為 {result['average_return']:.1f}%。這是歷史資料回顧，不是未來行情預測。",
         strengths=[EvidenceSection(
             title="最有代表性的成果",
@@ -125,7 +246,7 @@ def _minimal_report(context: dict[str, Any]) -> InvestmentAIReport:
     that a request never 500s just because narrative construction failed.
     """
     return InvestmentAIReport(
-        title="Investment DNA 深度解讀",
+        title="投資輪廓深度解讀",
         executive_summary="目前無法產生詳細解讀，這是歷史資料回顧，不是未來行情預測。",
         strengths=[],
         watchouts=[],
@@ -141,10 +262,132 @@ def _minimal_report(context: dict[str, Any]) -> InvestmentAIReport:
     )
 
 
-def _safe(report: InvestmentAIReport, allowed_refs: set[str]) -> bool:
+def _user_facing_text(report: InvestmentAIReport) -> list[str]:
+    sections = [*report.strengths, *report.watchouts, *report.market_moments]
+    return [
+        report.title,
+        report.executive_summary,
+        *(text for section in sections for text in (section.title, section.body)),
+    ]
+
+
+def _is_predominantly_zh_tw(report: InvestmentAIReport) -> bool:
+    texts = _user_facing_text(report)
+    if any(_HAN_CHARACTER.search(text) is None for text in texts):
+        return False
+    blob = "".join(texts)
+    han_count = len(_HAN_CHARACTER.findall(blob))
+    latin_count = len(_LATIN_CHARACTER.findall(blob))
+    return han_count >= 20 and han_count / max(han_count + latin_count, 1) >= 0.45
+
+
+def _numbers_are_server_grounded(report: InvestmentAIReport, display_facts: dict[str, Any]) -> bool:
+    used = set(_NUMBER_TOKEN.findall(" ".join(_user_facing_text(report))))
+    allowed = set(_NUMBER_TOKEN.findall(json.dumps(display_facts, ensure_ascii=False)))
+    return used.issubset(allowed)
+
+
+def _semantic_validation_error(report: InvestmentAIReport, context: dict[str, Any]) -> str | None:
+    blob = " ".join(_user_facing_text(report))
+    persona_name = context["display_facts"]["portfolio"]["persona_name"]
+    if persona_name not in blob:
+        return "persona_name"
+
+    for section in [*report.strengths, *report.watchouts, *report.market_moments]:
+        section_text = f"{section.title} {section.body}"
+        for ref in section.evidence_refs:
+            if not ref.startswith("market:"):
+                continue
+            item = context["evidence"][ref]
+            metrics = item.get("evidence", {})
+            institutional_net = metrics.get("institutional_net")
+            if institutional_net is not None:
+                net = float(institutional_net)
+                if net < 0 and any(term in section_text for term in _POSITIVE_INSTITUTIONAL_CLAIMS):
+                    return "institutional_direction"
+                if net > 0 and any(term in section_text for term in _NEGATIVE_INSTITUTIONAL_CLAIMS):
+                    return "institutional_direction"
+                if net < 0 and "法人資金偏多" in section_text and "群集" not in section_text:
+                    return "regime_as_flow"
+
+            anomaly_level = item.get("anomaly_level")
+            if anomaly_level in {"general", "attention"}:
+                if any(term in section_text for term in _STRONG_ANOMALY_CLAIMS):
+                    return "anomaly_overclaim"
+    return None
+
+
+def _validation_error(report: InvestmentAIReport, context: dict[str, Any]) -> str | None:
     text = json.dumps(report.model_dump(mode="json"), ensure_ascii=False)
-    refs = [ref for section in [*report.strengths, *report.watchouts, *report.market_moments] for ref in section.evidence_refs]
-    return not any(term in text for term in FORBIDDEN) and set(refs).issubset(allowed_refs)
+    sections = [*report.strengths, *report.watchouts, *report.market_moments]
+    refs = [ref for section in sections for ref in section.evidence_refs]
+    if any(term in text for term in FORBIDDEN):
+        return "forbidden_term"
+    if not refs:
+        return "missing_evidence"
+    if not set(refs).issubset(set(context["evidence"])):
+        return "unknown_evidence"
+    if not _is_predominantly_zh_tw(report):
+        return "language"
+    if not _numbers_are_server_grounded(report, context["display_facts"]):
+        return "ungrounded_number"
+    return _semantic_validation_error(report, context)
+
+
+def _assemble_bedrock_report(
+    generated: _GeneratedInvestmentAIContent,
+    context: dict[str, Any],
+) -> InvestmentAIReport:
+    return InvestmentAIReport(
+        title=generated.title,
+        executive_summary=generated.executive_summary,
+        strengths=[EvidenceSection.model_validate(item.model_dump()) for item in generated.strengths],
+        watchouts=[EvidenceSection.model_validate(item.model_dump()) for item in generated.watchouts],
+        market_moments=[EvidenceSection.model_validate(item.model_dump()) for item in generated.market_moments],
+        suggested_questions=[SuggestedQuestion(id=key, label=value) for key, value in QUESTION_LABELS.items()],
+        source="bedrock",
+        versions={
+            "context": CONTEXT_VERSION,
+            "model": context["model_version"],
+            "prompt": PROMPT_VERSION,
+        },
+        generated_at=datetime.now(UTC),
+    )
+
+
+def _generation_prompt(context: dict[str, Any], repair_reason: str | None = None) -> str:
+    generation_context = {
+        "context_version": context["context_version"],
+        "display_facts": context["display_facts"],
+        "evidence_keys": sorted(context["evidence"]),
+    }
+    repair = ""
+    if repair_reason:
+        repair = (
+            f"\n上一份輸出被 server guardrail 拒絕，原因代碼為 {repair_reason}。"
+            "請重新產生完整 JSON，修正該問題且遵守所有規則。"
+        )
+    return (
+        "你是台灣投資歷史資料解讀器。所有使用者可見文字必須使用台灣繁體中文；股票代號、ETF、AI、Bedrock "
+        "等專有名詞可保留英文。投資人格名稱必須原樣使用 display_facts.portfolio.persona_name，不得翻譯或另創名稱。\n"
+        "你不能計算、四捨五入或改寫任何數字。文案中的數字只能逐字複製 display_facts 已格式化的值；"
+        "confidence 必須稱為「資料信心分數」，return_pct 必須稱為「持有期間重建報酬」，"
+        "monthly_return 必須稱為「買進月份市場月報酬」。\n"
+        "regime_label 只能稱為「市場情境群集標籤」，不得把群集名稱當成該股當月法人流向事實。"
+        "異常程度必須遵守 anomaly_level 與 anomaly_interpretation；general 不得描述為異常事件或高度異常。"
+        "不得把同時出現的市場資料寫成未經證明的因果關係。\n"
+        "只能使用 generation_context 的事實；不得提供買賣指令、目標價、心理診斷、適合性判斷或未來預測。"
+        "每個 evidence_refs 必須逐字取自 generation_context.evidence_keys。"
+        "請輸出完全符合 output_schema 的 JSON，不要 Markdown，也不要加入 schema 以外欄位。\n"
+        + json.dumps(
+            {
+                "generation_context": generation_context,
+                "output_schema": _GeneratedInvestmentAIContent.model_json_schema(),
+            },
+            ensure_ascii=False,
+        )
+        + repair
+    )
 
 
 def generate_report(context: dict[str, Any], client: Any | None, settings: Settings) -> InvestmentAIReport:
@@ -155,20 +398,33 @@ def generate_report(context: dict[str, Any], client: Any | None, settings: Setti
         return _minimal_report(context)
     if client is None or not settings.bedrock_enabled:
         return fallback
-    try:
-        prompt = (
-            "你是投資歷史資料解讀器。只能使用 context 的數值與 evidence key；不得提供買賣指令、目標價、心理診斷或未來預測。"
-            "請輸出完全符合 supplied JSON schema 的 JSON，不要 Markdown。\n"
-            + json.dumps({"context": context, "schema": InvestmentAIReport.model_json_schema()}, ensure_ascii=False)
-        )
-        response = client.converse(modelId=settings.bedrock_model_id, messages=[{"role": "user", "content": [{"text": prompt}]}])
-        blocks = response["output"]["message"]["content"]
-        text = next(block["text"] for block in blocks if isinstance(block.get("text"), str))
-        generated = InvestmentAIReport.model_validate(json.loads(text)).model_copy(update={"source": "bedrock"})
-        if _safe(generated, set(context["evidence"])):
-            return generated
-    except Exception:  # noqa: BLE001
-        logger.warning("AI Deep Dive failed; deterministic fallback used", exc_info=True)
+    repair_reason: str | None = None
+    for attempt in range(2):
+        try:
+            prompt = _generation_prompt(context, repair_reason)
+            response = client.converse(
+                modelId=settings.bedrock_model_id,
+                messages=[{"role": "user", "content": [{"text": prompt}]}],
+            )
+            blocks = response["output"]["message"]["content"]
+            text = next(block["text"] for block in blocks if isinstance(block.get("text"), str))
+            content = _GeneratedInvestmentAIContent.model_validate(json.loads(text))
+            generated = _assemble_bedrock_report(content, context)
+            repair_reason = _validation_error(generated, context)
+            if repair_reason is None:
+                return generated
+            logger.warning(
+                "AI Deep Dive rejected by guardrail: %s (attempt %s/2)",
+                repair_reason,
+                attempt + 1,
+            )
+        except Exception:  # noqa: BLE001
+            repair_reason = "provider_or_schema"
+            logger.warning(
+                "AI Deep Dive provider/schema failure (attempt %s/2)",
+                attempt + 1,
+                exc_info=True,
+            )
     return fallback
 
 

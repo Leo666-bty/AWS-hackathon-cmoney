@@ -45,7 +45,7 @@ IAM roles); the repo default stays `bedrock_enabled=false` (enabled via env var
 on deploy) and any failure still falls back deterministically. Not yet done:
 the action-card `mute` preference is stored but not yet acted on
 (Moment-Engine ranking deferred to Feature 006); `docs/api/004..007` per-feature
-SDD folders are not yet written. Python suite: 67 tests (web: 6).
+SDD folders are not yet written. Python suite: 77 tests (web: 6).
 
 ## Toolchain & commands (NOT uv)
 

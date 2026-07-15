@@ -315,6 +315,11 @@ POST /api/v2/reports/{report_id}/questions
 兩者都需要 bearer session 並驗證 report ownership。第一支回傳結構化摘要、優勢、
 觀察點、歷史市場時刻與三個問題 chips；相同 context/model/prompt version 讀取 cache。
 第二支只接受 `why-persona`、`most-influential-trade`、`why-anomalous-month`，不接受自由文字。
+AI report 的使用者可見文案固定為台灣繁體中文；Bedrock 只生成文案，問題標籤、
+`source`、版本與時間由 server 組裝。模型只接收 backend 格式化的 `display_facts`
+與 evidence key，不接收原始精度數字。英文／混合語言、未知 evidence ref、過長或
+語意 guardrail 不合格時會記錄拒絕原因並修復重試一次，仍不合格才使用
+deterministic fallback。prompt/context version 變更會自動使舊 cache 失效。
 
 ## Request sequence
 
@@ -345,8 +350,10 @@ AI 與計算共用 Python environment，不代表兩者混成同一函式：
 2. Core 同一次 deterministic 計算產生 trade result、vector、persona 與 scores。
 3. `market_context.py` 以 `stock_id:YYYY-MM` 查詢離線預先評分 context。
 4. `ai/narrative.py` 與 `ai/deep_dive.py` 只接收上述 verified DTO／context。
-5. AI output 必須通過 Pydantic schema。
-6. Timeout、schema error 或 provider failure 時回傳 deterministic fallback。
+5. AI output 必須通過內部 Pydantic schema、繁中比例、數字與 evidence guardrail；
+   public response 的 metadata 與問題標籤由 server 補上。
+6. Timeout、英文／混合語言、schema error、provider failure 或 guardrail 不合格時
+   回傳 deterministic fallback。
 
 LLM 不得接收資料庫 credential、完整匿名 event history、未驗證價格或可識別個資。
 
@@ -390,7 +397,7 @@ FastAPI → in-memory holdings store（DATABASE_URL 未設定時）
 ## Current status
 
 **React × FastAPI + AI P0 已完成**（14 支端點：獲客 6、留存 6、AI 2；
-V2 Python 67 tests、React 6 tests、production build 與 lint 通過）。市場資料與
+V2 Python 77 tests、React 6 tests、production build 與 lint 通過）。市場資料與
 pre-scored context 走版本化檔案，確認持股與 reports/cache/feedback/events 走 Postgres
 四表 schema。`V2/demo/` 是靜態互動 reference；`apps/ai-training/` 已完成離線模型 pipeline。
 
