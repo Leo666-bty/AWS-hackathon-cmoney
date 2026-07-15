@@ -1,6 +1,13 @@
 # Mindfolio Time Machine HTML 簡報
 
-## 開啟方式
+本目錄有兩份簡報，皆離線可用、不依賴外部 CDN／字型／JS 套件：
+
+- **[`pitch.html`](pitch.html) — 8 分鐘舞台版（上台用）**：6 頁大字、一頁一句、Demo 提前到第 3 頁。這是正式上台與繳交的主簡報。按 `N` 有逐頁講稿、`F` 全螢幕、`←`/`→` 翻頁。第 4 頁嵌入 `assets/bedrock-deep-dive.png`（真實 Bedrock Deep Dive 截圖）。
+- **[`index.html`](index.html) — 20 頁詳細版（附錄／備援）**：完整技術、資料、指標細節，供評審會後翻閱與 Q&A 彈藥。
+
+匯出 PDF：瀏覽器列印 → 橫向 → 邊界無 → 背景圖形開。
+
+## 開啟方式（詳細版）
 
 直接以瀏覽器開啟 [`index.html`](index.html)。簡報不依賴外部 CDN、字型或 JavaScript 套件，可離線展示。
 
