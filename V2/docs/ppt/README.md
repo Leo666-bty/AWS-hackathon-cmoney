@@ -1,9 +1,15 @@
 # Mindfolio Time Machine HTML 簡報
 
-本目錄有兩份簡報，皆離線可用、不依賴外部 CDN／字型／JS 套件：
+本目錄有三份簡報，皆離線可用、不依賴外部 CDN／字型／JS 套件：
 
-- **[`pitch.html`](pitch.html) — 8 分鐘舞台版（上台用）**：6 頁大字、一頁一句、Demo 提前到第 3 頁。這是正式上台與繳交的主簡報。按 `N` 有逐頁講稿、`F` 全螢幕、`←`/`→` 翻頁。第 4 頁嵌入 `assets/bedrock-deep-dive.png`（真實 Bedrock Deep Dive 截圖）。
-- **[`index.html`](index.html) — 20 頁詳細版（附錄／備援）**：完整技術、資料、指標細節，供評審會後翻閱與 Q&A 彈藥。
+- **[`pitch_v2.html`](pitch_v2.html) — 10 分鐘正式舞台版**：10 頁，依評分比重重排創新、技術、資料、AI、完成度；包含 3 分鐘 Live Demo 段落與真實 Bedrock 截圖。逐頁講稿見 [`pitch_v2.md`](pitch_v2.md)。
+- **[`index.html`](index.html) — 20 頁正式繳交／詳細版**：完整技術、資料、模型指標、系統架構與交付狀態，供書面審查與 Q&A。
+- **[`pitch.html`](pitch.html) — 舊 6 頁極短版**：保留作為時間被壓縮時的備援，不再是主要版本。
+
+## 可直接繳交的 PDF
+
+- [`mindfolio-time-machine-proposal-v2.pdf`](../../output/pdf/mindfolio-time-machine-proposal-v2.pdf)：20 頁正式提案文件。
+- [`mindfolio-pitch-v2.pdf`](../../output/pdf/mindfolio-pitch-v2.pdf)：10 頁上台報告版本。
 
 匯出 PDF：瀏覽器列印 → 橫向 → 邊界無 → 背景圖形開。
 
@@ -57,4 +63,4 @@
 - `14_AI_MINIMAL_INTEGRATION_SPEC.md`
 - 專案根目錄 `CHANGELOG.md`
 
-Bedrock Converse 已於 EC2 實測 live（短期 Bedrock API key 授權、evidence-grounded 敘事、「Bedrock 生成」badge）；簡報據此描述為「已上線驗證」，但不誇大為永久 production runtime —— 授權採短期 key、repo 預設 `bedrock_enabled=false`、任何失敗仍走 deterministic fallback，正式 IAM Role 授權於生產階段完成。
+Bedrock Converse 已於線上 EC2 實測 live 且可用（短期 Bedrock API key 授權、evidence-grounded 敘事、「Bedrock 生成」badge）。Repo 預設 `bedrock_enabled=false`，部署環境明確開啟；任何外部失敗仍走 deterministic fallback。正式 IAM Role、HTTPS 與網域屬產品化強化，不再描述為本次 Demo 尚未打通。

@@ -1,5 +1,12 @@
 # Changelog & Product Journey
 
+## 2026-07-15 — V2.14：正式提案 PDF 與 10 分鐘舞台簡報
+
+- 新增 `pitch_v2.html` 與逐頁講稿 `pitch_v2.md`，將創新、AI、資料、完成度與技術可行性依評分比重重排為 10 頁舞台版本，保留 3 分鐘 Live Demo 段落。
+- 更新 20 頁詳細提案 HTML 的敘事措辭、Bedrock 線上驗證狀態與 Python tests 77 項驗證數字。
+- 輸出 20 頁正式提案 PDF 與 10 頁舞台版 PDF，皆為 16:9、可離線閱讀，並加入文件中心與簡報 README 索引。
+- PDF 已完成逐頁渲染檢查，未發現裁切、重疊、破字或外部資源依賴；本版僅更新文件與簡報，不修改 application runtime。
+
 ## 2026-07-15 — V2.13：真實 Bedrock 於 EC2 上線驗證、簡報與文件對齊
 
 - **真實 Bedrock 已於部署的 EC2 實測 live**：AI Deep Dive 回傳「Bedrock 生成」badge 與 evidence-grounded（帶 `trade:` / `market:` refs）的 LLM 敘事，模型 `openai.gpt-oss-120b-1:0` 走 Converse。

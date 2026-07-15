@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#06101d" />
+  <title>Mindfolio Time Machine｜Pitch V2</title>
+  <meta name="description" content="Mindfolio Time Machine CMoney AI Hackathon 10 分鐘舞台簡報。" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="deck-bar" aria-label="簡報控制列">
+    <a class="deck-brand" href="#slide-1" aria-label="回到封面"><i>M</i><span><b>MINDFOLIO</b><small>PITCH V2 · STAGE DECK</small></span></a>
+    <div class="deck-progress" aria-hidden="true"><span id="progressBar"></span></div>
+    <div class="deck-actions"><span id="sectionLabel">OPENING</span><button type="button" id="notesButton" aria-pressed="false" title="顯示講者提示（N）">N</button><button type="button" id="overviewButton" aria-pressed="false" title="總覽（O）">O</button><button type="button" id="fullscreenButton" title="全螢幕（F）">F</button><b><span id="currentPage">01</span> / 10</b></div>
+  </header>
+
+  <main class="deck" id="deck">
+    <section class="slide cover is-active" id="slide-1" data-title="OPENING" aria-label="第 1 頁：開場">
+      <div class="ambient-grid" aria-hidden="true"></div>
+      <div class="slide-inner cover-layout">
+        <div class="cover-copy"><p class="eyebrow">CMONEY × AWS AI HACKATHON · 2026</p><h1>想知道用戶<br />手上抱著什麼？<br /><em>先別問他。</em></h1><p class="lead">Mindfolio 用一趟 2025 投資時光機，先讓陌生用戶看見自己，再換回第一筆本人確認的持股關係。</p></div>
+        <aside class="terminal-card tilt"><header><span>LIVE SYSTEM</span><i>ONLINE</i></header><div class="fingerprint"><small>VALUE EXCHANGE</small><strong>3 MIN</strong><span>零聊天 · 零截圖 · 不連券商</span></div><div class="terminal-lines"><p><i></i> 2025 market truth</p><p><i></i> reconstruction engine</p><p><i></i> verified holding activation</p><p><i></i> Bedrock live on EC2</p></div></aside>
+      </div>
+      <footer class="slide-footer"><span>Mindfolio Time Machine</span><b>01</b></footer>
+      <aside class="speaker-notes">0:00–0:35｜各位好，我們是 Mindfolio。CMoney 已經非常懂股票，但要做到真正個人化，還缺一件事：使用者手上到底抱著什麼。問題是，真實持股是最難取得的資料。我們的答案很反直覺：先別問他。</aside>
+    </section>
+
+    <section class="slide" id="slide-2" data-title="PROBLEM" aria-label="第 2 頁：既有 ChatGPT 互動失效">
+      <div class="slide-inner"><p class="eyebrow">THE BEHAVIORAL BARRIER</p><h2>ChatGPT 已經做過，<br /><em>但用戶不會一直對話。</em></h2><div class="comparison-grid three"><article class="problem-card"><small>CHAT</small><strong>要先想問題</strong><p>離開看盤節奏、組織 Prompt，才開始得到價值。</p><span>認知成本</span></article><article class="problem-card"><small>UPLOAD</small><strong>要先交隱私</strong><p>截圖、對帳單、成本股數，都要求尚未建立的信任。</p><span>信任成本</span></article><article class="problem-card"><small>MANUAL INPUT</small><strong>要先做功課</strong><p>完整建庫與維護很麻煩，還沒看見價值就流失。</p><span>操作成本</span></article></div><blockquote>突破點不是做更會聊天的 AI，而是設計「不必聊天，也能持續取得資料」的互動。</blockquote></div>
+      <footer class="slide-footer"><span>商業創新 30% · 真正問題</span><b>02</b></footer>
+      <aside class="speaker-notes">0:35–1:20｜CMoney 已做過 WebUI ChatGPT，但使用率低，這不是模型能力問題，而是互動模型錯了。用戶不想先打字、上傳隱私資料或整理完整庫存。於是我們把 Chatbot 拿掉，改成一段有立即回報的產品旅程。</aside>
+    </section>
+
+    <section class="slide" id="slide-3" data-title="INNOVATION" aria-label="第 3 頁：反向 Onboarding">
+      <div class="slide-inner"><p class="eyebrow">CORE INNOVATION · REVERSE ONBOARDING</p><h2>先給價值，<br /><em>再逐層交換資料。</em></h2><div class="journey-line six"><article><i>01</i><b>匿名進場</b><span>不用登入</span></article><article><i>02</i><b>選五檔</b><span>熟悉股票即可</span></article><article><i>03</i><b>模糊回憶</b><span>月份＋價格區間</span></article><article><i>04</i><b>取得價值</b><span>人格＋重建報酬</span></article><article><i>05</i><b>認領報告</b><span>解鎖 AI Deep Dive</span></article><article><i>06</i><b>確認持股</b><span>一句：還持有嗎？</span></article></div><div class="privacy-strip"><b>0</b><span>自由 Prompt</span><b>0</b><span>資產截圖</span><b>0</b><span>券商串接</span><b>1</b><span>明確持股同意</span></div></div>
+      <footer class="slide-footer"><span>創新 · Progressive Profiling</span><b>03</b></footer>
+      <aside class="speaker-notes">1:20–2:05｜我們反轉傳統 Onboarding。匿名使用者先玩時光機，只需選五檔、回憶大概月份與價格區間。系統先回報人格與重建結果；等他看見價值，再認領報告，最後只問一句：這幾檔現在還持有嗎？認領與持股是兩次獨立同意。</aside>
+    </section>
+
+    <section class="slide" id="slide-4" data-title="LIVE DEMO" aria-label="第 4 頁：Live Demo">
+      <div class="slide-inner"><p class="eyebrow">LIVE DEMO · 03:00</p><h2>不是概念稿，<br /><em>現在就在 AWS 上運作。</em></h2><div class="demo-timeline"><article><time>00:00</time><b>選五檔</b><span>熱門推薦＋300 檔搜尋</span></article><article><time>00:25</time><b>模糊回憶</b><span>月份與價格區間</span></article><article class="highlight"><time>00:55</time><b>錯價驗證</b><span>行情 Envelope 阻擋</span></article><article><time>01:20</time><b>人格結果</b><span>報酬、指紋、可信度</span></article><article><time>01:50</time><b>認領持股</b><span>邀請碼＋獨立 Consent</span></article><article class="highlight"><time>02:20</time><b>AI Deep Dive</b><span>真實 Bedrock 生成</span></article></div><div class="demo-proof"><span>Live：http://34.229.72.35</span><span>邀請碼：123456／000000</span><b>React + FastAPI + PostgreSQL + Bedrock</b></div></div>
+      <footer class="slide-footer"><span>完成度 15% · 現場切換 Live Demo</span><b>04</b></footer>
+      <aside class="speaker-notes">2:05–5:05｜切到瀏覽器。以 LEO 操作：選五檔、填一筆模糊記憶、故意輸入錯價證明後端驗證、修正後完成、查看人格、輸入邀請碼認領、勾選仍持有，最後進 Radar 點 AI Deep Dive。避免點 HTTP 環境下的分享按鈕。</aside>
+    </section>
+
+    <section class="slide" id="slide-5" data-title="TECHNOLOGY" aria-label="第 5 頁：技術護城河">
+      <div class="slide-inner"><p class="eyebrow">TECHNICAL MOAT</p><h2>把模糊記憶，<br /><em>重建成可驗證的投資事件。</em></h2><div class="pipeline-grid"><article><i>01</i><b>Entity Resolution</b><span>名稱、代號、產業對應唯一股票</span></article><article><i>02</i><b>Temporal Alignment</b><span>「大概 4 月」對齊真實交易月份</span></article><article><i>03</i><b>Price Envelope</b><span>驗證記憶是否落在當月行情</span></article><article><i>04</i><b>Corporate Action</b><span>拆股、除權息後仍可比較</span></article><article><i>05</i><b>Reconstructed Return</b><span>重建報酬、持有期與可信度</span></article><article><i>06</i><b>Portfolio Fingerprint</b><span>確定性五維指紋與人格 Mapping</span></article></div><blockquote>金融真相由 deterministic engine 計算；同輸入必定同輸出，LLM 無權改寫數字。</blockquote></div>
+      <footer class="slide-footer"><span>技術力 · Reconstruction Engine</span><b>05</b></footer>
+      <aside class="speaker-notes">5:05–5:55｜剛才錯價被擋，不是前端特效，而是 Reconstruction Engine。它把股票、月份、價格等模糊記憶，對齊官方行情，處理公司行動，重建報酬與資料可信度。金融數字完全由確定性程式產生。</aside>
+    </section>
+
+    <section class="slide" id="slide-6" data-title="DATA" aria-label="第 6 頁：CMoney 資料運用">
+      <div class="slide-inner"><p class="eyebrow">CMONEY DATA → PRODUCT ASSET</p><h2>CSV 不只拿來畫圖，<br /><em>而是產品計算與 AI 的共同地基。</em></h2><div class="data-map"><div class="source-column"><article><b>價格／還原報酬</b><span>行情 Envelope、公司行動、重建報酬</span></article><article><b>法人籌碼</b><span>外資、投信、自營商月度流量比例</span></article><article><b>社群彙總</b><span>發回文、多空與討論熱度</span></article><article><b>產業／股利</b><span>人格分散度與股票基本分類</span></article></div><div class="data-arrow"><span>2025 DAILY CSV</span><i>→</i></div><div class="output-column"><article><small>DETERMINISTIC PRODUCT</small><b>300 檔 Market Catalog</b><span>搜尋、熱門排序、月行情 Envelope、報酬驗證</span></article><article><small>AI FEATURE STORE</small><b>3,584 個 stock-month</b><span>8 features，供 Market Regime 與 Anomaly 訓練</span></article></div></div><p class="guardrail-note">社群資料是全站股票層彙總，不冒充 LEO 的個人情緒；官方資料沒有真實持股標籤，因此不虛構「持股預測模型」。</p></div>
+      <footer class="slide-footer"><span>數據應用 20% · Price + Chip + Community</span><b>06</b></footer>
+      <aside class="speaker-notes">5:55–6:45｜資料分兩條路。價格與還原報酬進重建引擎，直接支撐產品；價量、法人與社群彙總再聚合成 3,584 個 stock-month、8 個特徵。最重要的是誠實邊界：社群是市場情緒，不是個人焦慮；資料沒有持股 label，就不假裝能訓練持股模型。</aside>
+    </section>
+
+    <section class="slide" id="slide-7" data-title="AI" aria-label="第 7 頁：AI 訓練與 Bedrock">
+      <div class="slide-inner split"><div><p class="eyebrow">AI THAT KNOWS ITS JOB</p><h2>AI 分兩層，<br /><em>各自只做擅長的事。</em></h2><div class="semantic-stack"><article><small>OFFLINE ML</small><b>KMeans + IsolationForest</b><span>6 類 Market Regime、異常月份；3,584 筆預評分 Artifact</span></article><article class="active"><small>GENERATIVE AI · LIVE</small><b>Amazon Bedrock Converse</b><span>openai.gpt-oss-120b-1:0；把 verified evidence 寫成結構化繁中解讀</span></article><article><small>FAIL-SOFT</small><b>Schema + Evidence + Fallback</b><span>Pydantic 驗證、證據 refs、投資建議 guardrail、失敗自動固定模板</span></article></div></div><figure class="terminal-card bedrock-proof"><img src="./assets/bedrock-deep-dive.png" alt="線上 AI Deep Dive 顯示 Bedrock 生成" /><figcaption><b>BEDROCK 生成 · EC2 LIVE VERIFIED</b><span>不是模擬截圖</span></figcaption></figure></div>
+      <footer class="slide-footer"><span>AI 善用性 25% · Train + Infer + Guardrail</span><b>07</b></footer>
+      <aside class="speaker-notes">6:45–7:40｜我們沒有把一切丟給 LLM。離線 ML 用 KMeans 找市場情境、IsolationForest 找異常月份；結果預先評分成版本化 Artifact，API O(1) 查表、Runtime 不裝 sklearn。Bedrock 已在線上 EC2 實測可用，只把已驗證證據寫成結構化繁中解讀，每段帶 evidence ref；失敗仍有 deterministic fallback。</aside>
+    </section>
+
+    <section class="slide" id="slide-8" data-title="ARCHITECTURE" aria-label="第 8 頁：系統架構與完成度">
+      <div class="slide-inner"><p class="eyebrow">PRODUCTION-MINDED ARCHITECTURE</p><h2>完整閉環已上線，<br /><em>不是只有模型 Notebook。</em></h2><div class="system-architecture"><div class="arch-layer"><small>EXPERIENCE</small><article><b>React + TypeScript</b><span>6 routes · Zero Prompt journey · Portfolio Radar</span></article></div><i>HTTP / JSON CONTRACT</i><div class="arch-layer"><small>APPLICATION</small><article><b>FastAPI + Pydantic</b><span>14 API · Ownership · Consent · Cache · Guardrails</span></article></div><div class="arch-services"><article><b>Deterministic Core</b><span>Validate · Return · Fingerprint</span></article><article><b>Market Context</b><span>Pre-scored ML Artifact</span></article><article><b>AI Deep Dive</b><span>Bedrock Converse + Fallback</span></article></div><i>STATE / DATA / EXTERNAL AI</i><div class="arch-bottom"><article><b>PostgreSQL 16</b><span>Reports · Holdings · Events</span></article><article><b>Context JSON</b><span>SHA-256 · 3,584 samples</span></article><article><b>Amazon Bedrock</b><span>gpt-oss-120b live</span></article><article><b>Docker Compose</b><span>Nginx + API + DB on EC2</span></article></div></div><div class="metric-grid four"><article><small>API</small><strong>14</strong><span>/api/v2 endpoints</span></article><article><small>PYTHON TESTS</small><strong>77</strong><span>all green</span></article><article><small>REACT TESTS</small><strong>6</strong><span>plus strict TS</span></article><article><small>BEDROCK</small><strong>LIVE</strong><span>online verified</span></article></div></div>
+      <footer class="slide-footer"><span>完整性 15% · 技術可行性 10%</span><b>08</b></footer>
+      <aside class="speaker-notes">7:40–8:25｜整套系統已部署在單機 EC2 Compose：React、FastAPI、PostgreSQL、Bedrock。14 支 API、77 個 Python tests、6 個 React tests，還有 strict TypeScript。模型 Artifact 版本化且有 checksum；Bedrock 失敗不影響主要金融結果。</aside>
+    </section>
+
+    <section class="slide" id="slide-9" data-title="BUSINESS" aria-label="第 9 頁：資料飛輪與 KPI">
+      <div class="slide-inner"><p class="eyebrow">BUSINESS FLYWHEEL</p><h2>一次人格體驗，<br /><em>轉成可持續的持股資料資產。</em></h2><div class="loop-diagram"><article><small>ACQUIRE</small><b>匿名時光機</b><span>降低陌生流量進場成本</span></article><i>→</i><article><small>VALUE</small><b>人格＋報酬</b><span>建立信任與分享動機</span></article><i>→</i><article><small>ACTIVATE</small><b>確認持股</b><span>得到本人同意的承諾層資料</span></article><i>→</i><article><small>RETAIN</small><b>Portfolio Radar</b><span>個人證據卡與 AI Deep Dive</span></article></div><div class="funnel-mini"><span>Start</span><i>→</i><span>Complete</span><i>→</i><span>Share</span><i>→</i><span>Claim</span><i>→</i><b>Verified Holding Activation</b><i>→</i><span>D7 Return</span></div><blockquote>North Star：完成重建、明確同意，並至少確認 1 檔持股的人數。</blockquote></div>
+      <footer class="slide-footer"><span>商業價值 · Acquisition → Activation → Retention</span><b>09</b></footer>
+      <aside class="speaker-notes">8:25–9:10｜對 CMoney 的價值不是多一個 AI 功能，而是一條資料飛輪。人格體驗負責獲客與分享；認領後形成本人確認的持股關係；Radar 用個人證據帶動回訪。North Star 不是聊天次數，而是 Verified Holding Activation。</aside>
+    </section>
+
+    <section class="slide closing" id="slide-10" data-title="CLOSING" aria-label="第 10 頁：總結">
+      <div class="slide-inner closing-layout"><p class="eyebrow">WHY MINDFOLIO</p><h2>三分鐘的時光機，<br />換來 <em>第一筆本人確認的持股關係。</em></h2><div class="score-map"><header><small>JUDGING FIT</small><b>五項評分，一條產品主線</b></header><div><strong>30%</strong><b>創新</b><span>反向 Onboarding</span></div><div><strong>25%</strong><b>AI</b><span>ML + Bedrock Live</span></div><div><strong>20%</strong><b>資料</b><span>三類 CSV → 產品</span></div><div><strong>15%</strong><b>完整</b><span>閉環已上線</span></div><div><strong>10%</strong><b>可行</b><span>Fail-soft 架構</span></div></div><blockquote>我們不是打造另一個 ChatGPT；而是讓不想聊天的投資人，也願意被 AI 理解。</blockquote></div>
+      <footer class="slide-footer"><span>Mindfolio Time Machine · Thank You</span><b>10</b></footer>
+      <aside class="speaker-notes">9:10–9:45｜最後總結：創新是先給價值再要資料；技術是可驗證的 Reconstruction Engine；資料是價量、籌碼、社群真正進入產品與 ML；AI 是離線情境模型加已 live 的 Bedrock；完整度是一條已上線的獲客到留存閉環。我們不是另一個 ChatGPT，而是讓不想聊天的投資人，也願意被 AI 理解。謝謝。</aside>
+    </section>
+  </main>
+
+  <nav class="slide-dots" id="slideDots" aria-label="簡報頁面導覽"></nav>
+  <div class="keyboard-help" id="keyboardHelp" aria-hidden="true"><span><kbd>←</kbd><kbd>→</kbd> 切頁</span><span><kbd>O</kbd> 總覽</span><span><kbd>N</kbd> 講者提示</span><span><kbd>F</kbd> 全螢幕</span></div>
+  <script src="./slides.js"></script>
+</body>
+</html>
