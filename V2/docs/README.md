@@ -18,6 +18,7 @@
 | [`13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md`](13_ACQUISITION_RETENTION_INTEGRATION_SPEC.md) | Time Machine 獲客銜接 Portfolio Radar 留存的需求基準與後續 SDD 拆分 |
 | [`14_AI_MINIMAL_INTEGRATION_SPEC.md`](14_AI_MINIMAL_INTEGRATION_SPEC.md) | 不改現有架構的 ML 情境、完整 AI 報告與證據型問答整合需求 |
 | [`15_OPTIMIZATION_CHECKLIST.md`](15_OPTIMIZATION_CHECKLIST.md) | P0 之後的安全、部署、模型品質與產品實驗 backlog；不屬本次開發範圍 |
+| [`16_PROPOSAL_OUTLINE.md`](16_PROPOSAL_OUTLINE.md) | 黑客松提案大綱（TA／痛點解法／低門檻與回訪／指標／架構與資料應用／評分對映） |
 | [`ppt/index.html`](ppt/index.html) | 20 頁 HTML 提案簡報；沿用 V2 UI 視覺，含鍵盤操作、講者提示、總覽與列印版 |
 
 > 後端 SDD 功能規格（spec/plan/tasks）在 [`api/`](api/)：001 資料地基、002 重建引擎、003 確認持股。
