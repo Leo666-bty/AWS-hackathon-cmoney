@@ -45,6 +45,14 @@
 - 覆蓋 report ownership、過期 claim、Bedrock failure 與 cache hit。
 - 測試 mobile breakpoint、keyboard navigation 與 loading/error states。
 
+### 2.6 已知小型程式落差（P0 收尾候選，非行為阻擋）
+
+以下為已定位、不影響目前 Demo 主流程（Bedrock 預設 false）的已知落差，記錄於此以維持文件誠實：
+
+- **AI Deep Dive guardrail 過度攔截**：`ai/deep_dive.py` 的 `FORBIDDEN` 以子字串比對封鎖「買進」「賣出」，會連合法的歷史敘述（如「買進月份」）一併判為違規而退回 fallback。屬 Bedrock 啟用後才會顯現的偽陽性；建議改為 token/語意層級或詞界比對。
+- **AI cache key 未含 `feature_version`**：`cache_key()` 目前以 `context_version|model_version|prompt_version` 組成；`model_version` 變動時已能失效，但 `feature_version` 單獨變動未直接反映。建議顯式納入。
+- **離線 feature 測試 vacuous pass**：`apps/ai-training/tests/test_features.py` 的 `data_dir` 指向 `V1/data/...`（實際 CSV 在 `V2/data/...`），且 `if not data_dir.exists(): return`，因此該測試目前是空過。修正路徑（`parents[3] / "data/..."`）後才會真正驗證 pipeline。
+
 ## 3. P2：取得真實互動資料後評估
 
 ### 3.1 排序模型

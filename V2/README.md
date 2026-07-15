@@ -56,11 +56,11 @@ React + TypeScript Frontend
 - **`apps/ai-training`：P0 已完成** — 官方 CSV 聚合為 3,584 個 stock-month，KMeans + IsolationForest 離線訓練並輸出版本化、具 checksum 的 pre-scored artifact；API image 不安裝 sklearn。
 - 根目錄 workspace、Python 共用 virtual environment 設定與前後端測試／建置指令。
 
-部署程式已完成：`api + web + postgres` 可由 Docker Compose 在單一 EC2
-執行，且本機容器驗收已通過。Bedrock `openai.gpt-oss-120b` Converse
-已完成線上驗證與後端整合；本機可用 Bearer token，正式部署改用 IAM
-Role，所有失敗路徑保留 deterministic fallback。尚未完成的是實際 EC2
-上線、HTTPS／網域、CMoney SSO 與即時行情 feed
+部署程式已完成：`api + web + postgres` 由 Docker Compose 在單一 EC2
+執行，且已實際上線（單機 Compose）。Bedrock `openai.gpt-oss-120b` Converse
+介面與後端已整合，但 `bedrock_enabled` 預設 false、目前走 deterministic
+fallback，真實 Bedrock runtime（EC2 IAM Role）尚未實測驗證；所有失敗路徑
+保留 fallback。尚未完成的是 HTTPS／自訂網域、CMoney SSO 與即時行情 feed
 （操作見 [部署決策](docs/11_DEPLOYMENT.md)）。
 
 ## 核心閉環

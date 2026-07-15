@@ -26,20 +26,23 @@ The two-stage lifecycle — **Time Machine (acquisition) → Portfolio Radar
 (retention)** — is implemented end to end. `apps/web` contains the React
 landing, five-stock builder, per-stock reconstruction wizard, result,
 share-card and explicit-consent UI, plus `/activate` (invite-code activation)
-and `/app` (Portfolio Radar dashboard). `apps/api` exposes 12 `/api/v2`
-operations (6 acquisition + 6 retention in `routers/retention.py`);
-`packages/mindfolio-core` owns deterministic validation, reconstruction,
-persona and scoring. Market data is the built file catalog; confirmed holdings
-plus `reconstruction_reports`, `action_card_feedback` and `interaction_events`
-persist in PostgreSQL. `docker-compose.yml` runs web, API and PostgreSQL
-together on one EC2. `apps/ai-training` remains an untrained offline scaffold.
-Identity is now server-derived: an invite-code adapter issues a session token
-(demo `LEO` via `invite_identities="demo-leo:LEO"`); the retention surface never
-trusts a client-supplied `user_id`. Not yet done: real Bedrock is configured but
-unverified (`bedrock_enabled` default false → deterministic fallback); the
-action-card `mute` preference is stored but not yet acted on (Moment-Engine
-ranking deferred to Feature 006); `docs/api/004..007` per-feature SDD folders are
-not yet written. Python suite: 60 tests.
+and `/app` (Portfolio Radar dashboard, incl. a structured AI Deep Dive).
+`apps/api` exposes 14 `/api/v2` operations (6 acquisition + 6 retention + 2 AI,
+retention and AI both in `routers/retention.py`); `packages/mindfolio-core` owns
+deterministic validation, reconstruction, persona and scoring. Market data is the
+built file catalog; confirmed holdings plus `reconstruction_reports` (incl. the
+AI-report cache), `action_card_feedback` and `interaction_events` persist in
+PostgreSQL. `docker-compose.yml` runs web, API and PostgreSQL together on one EC2.
+`apps/ai-training` is a completed offline pipeline: it scores the official 2025
+CSVs into a versioned, checksummed pre-scored artifact (`market-context-2025-v1.json`,
+3,584 stock-month contexts); the API reads that JSON O(1) and never installs or
+loads sklearn/joblib. Identity is server-derived: an invite-code adapter issues a
+session token (demo `LEO` via `invite_identities="demo-leo:LEO"`); the retention
+surface never trusts a client-supplied `user_id`. Not yet done: real Bedrock is
+configured but unverified (`bedrock_enabled` default false → deterministic
+fallback); the action-card `mute` preference is stored but not yet acted on
+(Moment-Engine ranking deferred to Feature 006); `docs/api/004..007` per-feature
+SDD folders are not yet written. Python suite: 65 tests (web: 6).
 
 ## Toolchain & commands (NOT uv)
 
@@ -81,7 +84,7 @@ The FastAPI OpenAPI schema is the frozen integration surface. The current
 frontend uses a hand-written TypeScript + Zod client; OpenAPI codegen and a
 generated-client contract test remain production hardening. Any endpoint/field
 change is still made in the schema and communicated first. Implemented v2
-endpoints (12 total, docs/09):
+endpoints (14 total, docs/09):
 
 Acquisition (6):
 - `GET /api/v2/health`
@@ -97,6 +100,13 @@ Retention (6, `routers/retention.py`, session-authenticated):
 - `GET /api/v2/me/dashboard`
 - `POST /api/v2/me/action-cards/{card_id}/feedback`
 - `POST /api/v2/events/batch`
+
+AI Deep Dive (2, `routers/retention.py`, session-authenticated, report-owner-only):
+- `POST /api/v2/reports/{report_id}/ai-report` (structured `InvestmentAIReport`;
+  PostgreSQL-cached by `context|model|prompt` version; Bedrock schema-validated +
+  guardrailed, any failure → deterministic fallback, `source` flags which)
+- `POST /api/v2/reports/{report_id}/questions` (only 3 server-defined question IDs:
+  `why-persona`, `most-influential-trade`, `why-anomalous-month`; no free chat)
 
 **Removed for security**: the old unauthenticated `POST /api/v2/confirmed-holdings`
 and `GET /api/v2/users/{user_id}/confirmed-holdings` (trusted a client `user_id`, a

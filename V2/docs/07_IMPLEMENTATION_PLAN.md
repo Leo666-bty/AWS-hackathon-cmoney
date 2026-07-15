@@ -40,7 +40,7 @@ V2/
 holdings + reconstruction_reports + action_card_feedback + interaction_events）、
 邀請碼 session 與 report-scoped confirmed holdings，以及 React 六 route 串接
 （含 `/activate`、`/app` Portfolio Radar）。Docker Compose 已包含 nginx web、API
-與 PostgreSQL，並完成本機容器驗收。**尚未完成**：實際 EC2 上線、HTTPS／網域、
+與 PostgreSQL，已實際部署於單機 EC2（Compose）。**尚未完成**：HTTPS／自訂網域、
 真實 Bedrock 權限驗證（`bedrock_enabled` 預設 false，目前走 fallback）、真正的註冊登入（目前為邀請碼 adapter）、
 action card `mute` 尚未影響排序（Feature 006）、以及 `docs/api/004..007` per-feature
 SDD 資料夾尚未補齊（paper-trail 缺口）。

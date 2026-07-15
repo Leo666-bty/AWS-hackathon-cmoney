@@ -11,7 +11,7 @@ P0 offline training 已完成：由官方 2025 CSV 建立 3,584 個 stock-month 
 
 ```bash
 V2/.venv/bin/python -m mindfolio_training.pipeline \
-  --data-dir V1/data/Delivery_Hackathon_DataPackage_20260624 \
+  --data-dir V2/data/Delivery_Hackathon_DataPackage_20260624 \
   --features-output V2/apps/ai-training/artifacts/monthly-features-v1.csv \
   --artifact-output V2/data/market-context-2025-v1.json \
   --model-output V2/apps/ai-training/artifacts/market-models-2025-v1.joblib

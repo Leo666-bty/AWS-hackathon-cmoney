@@ -251,11 +251,10 @@ ai_answer_fallback
 ## 9. 最小部署拓撲
 
 ```text
-Vercel / static React
-        ↓ HTTPS
-EC2 Docker Compose
+單機 EC2（Docker Compose，見 11_DEPLOYMENT）
+  ├─ nginx web（React static build + reverse-proxy /api → api）
   ├─ FastAPI（載入 pre-scored JSON）
-  └─ PostgreSQL（report cache）
+  └─ PostgreSQL（report + AI-report cache）
         ↓ optional
 Amazon Bedrock
 ```
