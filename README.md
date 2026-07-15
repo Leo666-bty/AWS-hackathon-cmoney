@@ -15,8 +15,8 @@
 
 快速入口：
 
-- [V2 可操作 Demo](V2/demo/index.html)
-- [V2 工程初始化與啟動方式](V2/DEVELOPMENT.md)
+- [V2 本機啟動（正式 React + FastAPI 產品）](V2/DEVELOPMENT.md)
+- [V2 靜態 UX 參考](V2/demo/index.html)（早期 HTML/JS mockup，非後端串接的正式產品）
 - [V2 文件中心](V2/docs/README.md)
 - [版本變更與心路歷程](CHANGELOG.md)
 

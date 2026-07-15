@@ -2,7 +2,7 @@
 
 | 欄位 | 內容 |
 |---|---|
-| 文件狀態 | Implemented / Verified |
+| 文件狀態 | Implemented / Verified（deterministic 路徑；真實 Bedrock runtime 待驗） |
 | 文件版本 | 2.0 |
 | 更新日期 | 2026-07-15 |
 | 適用範圍 | `V2/apps/web`、`V2/apps/api`、`V2/apps/ai-training`、`V2/packages/mindfolio-core`、`V2/infra/schema` |

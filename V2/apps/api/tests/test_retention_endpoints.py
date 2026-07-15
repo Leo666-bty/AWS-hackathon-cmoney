@@ -1,9 +1,13 @@
 from fastapi.testclient import TestClient
 
+from mindfolio_api.auth import MemberIdentity, issue_session_token
 from mindfolio_api.main import create_app
 from mindfolio_api.repositories.holdings import InMemoryHoldingsRepository
 from mindfolio_api.repositories.market_data import MarketCatalog
-from mindfolio_api.repositories.retention import InMemoryRetentionRepository
+from mindfolio_api.repositories.retention import (
+    InMemoryRetentionRepository,
+    RetentionUnavailable,
+)
 
 
 def _month(close: float = 110.0):
@@ -257,3 +261,63 @@ def test_ai_deep_dive_requires_report_ownership() -> None:
     headers = _auth(client)
     response = client.post(f"/api/v2/reports/{report['report_id']}/ai-report", headers=headers)
     assert response.status_code == 404
+
+
+def test_ai_deep_dive_is_isolated_across_members() -> None:
+    """A second, validly-authenticated member cannot read another member's
+    claimed report via ai-report or questions — identity is server-derived, so a
+    forged-but-signed token for a different member_id must still be denied."""
+    client = _client()
+    report = _complete(client)
+    leo = _auth(client)
+    client.post(
+        f"/api/v2/reports/{report['report_id']}/claim",
+        json={"claim_token": report["claim_token"]},
+        headers=leo,
+    )
+    # A different member with a genuinely valid session token (not LEO's).
+    other_token = issue_session_token(MemberIdentity(member_id="MIA", display_name="MIA"))
+    mia = {"Authorization": f"Bearer {other_token}"}
+
+    assert client.post(
+        f"/api/v2/reports/{report['report_id']}/ai-report", headers=mia
+    ).status_code == 404
+    assert client.post(
+        f"/api/v2/reports/{report['report_id']}/questions",
+        json={"question_id": "why-persona"},
+        headers=mia,
+    ).status_code == 404
+    # The owner still reaches it.
+    assert client.post(
+        f"/api/v2/reports/{report['report_id']}/ai-report", headers=leo
+    ).status_code == 200
+
+
+def test_ai_deep_dive_survives_cache_write_failure() -> None:
+    """A cache-write failure (e.g. a pre-migration DB volume) must not discard an
+    already-generated report — the endpoint returns the report uncached."""
+
+    class _CacheFailingRetention(InMemoryRetentionRepository):
+        def save_ai_report(self, *args, **kwargs) -> None:  # type: ignore[override]
+            raise RetentionUnavailable("ai_report columns missing")
+
+    client = TestClient(
+        create_app(
+            catalog=MarketCatalog(CATALOG),
+            holdings_repo=InMemoryHoldingsRepository(),
+            retention_repo=_CacheFailingRetention(),
+        )
+    )
+    report = _complete(client)
+    headers = _auth(client)
+    client.post(
+        f"/api/v2/reports/{report['report_id']}/claim",
+        json={"claim_token": report["claim_token"]},
+        headers=headers,
+    )
+    first = client.post(f"/api/v2/reports/{report['report_id']}/ai-report", headers=headers)
+    assert first.status_code == 200
+    assert first.json()["source"] == "fallback"
+    # Not cached, so a second call regenerates rather than 503-ing.
+    second = client.post(f"/api/v2/reports/{report['report_id']}/ai-report", headers=headers)
+    assert second.status_code == 200

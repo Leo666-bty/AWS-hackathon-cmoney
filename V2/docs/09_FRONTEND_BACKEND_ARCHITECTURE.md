@@ -372,8 +372,9 @@ FastAPI → in-memory holdings store（DATABASE_URL 未設定時）
 - PostgreSQL 不發布 5432；named volume `pgdata` 落在 EC2 EBS。
 - Bedrock 為可選功能，只能由 API 經 EC2 IAM Role 存取；不得在 `.env` 放 AWS key。
 
-完整啟動、驗收、安全組與備份注意事項見 `11_DEPLOYMENT.md`。目前已完成本機
-Compose 驗收；實際 EC2、IAM Role、網域與 HTTPS 仍需在目標主機驗證。
+完整啟動、驗收、安全組與備份注意事項見 `11_DEPLOYMENT.md`。目前已部署並上線於
+單機 EC2（Docker Compose）；尚未完成的是正式 runtime 驗收——IAM Role、真實
+Bedrock、自訂網域與 HTTPS。
 
 ## Testing and verification
 

@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, Request
+from pydantic import ValidationError
 
 from mindfolio_api.auth import (
     MemberIdentity,
@@ -46,6 +49,8 @@ from mindfolio_api.services.retention import build_action_card, build_dashboard
 from mindfolio_api.ai.deep_dive import answer_question, build_context, cache_key, generate_report
 from mindfolio_api.config import get_settings
 from mindfolio_core.domain.models import ConfirmedHolding
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["retention"])
 
@@ -149,14 +154,25 @@ def investment_ai_report(
         if stored.get("ai_report") and stored.get("ai_report_cache_key") == expected_key:
             return InvestmentAIReport.model_validate(stored["ai_report"])
         generated = generate_report(context, request.app.state.bedrock_client, get_settings())
-        retention.save_ai_report(
-            identity.member_id,
-            report_id,
-            generated.model_dump(mode="json"),
-            expected_key,
-            generated.generated_at,
-        )
+        # Caching is best-effort: a cache-write failure (e.g. a pre-migration DB
+        # volume missing the ai_report columns, or a transient blip) must not
+        # discard the report we already successfully generated.
+        try:
+            retention.save_ai_report(
+                identity.member_id,
+                report_id,
+                generated.model_dump(mode="json"),
+                expected_key,
+                generated.generated_at,
+            )
+        except (RetentionUnavailable, ReportNotFound):
+            logger.warning("AI report cache write failed; returning uncached report", exc_info=True)
         return generated
+    except HTTPException:
+        raise
+    except ValidationError:
+        logger.warning("Stored reconstruction report is malformed", exc_info=True)
+        raise HTTPException(status_code=500, detail="Stored report is malformed.")
     except ReportNotFound:
         raise HTTPException(status_code=404, detail="Claimed report not found.")
     except RetentionUnavailable:
@@ -176,6 +192,13 @@ def investment_question(
         if stored is None:
             raise HTTPException(status_code=404, detail="Claimed report not found.")
         return answer_question(payload.question_id, build_context(stored, market))
+    except HTTPException:
+        raise
+    except ValidationError:
+        logger.warning("Stored reconstruction report is malformed", exc_info=True)
+        raise HTTPException(status_code=500, detail="Stored report is malformed.")
+    except ReportNotFound:
+        raise HTTPException(status_code=404, detail="Claimed report not found.")
     except RetentionUnavailable:
         raise HTTPException(status_code=503, detail="Report store is unavailable.")
 

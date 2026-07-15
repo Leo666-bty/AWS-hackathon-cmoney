@@ -49,6 +49,7 @@ def build_context(report: dict[str, Any], market: MarketContextRepository) -> di
     return {
         "context_version": CONTEXT_VERSION,
         "model_version": market.model_version or "unavailable",
+        "content_sha256": market.content_sha256 or "unavailable",
         "result": result.model_dump(mode="json"),
         "trades": trades,
         "evidence": evidence,
@@ -56,7 +57,14 @@ def build_context(report: dict[str, Any], market: MarketContextRepository) -> di
 
 
 def cache_key(context: dict[str, Any]) -> str:
-    return "|".join((CONTEXT_VERSION, context["model_version"], PROMPT_VERSION))
+    # content_sha256 is included so a re-trained artifact invalidates the cache
+    # even if MODEL_VERSION was not bumped (the checksum always changes).
+    return "|".join((
+        CONTEXT_VERSION,
+        context["model_version"],
+        context.get("content_sha256", "unavailable"),
+        PROMPT_VERSION,
+    ))
 
 
 def _fallback_report(context: dict[str, Any]) -> InvestmentAIReport:
@@ -99,6 +107,30 @@ def _fallback_report(context: dict[str, Any]) -> InvestmentAIReport:
     )
 
 
+def _minimal_report(context: dict[str, Any]) -> InvestmentAIReport:
+    """Last-resort report when even the deterministic fallback cannot be built.
+
+    References no evidence and makes no factual claim, so it can never raise on a
+    malformed/degenerate context. This is what backstops the documented guarantee
+    that a request never 500s just because narrative construction failed.
+    """
+    return InvestmentAIReport(
+        title="Investment DNA 深度解讀",
+        executive_summary="目前無法產生詳細解讀，這是歷史資料回顧，不是未來行情預測。",
+        strengths=[],
+        watchouts=[],
+        market_moments=[],
+        suggested_questions=[SuggestedQuestion(id=key, label=value) for key, value in QUESTION_LABELS.items()],
+        source="fallback",
+        versions={
+            "context": CONTEXT_VERSION,
+            "model": str(context.get("model_version", "unavailable")),
+            "prompt": PROMPT_VERSION,
+        },
+        generated_at=datetime.now(UTC),
+    )
+
+
 def _safe(report: InvestmentAIReport, allowed_refs: set[str]) -> bool:
     text = json.dumps(report.model_dump(mode="json"), ensure_ascii=False)
     refs = [ref for section in [*report.strengths, *report.watchouts, *report.market_moments] for ref in section.evidence_refs]
@@ -106,7 +138,11 @@ def _safe(report: InvestmentAIReport, allowed_refs: set[str]) -> bool:
 
 
 def generate_report(context: dict[str, Any], client: Any | None, settings: Settings) -> InvestmentAIReport:
-    fallback = _fallback_report(context)
+    try:
+        fallback = _fallback_report(context)
+    except Exception:  # noqa: BLE001 — the deterministic fallback must never bubble a 500.
+        logger.warning("AI fallback report construction failed; using minimal report", exc_info=True)
+        return _minimal_report(context)
     if client is None or not settings.bedrock_enabled:
         return fallback
     try:

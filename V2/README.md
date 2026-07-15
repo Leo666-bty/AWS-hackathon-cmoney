@@ -57,7 +57,8 @@ React + TypeScript Frontend
 - 根目錄 workspace、Python 共用 virtual environment 設定與前後端測試／建置指令。
 
 部署程式已完成：`api + web + postgres` 由 Docker Compose 在單一 EC2
-執行，且已實際上線（單機 Compose）。Bedrock `openai.gpt-oss-120b` Converse
+執行，且已實際上線（單機 Compose；正式 runtime 驗收仍待進行）。Bedrock
+`openai.gpt-oss-120b-1:0` Converse
 介面與後端已整合，但 `bedrock_enabled` 預設 false、目前走 deterministic
 fallback，真實 Bedrock runtime（EC2 IAM Role）尚未實測驗證；所有失敗路徑
 保留 fallback。尚未完成的是 HTTPS／自訂網域、CMoney SSO 與即時行情 feed

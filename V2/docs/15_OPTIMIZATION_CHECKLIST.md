@@ -47,11 +47,13 @@
 
 ### 2.6 已知小型程式落差（P0 收尾候選，非行為阻擋）
 
-以下為已定位、不影響目前 Demo 主流程（Bedrock 預設 false）的已知落差，記錄於此以維持文件誠實：
+以下為已定位、不影響目前 Demo 主流程（Bedrock 預設 false，或僅在重訓時觸發）的已知落差，記錄於此以維持文件誠實。均屬純訓練期或 Bedrock 開啟後才會顯現，故排在 P0 收尾之後。
 
-- **AI Deep Dive guardrail 過度攔截**：`ai/deep_dive.py` 的 `FORBIDDEN` 以子字串比對封鎖「買進」「賣出」，會連合法的歷史敘述（如「買進月份」）一併判為違規而退回 fallback。屬 Bedrock 啟用後才會顯現的偽陽性；建議改為 token/語意層級或詞界比對。
-- **AI cache key 未含 `feature_version`**：`cache_key()` 目前以 `context_version|model_version|prompt_version` 組成；`model_version` 變動時已能失效，但 `feature_version` 單獨變動未直接反映。建議顯式納入。
-- **離線 feature 測試 vacuous pass**：`apps/ai-training/tests/test_features.py` 的 `data_dir` 指向 `V1/data/...`（實際 CSV 在 `V2/data/...`），且 `if not data_dir.exists(): return`，因此該測試目前是空過。修正路徑（`parents[3] / "data/..."`）後才會真正驗證 pipeline。
+- **AI Deep Dive guardrail 過度攔截**：`ai/deep_dive.py` 的 `FORBIDDEN` 以子字串比對封鎖「買進」「賣出」，會連合法的歷史敘述（如「買進月份」）一併判為違規而退回 fallback；且 `_safe()` 只作用於 Bedrock 輸出、不作用於 fallback 本身。屬 Bedrock 啟用後才會顯現的偽陽性；建議改為 token/語意層級或詞界比對。
+- **離線 feature 測試 vacuous pass ＋ 其掩蓋的 NaN fallback bug**：`apps/ai-training/tests/test_features.py` 的 `data_dir` 指向 `V1/data/...`（實際 CSV 在 `V2/data/...`），且 `if not data_dir.exists(): return`，因此該測試目前空過。它掩蓋了 `features.py` 的 `group["daily_return"].std(ddof=0) or 0.0` / `drawdown.min() or 0.0` —— Python `float('nan') or 0.0` 會回傳 `nan` 而非 `0.0`（NaN 為真值），使原本想「無法計算時歸零」的 fallback 從未生效（該 row 後續被 `dropna` 整筆丟棄）。觸發條件極窄（某 stock-month 無任何有效 `daily_return`），現有 3,584-context artifact 大概率未受影響。修正測試路徑（`parents[3] / "data/..."`）後才會真正驗證。
+- **pipeline balance-gate 靜默放行 ＋ 假 provenance**：`pipeline.py` 的 `max(balanced or candidates, ...)` 在無任何候選通過 ≤75% gate 時，會靜默退回未過濾候選，但 metadata 的 `selection_policy` 仍無條件宣稱套用了 gate。現有 artifact 最大群 34.46% 遠低於門檻故為 latent，但屬對文件宣稱的 provenance 落差；建議加旗標並補 `test_pipeline.py`。
+
+> 已於本輪（收尾）修正、不再列為落差：AI cache key 現已納入 artifact `content_sha256`（重訓即失效，不再 stale-forever）；`save_ai_report` 快取寫入失敗改為 best-effort（已產生的報告仍回傳，不再 503）；`_fallback_report` 具例外邊界（退回最小報告）；兩支 AI 端點會攔截 `ValidationError`；新增雙身份 cross-member 隔離測試。
 
 ## 3. P2：取得真實互動資料後評估
 

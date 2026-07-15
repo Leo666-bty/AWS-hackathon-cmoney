@@ -41,6 +41,10 @@ class MarketContextRepository:
     def model_version(self) -> str | None:
         return self._artifact.metadata.model_version if self._artifact else None
 
+    @property
+    def content_sha256(self) -> str | None:
+        return self._artifact.content_sha256 if self._artifact else None
+
     def get(self, stock_id: str, month: str) -> MarketContextEvidence | None:
         if self._artifact is None:
             return None

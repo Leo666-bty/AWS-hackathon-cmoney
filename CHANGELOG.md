@@ -1,5 +1,15 @@
 # Changelog & Product Journey
 
+## 2026-07-15 — V2.12：AI Deep Dive 稽核收尾與文件全面對齊
+
+- 對 V2.11 AI 功能碼做嚴苛程式稽核：確認跨會員權限隔離、月份 key 正規化、無 secret／SQLi 皆正確；修正四個 hardening bug。
+- `save_ai_report` 快取寫入失敗改為 best-effort：已產生的報告仍回傳，不再因缺 migration 欄位或 DB 抖動而 503 丟棄有效報告。
+- AI cache key 納入 artifact `content_sha256`：重訓即使未 bump `MODEL_VERSION` 也會失效，消除 stale-forever。
+- `_fallback_report` 加上例外邊界（退回最小報告），兩支 AI 端點攔截 `ValidationError`，兌現「一定有 deterministic fallback、不裸 500」的文件保證。
+- 補雙身份 cross-member 隔離測試與快取失敗測試；Python 67 tests 綠。
+- 全面對齊所有 `V2/` Markdown 與根 `README/CHANGELOG`：端點數（12→14）、測試數（60→65／67）、ai-training「未訓練」敘述、部署拓撲（Vercel→單機 EC2 Compose）、Bedrock「已線上驗證」過度宣稱、EC2 上線狀態的三方不一致、Bedrock 完整 model ID，以及根 README 的 demo 連結改指本機啟動。
+- 未處理（進 `15_OPTIMIZATION_CHECKLIST §2.6` backlog，均屬訓練期或 Bedrock-only、不影響 Demo）：guardrail 子字串誤擋、`features.py` NaN fallback、pipeline balance-gate provenance。
+
 ## 2026-07-15 — V2.11：AI P0 實作、前後端整合與可驗證市場情境
 
 - 將 `14_AI_MINIMAL_INTEGRATION_SPEC.md` 從規劃更新為已實作／已驗證，並同步修正 Project Charter、Pitch、Implementation、Architecture、Training、Deployment 與 End-to-End Spec。
