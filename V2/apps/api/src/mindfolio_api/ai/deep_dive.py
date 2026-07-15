@@ -26,7 +26,17 @@ QUESTION_LABELS: dict[QuestionId, str] = {
     "most-influential-trade": "哪筆交易最影響結果？",
     "why-anomalous-month": "哪個買進月份最不尋常？",
 }
-FORBIDDEN = ("買進", "賣出", "加碼", "減碼", "目標價", "保證獲利", "焦慮診斷")
+# Block investment ADVICE, guarantees and pseudo-diagnosis — not the bare words
+# 買進/賣出, which are core historical-reconstruction vocabulary appearing
+# throughout legitimate narratives (this whole product is about past buy/sell
+# months, e.g. the card title "緯創的買進月份"). Guarding the bare words rejected
+# almost every valid Bedrock report and silently forced the fallback. We still
+# block the phrasings that would actually constitute regulated investment advice.
+FORBIDDEN = (
+    "建議買", "建議賣", "應該買", "應該賣", "可以買", "可以賣",
+    "現在買", "現在賣", "加碼", "減碼", "目標價", "保證獲利",
+    "穩賺", "必漲", "必跌", "焦慮診斷",
+)
 
 
 def build_context(report: dict[str, Any], market: MarketContextRepository) -> dict[str, Any]:
